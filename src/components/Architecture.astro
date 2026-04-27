@@ -115,7 +115,7 @@
                     </div>
                     <div>
                         <h3 class="font-display text-2xl font-medium text-ink">Flight Software</h3>
-                        <p class="text-ink-dim text-sm font-mono">Dual-computer architecture</p>
+                        <p class="text-ink-dim text-sm font-mono">ESP32-first flight software</p>
                     </div>
                 </div>
 
@@ -123,10 +123,11 @@
                 <p class="text-ink-muted text-sm leading-relaxed mb-6 text-justify">
                     An ESP32 handles all mission-critical work in
                     <strong class="text-ink-soft">no_std Rust</strong>, ADCS on CPU1,
-                    comms scheduler on CPU0, with a hardware watchdog chip monitoring liveness.
-                    A Raspberry Pi Zero 2W manages the camera payload and protein experiment,
-                    talking to the ESP over UART; its comms interface is also written in Rust for
-                    reusability. Images are JPEG/AVIF compressed on-board and chunked for RF streaming.
+                    comms scheduling on CPU0, with a hardware watchdog chip monitoring liveness.
+                    The current simplification path is to keep imagery on the ESP32 using a camera
+                    module that can emit JPEG frames directly, then store and chunk those images for
+                    RF downlink. A Raspberry Pi Zero 2W remains under evaluation only as a secondary
+                    camera computer, watchdogged by the ESP32 ULP if it is used.
                 </p>
 
 
@@ -146,7 +147,7 @@
             </span>
 
                         <span class="text-ink text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
-              Raspberry Pi Zero 2W
+              TBD · ESP32 or Pi helper
             </span>
                     </div>
                     <div class="spec-row">
@@ -155,16 +156,16 @@
             </span>
 
                         <span class="text-ink text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
-              RPi Cam 3 Wide AF · 720p
+              JPEG payload camera · TBD
             </span>
                     </div>
                     <div class="spec-row">
             <span class="text-ink-muted text-xs sm:text-sm w-1/2 text-center sm:text-left">
-              IPC
+              Image Handling
             </span>
 
                         <span class="text-ink text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
-              UART bridge
+              Onboard storage + chunking
             </span>
                     </div>
                     <div class="spec-row">
@@ -191,30 +192,31 @@
                     </div>
                     <div>
                         <h3 class="font-display text-2xl font-medium text-ink">Communications</h3>
-                        <p class="text-ink-dim text-sm font-mono">UHF GMSK · SatNOGS downlink</p>
+                        <p class="text-ink-dim text-sm font-mono">UHF GMSK · SatNOGS-ready downlink</p>
                     </div>
                 </div>
 
 
                 <p class="text-ink-muted text-sm leading-relaxed mb-6 text-justify">
-                    Primary downlink over UHF GMSK to the global SatNOGS receiver network.
-                    Doppler correction is bootstrapped autonomously: FFT centroid analysis
-                    on a received heartbeat waveforms is cross-referenced with SatNOGS receipt
-                    timestamps to derive orbital TLEs, which means no reliance on NORAD is required.
-                    A bidirectional link enables TLE uplink and command injection.
-                    Multi-band omnidirectional antenna (UHF/L/S) based on partial-ground-plane
-                    loop design, co-integrated with the CubeSat structure.
+                    The communications baseline has moved away from LoRa/SX radios and toward a
+                    flight-proven UHF GMSK transceiver for heartbeats, telemetry, commands, and
+                    image chunks. SatNOGS provides the primary public downlink path, with partner
+                    ground-station support under evaluation. First-contact Doppler handling starts
+                    with catalog TLEs when available; if not, SatNOGS range searching and FFT
+                    centroid analysis of heartbeat waveforms can recover the orbit for later passes.
+                    A compact omnidirectional antenna design is being evaluated for structure-level
+                    integration near the transceiver.
                 </p>
 
 
                 <div class="space-y-0 font-mono text-xs">
                     <div class="spec-row">
             <span class="text-ink-muted text-xs sm:text-sm w-1/2 text-center sm:text-left">
-              Frequency
+              Band
             </span>
 
                         <span class="text-ink text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
-              UHF · 435–438 MHz
+              UHF amateur satellite band
             </span>
                     </div>
                     <div class="spec-row">
@@ -232,7 +234,7 @@
             </span>
 
                         <span class="text-ink text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
-              SatNOGS global
+              SatNOGS + partner GS
             </span>
                     </div>
                     <div class="spec-row">
@@ -241,16 +243,16 @@
             </span>
 
                         <span class="text-accent text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
-              Pulsar-UTRX (candidate)
+              Pulsar-UTRX / AX100-class
             </span>
                     </div>
                     <div class="spec-row">
             <span class="text-ink-muted text-xs sm:text-sm w-1/2 text-center sm:text-left">
-              TX Power
+              Bus / Rate
             </span>
 
                         <span class="text-ink text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
-              ≤ 100 mW (no PA)
+              I²C or PC/104 · 9600 baud
             </span>
                     </div>
                 </div>
@@ -276,8 +278,8 @@
                 <p class="text-ink-muted text-sm leading-relaxed mb-6 text-justify">
                     Master power from a 4P3S pack of twelve 21700-format Li-ion cells
                     stepped down to a 5 V satellite bus. Twelve 10x10 cm solar panels
-                    (three per long face) borth charge the pack and serve as coarse sun sensors
-                    vis shunt-resistor current measurement. A custom relay-based power
+                    (three per long face) both charge the pack and serve as coarse sun sensors
+                    via shunt-resistor current measurement. A custom relay-based power
                     controller enforces priority-ranked load shedding under low-battery conditions.
                     Kapton tape and aluminized thermal blanketing insulate the battery from
                     orbital temperature extremes.
@@ -327,7 +329,7 @@
             </span>
 
                         <span class="text-ink text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
-              UHF · 435–438 MHz
+              Kapton + aluminized blankets
             </span>
                     </div>
                 </div>
