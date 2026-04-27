@@ -1,0 +1,328 @@
+<section id="architecture" class="relative bg-orbit py-32">
+    <div class="absolute inset-0 grid-bg opacity-20 pointer-events-none"></div>
+
+
+    <div class="max-w-7xl mx-auto px-6 relative">
+
+
+        <div class="reveal mb-20">
+            <div class="section-label">
+                <span class="font-mono text-xs text-accent tracking-widest uppercase">Technical Architecture</span>
+            </div>
+            <h2 class="section-title mb-5">
+                Engineering from first principles
+            </h2>
+            <p class="text-ink-muted max-w-3xl text-lg leading-relaxed">
+                Every subsystem is designed in-house, from the hand-wound copper magnetorquers
+                to the <code class="text-ink-soft font-mono text-sm">no_std</code> Rust flight software.
+                Here's what makes PixelSat I tick.
+            </p>
+        </div>
+
+
+        <div class="grid md:grid-cols-2 gap-8 justify-center">
+
+
+            <!-- ADCS -->
+            <div class="feature-card reveal">
+                <div class="flex gap-4 mb-6">
+                    <div class="icon-tile">
+                        <!-- gyroscope icon -->
+                        <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" stroke-width="1.5"/>
+                            <circle cx="12" cy="12" r="4" stroke-width="1.5"/>
+                            <path stroke-linecap="round" stroke-width="1.5" d="M12 2v4M12 18v4M2 12h4M18 12h4"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-display text-2xl font-medium text-ink">ADCS</h3>
+                        <p class="text-ink-dim text-sm font-mono">Attitude Determination & Control</p>
+                    </div>
+                </div>
+
+
+                <p class="text-ink-muted text-sm leading-relaxed mb-6 text-justify">
+                    Three-axis attitude control via custom air-core magnetorquers wound by hand from
+                    enamel copper wire on polycarbonate bobbins (PLA/PETG ruled out — softens in use).
+                    Torque follows <strong class="text-ink-soft">τ = m × B</strong> where
+                    <strong class="text-ink-soft">m = N·I·A</strong>.
+                    H-bridge MOSFETs flip 11.1 V across each coil; closed-loop PWM with current sensing
+                    compensates for resistance drift as wire heats in vacuum.
+                    An Extended Kalman Filter on ESP32 CPU1 fuses IMU, magnetometer,
+                    and coarse sun sensors continuously.
+                </p>
+
+
+                <div class="space-y-0 font-mono text-xs">
+                    <div class="spec-row">
+            <span class="text-ink-muted text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              ADS Algorithm
+            </span>
+
+                        <span class="text-ink text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              EKF · IMU + Mag (Adafruit 9 DOF IMU) and Sun Sensor
+            </span>
+                    </div>
+                    <div class="spec-row">
+            <span class="text-ink-muted text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              ACS Actuators
+            </span>
+
+                        <span class="text-ink text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              3× air-core magnetorquers
+            </span>
+                    </div>
+                    <div class="spec-row">
+            <span class="text-ink-muted text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              Power Budget
+            </span>
+
+                        <span class="text-accent text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              3 W total · 1 W / torquer
+            </span>
+                    </div>
+                    <div class="spec-row">
+            <span class="text-ink-muted text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              Torquer Drive
+            </span>
+
+                        <span class="text-ink text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              H-bridge + closed-loop PWM
+            </span>
+                    </div>
+                    <div class="flex justify-between py-2">
+            <span class="text-ink-muted text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              Simulation
+            </span>
+
+                        <span class="text-ink text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              Basilisk
+            </span>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Flight Software -->
+            <div class="feature-card reveal [transition-delay:.08s]">
+                <div class="flex gap-4 mb-6">
+                    <div class="icon-tile">
+                        <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <rect x="2" y="3" width="20" height="14" rx="2" stroke-width="1.5"/>
+                            <path stroke-linecap="round" stroke-width="1.5" d="M8 21h8M12 17v4"/>
+                            <path stroke-linecap="round" stroke-width="1.5" d="M7 9l2 2-2 2M13 13h2"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-display text-2xl font-medium text-ink">Flight Software</h3>
+                        <p class="text-ink-dim text-sm font-mono">ESP32-first flight software</p>
+                    </div>
+                </div>
+
+
+                <p class="text-ink-muted text-sm leading-relaxed mb-6 text-justify">
+                    An ESP32 handles all mission-critical work in
+                    <strong class="text-ink-soft">no_std Rust</strong>, ADCS on CPU1,
+                    comms scheduling on CPU0, with a hardware watchdog chip monitoring liveness.
+                    The current simplification path is to keep imagery on the ESP32 using a camera
+                    module that can emit JPEG frames directly, then store and chunk those images for
+                    RF downlink. A Raspberry Pi Zero 2W remains under evaluation only as a secondary
+                    camera computer, watchdogged by the ESP32 ULP if it is used.
+                </p>
+
+
+                <div class="space-y-0 font-mono text-xs">
+                    <div class="spec-row">
+            <span class="text-ink-muted text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              Mission CPU
+            </span>
+
+                        <span class="text-ink text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              ESP32 · no_std Rust
+            </span>
+                    </div>
+                    <div class="spec-row">
+            <span class="text-ink-muted text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              Payload CPU
+            </span>
+
+                        <span class="text-ink text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              TBD (if any) · ESP32 or Pi helper
+            </span>
+                    </div>
+                    <div class="spec-row">
+            <span class="text-ink-muted text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              Camera
+            </span>
+
+            <span class="text-ink text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              JPEG payload camera · TBD
+            </span>
+                    </div>
+                    <div class="spec-row">
+            <span class="text-ink-muted text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              Image Handling
+            </span>
+
+                        <span class="text-ink text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              Onboard storage + chunking
+            </span>
+                    </div>
+                    <div class="spec-row">
+            <span class="text-ink-muted text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              Fault Tolerance
+            </span>
+
+                        <span class="text-accent text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              WDT chip + ESP ULP watchdog
+            </span>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Communications -->
+            <div class="feature-card reveal [transition-delay:.16s]">
+                <div class="flex gap-4 mb-6">
+                    <div class="icon-tile">
+                        <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                  d="M8.111 16.404a5.5 5.5 0 0 1 7.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-display text-2xl font-medium text-ink">Communications</h3>
+                        <p class="text-ink-dim text-sm font-mono">UHF LoRa · w/ TinyGS-ready downlink</p>
+                    </div>
+                </div>
+
+
+                <p class="text-ink-muted text-sm leading-relaxed mb-6 text-justify">
+                    To maintain reliability and remain under budget we intent to use LoRa/SX radios and toward a
+                    flight-proven UHF LoRa transceiver for heartbeats, telemetry, commands, and image chunks.
+                    TinyGS provides the downlink path, with partner ground-station support under evaluation.
+                    A compact omnidirectional antenna design is being evaluated for structure-level integration near the transceiver.
+                </p>
+
+
+                <div class="space-y-0 font-mono text-xs">
+                    <div class="spec-row">
+            <span class="text-ink-muted text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              Band
+            </span>
+
+                        <span class="text-ink text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              UHF amateur satellite band
+            </span>
+                    </div>
+                    <div class="spec-row">
+            <span class="text-ink-muted text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              Modulation
+            </span>
+
+                        <span class="text-ink text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              LoRa
+            </span>
+                    </div>
+            <div class="spec-row">
+            <span class="text-ink-muted text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              Ground Network
+            </span>
+
+                        <span class="text-ink text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              TinyGS
+            </span>
+                    </div>
+                    <div class="spec-row">
+            <span class="text-ink-muted text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              Transceiver
+            </span>
+
+                        <span class="text-accent text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              Semtech SX1262
+            </span>
+                    </div>
+                    </div>
+                </div>
+
+
+            <!-- Power & Electrical -->
+            <div class="feature-card reveal [transition-delay:.24s]">
+                <div class="flex gap-4 mb-6">
+                    <div class="icon-tile">
+                        <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                  d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-display text-2xl font-medium text-ink">Power & Electrical</h3>
+                        <p class="text-ink-dim text-sm font-mono">4P3S Li-ion + solar array</p>
+                    </div>
+                </div>
+
+
+                <p class="text-ink-muted text-sm leading-relaxed mb-6 text-justify">
+                    Master power from a 4P3S pack of twelve 21700-format Li-ion cells
+                    stepped down to a 5 V satellite bus. Twelve 10x10 cm solar panels
+                    (three per long face) both charge the pack and serve as coarse sun sensors
+                    via shunt-resistor current measurement. A custom relay-based power
+                    controller enforces priority-ranked load shedding under low-battery conditions.
+                    Kapton tape and aluminized thermal blanketing insulate the battery from
+                    orbital temperature extremes.
+                </p>
+
+
+                <div class="space-y-0 font-mono text-xs">
+                    <div class="spec-row">
+            <span class="text-ink-muted text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              Battery
+            </span>
+
+                        <span class="text-ink text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              4P3S · 12× 21700 Li-ion
+            </span>
+                    </div>
+                    <div class="spec-row">
+            <span class="text-ink-muted text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              Bus Voltage
+            </span>
+
+                        <span class="text-ink text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              11.1 V → 5 V regulated
+            </span>
+                    </div>
+                    <div class="spec-row">
+            <span class="text-ink-muted text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              Solar Array
+            </span>
+
+                        <span class="text-ink text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              12× 10 cm² · 3 per long side
+            </span>
+                    </div>
+                    <div class="spec-row">
+            <span class="text-ink-muted text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              Sun Sensing
+            </span>
+
+                        <span class="text-accent text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              Coarse via panel shunts
+            </span>
+                    </div>
+                    <div class="spec-row">
+            <span class="text-ink-muted text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              Thermal
+            </span>
+
+                        <span class="text-ink text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              Kapton + aluminized blankets
+            </span>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</section>
