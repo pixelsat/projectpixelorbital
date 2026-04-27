@@ -5,10 +5,10 @@
 
 
     <div class="reveal mb-20">
-      <div class="sec-label">
+      <div class="mb-[18px] flex items-center gap-2.5 before:block before:h-px before:w-7 before:bg-amber-glow before:content-['']">
         <span class="font-mono text-xs text-amber-glow tracking-widest uppercase">Mission Overview</span>
       </div>
-      <h2 class="font-display font-light text-frost-100" style="font-size:clamp(2.5rem,6vw,4.5rem)">
+      <h2 class="font-display font-light text-frost-100 text-[clamp(2.5rem,6vw,4.5rem)]">
         Why we're going to orbit
       </h2>
     </div>
@@ -23,7 +23,7 @@
 
       <!-- Objectives -->
       <div class="space-y-5 max-w-md mx-auto lg:max-w-none lg:mx-0">
-        <div class="glass rounded-2xl p-7 card-hover reveal">
+        <div class="border border-sp-500/90 bg-sp-800/75 backdrop-blur-[14px] rounded-2xl p-7 transition-[translate,border-color,box-shadow] duration-300 ease-out hover:-translate-y-[5px] hover:border-amber-glow/30 hover:shadow-[0_22px_44px_rgba(0,0,0,.35),0_0_36px_rgba(240,192,96,.06)] reveal">
           <div class="flex flex-col items-center text-center gap-4 lg:flex-row lg:items-start lg:text-left lg:gap-5">
             <span class="font-mono text-5xl font-bold text-amber-glow/20 leading-none shrink-0">01</span>
             <div>
@@ -40,7 +40,7 @@
 
 
 
-        <div class="glass rounded-2xl p-7 card-hover reveal" style="transition-delay:.08s">
+        <div class="border border-sp-500/90 bg-sp-800/75 backdrop-blur-[14px] rounded-2xl p-7 transition-[translate,border-color,box-shadow] duration-300 ease-out hover:-translate-y-[5px] hover:border-amber-glow/30 hover:shadow-[0_22px_44px_rgba(0,0,0,.35),0_0_36px_rgba(240,192,96,.06)] reveal [transition-delay:.08s]">
           <div class="flex flex-col items-center text-center gap-4 lg:flex-row lg:items-start lg:text-left lg:gap-5">
             <span class="font-mono text-5xl font-bold text-amber-glow/20 leading-none shrink-0">02</span>
             <div>
@@ -57,7 +57,7 @@
 
 
 
-        <div class="glass rounded-2xl p-7 card-hover reveal" style="transition-delay:.16s">
+        <div class="border border-sp-500/90 bg-sp-800/75 backdrop-blur-[14px] rounded-2xl p-7 transition-[translate,border-color,box-shadow] duration-300 ease-out hover:-translate-y-[5px] hover:border-amber-glow/30 hover:shadow-[0_22px_44px_rgba(0,0,0,.35),0_0_36px_rgba(240,192,96,.06)] reveal [transition-delay:.16s]">
           <div class="flex flex-col items-center text-center gap-4 lg:flex-row lg:items-start lg:text-left lg:gap-5">
             <span class="font-mono text-5xl font-bold text-amber-glow/20 leading-none shrink-0">03</span>
             <div>
@@ -74,7 +74,7 @@
 
 
 
-        <div class="glass rounded-2xl p-7 card-hover reveal" style="transition-delay:.24s">
+        <div class="border border-sp-500/90 bg-sp-800/75 backdrop-blur-[14px] rounded-2xl p-7 transition-[translate,border-color,box-shadow] duration-300 ease-out hover:-translate-y-[5px] hover:border-amber-glow/30 hover:shadow-[0_22px_44px_rgba(0,0,0,.35),0_0_36px_rgba(240,192,96,.06)] reveal [transition-delay:.24s]">
           <div class="flex flex-col items-center text-center gap-4 lg:flex-row lg:items-start lg:text-left lg:gap-5">
             <span class="font-mono text-5xl font-bold text-amber-glow/20 leading-none shrink-0">04</span>
             <div>
@@ -93,12 +93,11 @@
 
 
       <!-- Telemetry panel -->
-      <div class="reveal" style="transition-delay:.2s">
-        <div class="glass rounded-2xl overflow-hidden relative scanlines">
+      <div class="reveal [transition-delay:.2s]">
+        <div class="border border-sp-500/90 bg-sp-800/75 backdrop-blur-[14px] rounded-2xl overflow-hidden relative after:pointer-events-none after:absolute after:inset-0 after:bg-[repeating-linear-gradient(0deg,transparent,transparent_3px,rgba(0,0,0,.04)_3px,rgba(0,0,0,.04)_4px)] after:content-['']">
         
           <!-- Header bar -->
-          <div class="flex items-center justify-between px-6 py-3 border-b"
-               style="background:rgba(22,35,60,.7);border-color:var(--border)">
+          <div class="flex items-center justify-between border-b border-sp-500/90 bg-sp-600/70 px-6 py-3">
             <div class="flex items-center gap-2">
               <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
               <span class="font-mono text-xs text-frost-500 tracking-widest">PIXELSAT-I · MISSION DATA</span>
@@ -110,7 +109,7 @@
 
 
           <!-- Satellite render -->
-          <div class="flex justify-center py-10 border-b" style="background:rgba(7,12,26,.5);border-color:var(--border)">
+          <div class="flex justify-center border-b border-sp-500/90 bg-sp-900/50 py-10">
             <img src="https://static.wixstatic.com/media/a77f8c_f2f26de146da4524891674b0307de824~mv2.png/v1/fill/w_360,h_540,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/a77f8c_f2f26de146da4524891674b0307de824~mv2.png"
                  alt="PixelSat I 3U CubeSat render"
                  class="h-52 w-auto object-contain opacity-90 drop-shadow-2xl">
@@ -121,29 +120,29 @@
 
           <!-- Specs table -->
           <div class="px-6 py-4 space-y-0 font-mono text-[11px] sm:text-xs">
-            <div class="flex justify-between py-2.5 border-b" style="border-color:rgba(30,46,71,.55)">
+            <div class="flex justify-between border-b border-sp-500/55 py-2.5">
               <span class="text-frost-500">Form Factor</span>
               <span class="text-amber-glow block text-right ml-auto">
                 3U CubeSat · 100×100×300 mm
               </span>
             </div>
-            <div class="flex justify-between py-2.5 border-b" style="border-color:rgba(30,46,71,.55)">
+            <div class="flex justify-between border-b border-sp-500/55 py-2.5">
               <span class="text-frost-500">Target Mass</span>
               <span class="text-frost-100">&lt; 6 kg</span>
             </div>
-            <div class="flex justify-between py-2.5 border-b" style="border-color:rgba(30,46,71,.55)">
+            <div class="flex justify-between border-b border-sp-500/55 py-2.5">
               <span class="text-frost-500">Orbit</span>
               <span class="text-frost-100">Sun-Synchronous LEO</span>
             </div>
-            <div class="flex justify-between py-2.5 border-b" style="border-color:rgba(30,46,71,.55)">
+            <div class="flex justify-between border-b border-sp-500/55 py-2.5">
               <span class="text-frost-500">Launch Date</span>
               <span class="text-amber-glow">NET November 2026</span>
             </div>
-            <div class="flex justify-between py-2.5 border-b" style="border-color:rgba(30,46,71,.55)">
+            <div class="flex justify-between border-b border-sp-500/55 py-2.5">
               <span class="text-frost-500">Structure</span>
               <span class="text-frost-100">3D-printed PPS-CF</span>
             </div>
-            <div class="flex justify-between py-2.5 border-b" style="border-color:rgba(30,46,71,.55)">
+            <div class="flex justify-between border-b border-sp-500/55 py-2.5">
               <span class="text-frost-500">Comms</span>
               <span class="text-frost-100">UHF · 435–438 MHz GMSK</span>
             </div>
@@ -158,21 +157,21 @@
         
         <!-- Stats -->
 <div class="grid grid-cols-3 gap-4 mt-5">
-  <div class="glass rounded-xl p-4 flex flex-col items-center justify-center text-center card-hover">
+  <div class="border border-sp-500/90 bg-sp-800/75 backdrop-blur-[14px] rounded-xl p-4 flex flex-col items-center justify-center text-center transition-[translate,border-color,box-shadow] duration-300 ease-out hover:-translate-y-[5px] hover:border-amber-glow/30 hover:shadow-[0_22px_44px_rgba(0,0,0,.35),0_0_36px_rgba(240,192,96,.06)]">
     <div class="font-mono text-2xl text-amber-glow font-bold">18+</div>
     <div class="text-center text-[9px] sm:text-xs text-frost-700 tracking-wide mt-1 leading-tight block">
       Team Members
     </div>
   </div>
 
-  <div class="glass rounded-xl p-4 flex flex-col items-center justify-center text-center card-hover">
+  <div class="border border-sp-500/90 bg-sp-800/75 backdrop-blur-[14px] rounded-xl p-4 flex flex-col items-center justify-center text-center transition-[translate,border-color,box-shadow] duration-300 ease-out hover:-translate-y-[5px] hover:border-amber-glow/30 hover:shadow-[0_22px_44px_rgba(0,0,0,.35),0_0_36px_rgba(240,192,96,.06)]">
     <div class="font-mono text-2xl text-amber-glow font-bold">5</div>
     <div class="text-center text-[9px] sm:text-xs text-frost-700 tracking-wide mt-1 leading-tight block">
       Subsystems
     </div>
   </div>
 
-  <div class="glass rounded-xl p-4 flex flex-col items-center justify-center text-center card-hover">
+  <div class="border border-sp-500/90 bg-sp-800/75 backdrop-blur-[14px] rounded-xl p-4 flex flex-col items-center justify-center text-center transition-[translate,border-color,box-shadow] duration-300 ease-out hover:-translate-y-[5px] hover:border-amber-glow/30 hover:shadow-[0_22px_44px_rgba(0,0,0,.35),0_0_36px_rgba(240,192,96,.06)]">
     <div class="font-mono text-2xl text-amber-glow font-bold">0</div>
     <div class="text-center text-[9px] sm:text-xs text-frost-700 tracking-wide mt-1 leading-tight block">
       Adult Supervisors

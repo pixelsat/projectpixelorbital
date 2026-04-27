@@ -2,39 +2,30 @@
   <!-- Starfield -->
   <canvas id="starfield" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
   <!-- Grid -->
-  <div class="absolute inset-0 bg-grid opacity-25 pointer-events-none"></div>
+  <div class="absolute inset-0 bg-grid-space bg-[length:64px_64px] opacity-25 pointer-events-none"></div>
   <!-- Radial vignette -->
-  <div class="absolute inset-0 pointer-events-none"
-       style="background:radial-gradient(ellipse 80% 80% at 50% 50%, transparent 40%, #040710 100%)"></div>
+  <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_80%_80%_at_50%_50%,transparent_40%,#040710_100%)]"></div>
 
 
 
 
   <!-- Orbital rings -->
   <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-    <div class="relative" style="width:min(80vw, 580px); height:min(80vw, 580px);">
+    <div class="relative h-[min(80vw,580px)] w-[min(80vw,580px)]">
       <!-- Earth-like planet -->
-      <div class="orbit-ring" style="width:110px;height:110px;margin:-55px;
-           background:radial-gradient(circle at 35% 32%, #1B3B60, #060E1A 72%);
-           box-shadow:0 0 50px rgba(59,130,246,.14), inset 0 0 20px rgba(0,0,0,.6)">
+      <div class="absolute left-1/2 top-1/2 -m-[55px] size-[110px] origin-center rounded-full bg-[radial-gradient(circle_at_35%_32%,#1B3B60,#060E1A_72%)] shadow-[0_0_50px_rgba(59,130,246,.14),inset_0_0_20px_rgba(0,0,0,.6)]">
       </div>
       <!-- Ring 1 – outermost dashed -->
-      <div class="orbit-ring orbit-ring-1" style="width:540px;height:540px;margin:-270px;
-           border:1px dashed rgba(30,46,71,.55);
-           transform:translate(-50%,-50%) rotate(0deg) perspective(800px) rotateX(60deg)">
+      <div class="absolute left-1/2 top-1/2 -m-[270px] size-[540px] origin-center animate-spin-cw rounded-full border border-dashed border-sp-500/55 [transform:translate(-50%,-50%)_rotate(0deg)_perspective(800px)_rotateX(60deg)]">
       </div>
       <!-- Ring 2 – medium -->
-      <div class="orbit-ring orbit-ring-2" style="width:380px;height:380px;margin:-190px;
-           border:1px solid rgba(240,192,96,.10);
-           transform:translate(-50%,-50%) rotate(30deg) perspective(800px) rotateX(55deg)">
+      <div class="absolute left-1/2 top-1/2 -m-[190px] size-[380px] origin-center animate-spin-ccw rounded-full border border-amber-glow/10 [transform:translate(-50%,-50%)_rotate(30deg)_perspective(800px)_rotateX(55deg)]">
       </div>
       <!-- Ring 3 – inner (satellite travels on this) -->
-      <div class="orbit-ring orbit-ring-3" style="width:430px;height:430px;margin:-215px;
-           border:1px solid rgba(91,171,255,.12);
-           transform:translate(-50%,-50%) rotate(15deg)">
+      <div class="absolute left-1/2 top-1/2 -m-[215px] size-[430px] origin-center animate-spin-med rounded-full border border-blue-300/10 [transform:translate(-50%,-50%)_rotate(15deg)]">
       </div>
       <!-- Satellite dot -->
-      <div class="sat-dot"></div>
+      <div class="absolute left-1/2 top-1/2 -m-[3.5px] size-[7px] animate-sat-travel rounded-full bg-amber-glow shadow-[0_0_10px_4px_rgba(240,192,96,.55)] [--r:210px] max-md:[--r:130px]"></div>
     </div>
   </div>
 
@@ -44,7 +35,7 @@
   <!-- Hero content -->
   <div class="relative z-10 text-center px-6 w-full max-w-[1400px] mx-auto">
     <!-- Badge -->
-    <div class="fi fi-1 inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full glass mt-12 sm:mt-0 mb-6 sm:mb-10 reveal card-hover" style="transition-delay:.1s">
+    <div class="inline-flex animate-fade-up items-center gap-1.5 rounded-full border border-sp-500/90 bg-sp-800/75 px-3 py-1.5 opacity-0 backdrop-blur-[14px] [animation-delay:.10s] [animation-fill-mode:forwards] sm:mt-0 sm:gap-2 sm:px-4 sm:py-2 mt-12 mb-6 sm:mb-10 reveal transition-[translate,border-color,box-shadow] duration-300 ease-out hover:-translate-y-[5px] hover:border-amber-glow/30 hover:shadow-[0_22px_44px_rgba(0,0,0,.35),0_0_36px_rgba(240,192,96,.06)] [transition-delay:.1s]">
       <div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-amber-glow animate-pulse"></div>
       <span class="font-mono text-[10px] sm:text-xs text-frost-500 tracking-wide sm:tracking-widest uppercase">
         Targeting SSO · NET Nov 2026
@@ -55,19 +46,17 @@
 
 
     <!-- Title -->
-    <h1 class="fi fi-2 font-display font-light tracking-tight mb-3 hero-glow grad-amber"
-        style="font-size:clamp(4rem,12vw,9rem);line-height:1.0">
+    <h1 class="mb-3 animate-fade-up bg-[linear-gradient(130deg,#F5D070_0%,#E0A838_45%,#FFE8A0_100%)] bg-clip-text font-display text-[clamp(4rem,12vw,9rem)] font-light leading-none tracking-tight text-transparent opacity-0 [animation-delay:.28s] [animation-fill-mode:forwards] [text-shadow:0_0_60px_rgba(240,192,96,.35)]">
       PixelSat I
     </h1>
   
-    <p class="fi fi-3 font-display text-base sm:text-lg md:text-3xl italic text-frost-500 mb-5 md:mb-8 leading-snug">
+    <p class="mb-5 animate-fade-up font-display text-base italic leading-snug text-frost-500 opacity-0 [animation-delay:.46s] [animation-fill-mode:forwards] sm:text-lg md:mb-8 md:text-3xl">
       <span class="block">A 3U CubeSat. Built by</span>
       <span class="block">high schoolers. Launched from Earth.</span>
     </p>
   
     <div class="mx-auto max-w-[85%] sm:max-w-md md:max-w-2xl px-2">
-      <p class="fi fi-4 text-frost-500 text-xs sm:text-sm md:text-lg
-                 mb-8 md:mb-14 leading-relaxed">
+      <p class="mb-8 animate-fade-up text-xs leading-relaxed text-frost-500 opacity-0 [animation-delay:.64s] [animation-fill-mode:forwards] sm:text-sm md:mb-14 md:text-lg">
         Project Pixel Orbital is a student-led CubeSat team at Stanford Online High
         School proving that lean, 3D-printed, COTS-driven hardware can reach and operate
         in low Earth orbit, on only a $10,000 materials budget.
@@ -78,8 +67,7 @@
 
 
     <!-- Live countdown -->
-    <div class="fi fi-5 inline-flex gap-2 md:gap-10 glass rounded-2xl px-3 md:px-12 py-3 md:py-6 mb-12 reveal card-hover"
-   style="transition-delay:.1s">
+    <div class="mb-12 inline-flex animate-fade-up gap-2 rounded-2xl border border-sp-500/90 bg-sp-800/75 px-3 py-3 opacity-0 backdrop-blur-[14px] [animation-delay:.82s] [animation-fill-mode:forwards] md:gap-10 md:px-12 md:py-6 reveal transition-[translate,border-color,box-shadow] duration-300 ease-out hover:-translate-y-[5px] hover:border-amber-glow/30 hover:shadow-[0_22px_44px_rgba(0,0,0,.35),0_0_36px_rgba(240,192,96,.06)] [transition-delay:.1s]">
 
 
 
@@ -137,13 +125,13 @@
 
 
     <!-- CTAs -->
-    <div class="fi fi-6 flex flex-col sm:flex-row items-center justify-center gap-4">
+    <div class="flex animate-fade-up flex-col items-center justify-center gap-4 opacity-0 [animation-delay:1s] [animation-fill-mode:forwards] sm:flex-row">
       <a href="#mission"
-         class="px-8 py-3.5 donate-btn rounded font-medium tracking-wide text-sm">
+         class="px-8 py-3.5 bg-amber-glow text-sp-950 transition-[background,translate,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:bg-[#F5D070] hover:shadow-[0_16px_40px_rgba(240,192,96,.25)] rounded font-medium tracking-wide text-sm">
         Explore the Mission
       </a>
       <a href="https://www.gofundme.com/f/support-project-pixel-orbital-student-team" target="_blank"
-         class="px-8 py-3.5 glass rounded font-medium tracking-wide text-sm text-frost-300
+         class="px-8 py-3.5 border border-sp-500/90 bg-sp-800/75 backdrop-blur-[14px] rounded font-medium tracking-wide text-sm text-frost-300
                 hover:border-amber-glow/40 hover:text-amber-glow transition-all">
         Support Our Launch →
       </a>
@@ -156,6 +144,6 @@
   <!-- Scroll hint -->
   <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 opacity-35">
     <span class="font-mono text-xs text-frost-500 tracking-widest uppercase">Scroll</span>
-    <div class="w-px h-10" style="background:linear-gradient(180deg,#7A8CAF,transparent)"></div>
+    <div class="h-10 w-px bg-[linear-gradient(180deg,#7A8CAF,transparent)]"></div>
   </div>
 </section>
