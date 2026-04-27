@@ -1,0 +1,162 @@
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━ HERO ━━━━━━━━━━━━━━━━━━━━━━━ -->
+<section class="relative min-h-screen flex items-center justify-center overflow-hidden">
+  <!-- Starfield -->
+  <canvas id="starfield" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
+  <!-- Grid -->
+  <div class="absolute inset-0 bg-grid opacity-25 pointer-events-none"></div>
+  <!-- Radial vignette -->
+  <div class="absolute inset-0 pointer-events-none"
+       style="background:radial-gradient(ellipse 80% 80% at 50% 50%, transparent 40%, #040710 100%)"></div>
+
+
+
+
+  <!-- Orbital rings -->
+  <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
+    <div class="relative" style="width:min(80vw, 580px); height:min(80vw, 580px);">
+      <!-- Earth-like planet -->
+      <div class="orbit-ring" style="width:110px;height:110px;margin:-55px;
+           background:radial-gradient(circle at 35% 32%, #1B3B60, #060E1A 72%);
+           box-shadow:0 0 50px rgba(59,130,246,.14), inset 0 0 20px rgba(0,0,0,.6)">
+      </div>
+      <!-- Ring 1 – outermost dashed -->
+      <div class="orbit-ring orbit-ring-1" style="width:540px;height:540px;margin:-270px;
+           border:1px dashed rgba(30,46,71,.55);
+           transform:translate(-50%,-50%) rotate(0deg) perspective(800px) rotateX(60deg)">
+      </div>
+      <!-- Ring 2 – medium -->
+      <div class="orbit-ring orbit-ring-2" style="width:380px;height:380px;margin:-190px;
+           border:1px solid rgba(240,192,96,.10);
+           transform:translate(-50%,-50%) rotate(30deg) perspective(800px) rotateX(55deg)">
+      </div>
+      <!-- Ring 3 – inner (satellite travels on this) -->
+      <div class="orbit-ring orbit-ring-3" style="width:430px;height:430px;margin:-215px;
+           border:1px solid rgba(91,171,255,.12);
+           transform:translate(-50%,-50%) rotate(15deg)">
+      </div>
+      <!-- Satellite dot -->
+      <div class="sat-dot"></div>
+    </div>
+  </div>
+
+
+
+
+  <!-- Hero content -->
+  <div class="relative z-10 text-center px-6 w-full max-w-[1400px] mx-auto">
+    <!-- Badge -->
+    <div class="fi fi-1 inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full glass mt-12 sm:mt-0 mb-6 sm:mb-10 reveal card-hover" style="transition-delay:.1s">
+      <div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-amber-glow animate-pulse"></div>
+      <span class="font-mono text-[10px] sm:text-xs text-frost-500 tracking-wide sm:tracking-widest uppercase">
+        Targeting SSO · NET Nov 2026
+      </span>
+    </div>
+
+
+
+
+    <!-- Title -->
+    <h1 class="fi fi-2 font-display font-light tracking-tight mb-3 hero-glow grad-amber"
+        style="font-size:clamp(4rem,12vw,9rem);line-height:1.0">
+      PixelSat I
+    </h1>
+  
+    <p class="fi fi-3 font-display text-base sm:text-lg md:text-3xl italic text-frost-500 mb-5 md:mb-8 leading-snug">
+      <span class="block">A 3U CubeSat. Built by</span>
+      <span class="block">high schoolers. Launched from Earth.</span>
+    </p>
+  
+    <div class="mx-auto max-w-[85%] sm:max-w-md md:max-w-2xl px-2">
+      <p class="fi fi-4 text-frost-500 text-xs sm:text-sm md:text-lg
+                 mb-8 md:mb-14 leading-relaxed">
+        Project Pixel Orbital is a student-led CubeSat team at Stanford Online High
+        School proving that lean, 3D-printed, COTS-driven hardware can reach and operate
+        in low Earth orbit, on only a $10,000 materials budget.
+      </p>
+    </div>
+
+
+
+
+    <!-- Live countdown -->
+    <div class="fi fi-5 inline-flex gap-2 md:gap-10 glass rounded-2xl px-3 md:px-12 py-3 md:py-6 mb-12 reveal card-hover"
+   style="transition-delay:.1s">
+
+
+
+
+<div class="text-center">
+  <div id="cd-days" class="font-mono text-xl md:text-4xl text-amber-glow font-bold tabular-nums">000</div>
+  <div class="text-[10px] md:text-xs text-frost-700 tracking-widest uppercase mt-1">Days</div>
+</div>
+
+
+
+
+<div class="text-frost-700 text-xl md:text-3xl font-mono self-center">:</div>
+
+
+
+
+<div class="text-center">
+  <div id="cd-hours" class="font-mono text-xl md:text-4xl text-amber-glow font-bold tabular-nums">00</div>
+  <div class="text-[10px] md:text-xs text-frost-700 tracking-widest uppercase mt-1">Hrs</div>
+</div>
+
+
+
+
+<div class="text-frost-700 text-xl md:text-3xl font-mono self-center">:</div>
+
+
+
+
+<div class="text-center">
+  <div id="cd-mins" class="font-mono text-xl md:text-4xl text-amber-glow font-bold tabular-nums">00</div>
+  <div class="text-[10px] md:text-xs text-frost-700 tracking-widest uppercase mt-1">Min</div>
+</div>
+
+
+
+
+<div class="text-frost-700 text-xl md:text-3xl font-mono self-center">:</div>
+
+
+
+
+<div class="text-center">
+  <div id="cd-secs" class="font-mono text-xl md:text-4xl text-amber-glow font-bold tabular-nums">00</div>
+  <div class="text-[10px] md:text-xs text-frost-700 tracking-widest uppercase mt-1">Sec</div>
+</div>
+
+
+
+
+</div>
+
+
+
+
+    <!-- CTAs -->
+    <div class="fi fi-6 flex flex-col sm:flex-row items-center justify-center gap-4">
+      <a href="#mission"
+         class="px-8 py-3.5 donate-btn rounded font-medium tracking-wide text-sm">
+        Explore the Mission
+      </a>
+      <a href="https://www.gofundme.com/f/support-project-pixel-orbital-student-team" target="_blank"
+         class="px-8 py-3.5 glass rounded font-medium tracking-wide text-sm text-frost-300
+                hover:border-amber-glow/40 hover:text-amber-glow transition-all">
+        Support Our Launch →
+      </a>
+    </div>
+  </div>
+
+
+
+
+  <!-- Scroll hint -->
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 opacity-35">
+    <span class="font-mono text-xs text-frost-500 tracking-widest uppercase">Scroll</span>
+    <div class="w-px h-10" style="background:linear-gradient(180deg,#7A8CAF,transparent)"></div>
+  </div>
+</section>

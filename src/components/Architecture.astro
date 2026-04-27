@@ -1,0 +1,433 @@
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━ ARCHITECTURE ━━━━━━━━━━━━━━━━━━━━━━━ -->
+<section id="architecture" class="py-32 relative" style="background:#070C1A">
+  <div class="absolute inset-0 bg-grid opacity-20 pointer-events-none"></div>
+
+
+
+
+  <div class="max-w-7xl mx-auto px-6 relative">
+
+
+
+
+    <div class="reveal mb-20">
+      <div class="sec-label">
+        <span class="font-mono text-xs text-amber-glow tracking-widest uppercase">Technical Architecture</span>
+      </div>
+      <h2 class="font-display font-light text-frost-100 mb-5" style="font-size:clamp(2.5rem,6vw,4.5rem)">
+        Engineering from first principles
+      </h2>
+      <p class="text-frost-500 max-w-3xl text-lg leading-relaxed">
+        Every subsystem is designed in-house, from the hand-wound copper magnetorquers
+        to the <code class="text-frost-300 font-mono text-sm">no_std</code> Rust flight software.
+        Here's what makes PixelSat I tick.
+      </p>
+    </div>
+
+
+
+
+    <div class="grid md:grid-cols-2 gap-8 justify-center">
+
+
+
+
+      <!-- ADCS -->
+      <div class="glass rounded-2xl p-8 card-hover reveal">
+        <div class="flex gap-4 mb-6">
+          <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+               style="background:rgba(22,35,60,.8);border:1px solid var(--border)">
+            <!-- gyroscope icon -->
+            <svg class="w-6 h-6 text-amber-glow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10" stroke-width="1.5"/>
+              <circle cx="12" cy="12" r="4"  stroke-width="1.5"/>
+              <path stroke-linecap="round" stroke-width="1.5" d="M12 2v4M12 18v4M2 12h4M18 12h4"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-display text-2xl font-medium text-frost-100">ADCS</h3>
+            <p class="text-frost-700 text-sm font-mono">Attitude Determination & Control</p>
+          </div>
+        </div>
+
+
+
+
+        <p class="text-frost-500 text-sm leading-relaxed mb-6 text-justify">
+          Three-axis attitude control via custom air-core magnetorquers wound by hand from
+          enamel copper wire on polycarbonate bobbins (PLA/PETG ruled out — softens in use).
+          Torque follows <strong class="text-frost-300">τ = m × B</strong> where
+          <strong class="text-frost-300">m = N·I·A</strong>.
+          H-bridge MOSFETs flip 11.1 V across each coil; closed-loop PWM with current sensing
+          compensates for resistance drift as wire heats in vacuum.
+          An Extended Kalman Filter on ESP32 CPU1 fuses IMU, magnetometer,
+          and coarse sun sensors continuously.
+        </p>
+
+
+
+
+        <div class="space-y-0 font-mono text-xs">
+          <div class="flex justify-between items-center py-2 border-b gap-4" style="border-color:rgba(30,46,71,.55)">
+            <span class="text-frost-500 text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              ADS Algorithm
+            </span>
+        
+            <span class="text-frost-100 text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              EKF · IMU + Mag + Sun sensors
+            </span>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b gap-4" style="border-color:rgba(30,46,71,.55)">
+            <span class="text-frost-500 text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              ACS Actuators
+            </span>
+        
+            <span class="text-frost-100 text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              3× air-core magnetorquers
+            </span>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b gap-4" style="border-color:rgba(30,46,71,.55)">
+            <span class="text-frost-500 text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              Power Budget
+            </span>
+        
+            <span class="text-amber-glow text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              3 W total · 1 W / torquer
+            </span>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b gap-4" style="border-color:rgba(30,46,71,.55)">
+            <span class="text-frost-500 text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              Torquer Drive
+            </span>
+        
+            <span class="text-frost-100 text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              H-bridge + closed-loop PWM
+            </span>
+          </div>
+          <div class="flex justify-between py-2">
+            <span class="text-frost-500 text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              Simulation
+            </span>
+        
+            <span class="text-frost-100 text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              Basilisk (C++) + Zenoh
+            </span>
+          </div>
+        </div>
+      </div>
+
+
+
+
+      <!-- Flight Software -->
+      <div class="glass rounded-2xl p-8 card-hover reveal" style="transition-delay:.08s">
+        <div class="flex gap-4 mb-6">
+          <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+               style="background:rgba(22,35,60,.8);border:1px solid var(--border)">
+            <svg class="w-6 h-6 text-amber-glow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <rect x="2" y="3" width="20" height="14" rx="2" stroke-width="1.5"/>
+              <path stroke-linecap="round" stroke-width="1.5" d="M8 21h8M12 17v4"/>
+              <path stroke-linecap="round" stroke-width="1.5" d="M7 9l2 2-2 2M13 13h2"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-display text-2xl font-medium text-frost-100">Flight Software</h3>
+            <p class="text-frost-700 text-sm font-mono">Dual-computer architecture</p>
+          </div>
+        </div>
+
+
+
+
+        <p class="text-frost-500 text-sm leading-relaxed mb-6 text-justify">
+          An ESP32 handles all mission-critical work in
+          <strong class="text-frost-300">no_std Rust</strong>, ADCS on CPU1,
+          comms scheduler on CPU0, with a hardware watchdog chip monitoring liveness.
+          A Raspberry Pi Zero 2W manages the camera payload and protein experiment,
+          talking to the ESP over UART; its comms interface is also written in Rust for
+          reusability. Images are JPEG/AVIF compressed on-board and chunked for RF streaming.
+        </p>
+
+
+
+
+        <div class="space-y-0 font-mono text-xs">
+          <div class="flex justify-between items-center py-2 border-b gap-4" style="border-color:rgba(30,46,71,.55)">
+            <span class="text-frost-500 text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              Mission CPU
+            </span>
+        
+            <span class="text-frost-100 text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              ESP32 · no_std Rust
+            </span>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b gap-4" style="border-color:rgba(30,46,71,.55)">
+            <span class="text-frost-500 text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              Payload CPU
+            </span>
+        
+            <span class="text-frost-100 text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              Raspberry Pi Zero 2W
+            </span>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b gap-4" style="border-color:rgba(30,46,71,.55)">
+            <span class="text-frost-500 text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              Camera
+            </span>
+        
+            <span class="text-frost-100 text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              RPi Cam 3 Wide AF · 720p
+            </span>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b gap-4" style="border-color:rgba(30,46,71,.55)">
+            <span class="text-frost-500 text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              IPC
+            </span>
+        
+            <span class="text-frost-100 text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              UART bridge
+            </span>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b gap-4" style="border-color:rgba(30,46,71,.55)">
+            <span class="text-frost-500 text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              Fault Tolerance
+            </span>
+        
+            <span class="text-amber-glow text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              WDT chip + ESP ULP watchdog
+            </span>
+          </div>
+        </div>
+      </div>
+
+
+
+
+      <!-- Communications -->
+      <div class="glass rounded-2xl p-8 card-hover reveal" style="transition-delay:.16s">
+        <div class="flex gap-4 mb-6">
+          <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+               style="background:rgba(22,35,60,.8);border:1px solid var(--border)">
+            <svg class="w-6 h-6 text-amber-glow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                    d="M8.111 16.404a5.5 5.5 0 0 1 7.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-display text-2xl font-medium text-frost-100">Communications</h3>
+            <p class="text-frost-700 text-sm font-mono">UHF GMSK · SatNOGS downlink</p>
+          </div>
+        </div>
+
+
+
+
+        <p class="text-frost-500 text-sm leading-relaxed mb-6 text-justify">
+          Primary downlink over UHF GMSK to the global SatNOGS receiver network.
+          Doppler correction is bootstrapped autonomously: FFT centroid analysis
+          on a received heartbeat waveforms is cross-referenced with SatNOGS receipt
+          timestamps to derive orbital TLEs, which means no reliance on NORAD is required.
+          A bidirectional link enables TLE uplink and command injection.
+          Multi-band omnidirectional antenna (UHF/L/S) based on partial-ground-plane
+          loop design, co-integrated with the CubeSat structure.
+        </p>
+
+
+
+
+        <div class="space-y-0 font-mono text-xs">
+          <div class="flex justify-between items-center py-2 border-b gap-4" style="border-color:rgba(30,46,71,.55)">
+            <span class="text-frost-500 text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              Frequency
+            </span>
+        
+            <span class="text-frost-100 text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              UHF · 435–438 MHz
+            </span>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b gap-4" style="border-color:rgba(30,46,71,.55)">
+            <span class="text-frost-500 text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              Modulation
+            </span>
+        
+            <span class="text-frost-100 text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              GMSK (primary)
+            </span>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b gap-4" style="border-color:rgba(30,46,71,.55)">
+            <span class="text-frost-500 text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              Ground Network
+            </span>
+        
+            <span class="text-frost-100 text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              SatNOGS global
+            </span>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b gap-4" style="border-color:rgba(30,46,71,.55)">
+            <span class="text-frost-500 text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              Transceiver
+            </span>
+        
+            <span class="text-amber-glow text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              Pulsar-UTRX (candidate)
+            </span>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b gap-4" style="border-color:rgba(30,46,71,.55)">
+            <span class="text-frost-500 text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              TX Power
+            </span>
+        
+            <span class="text-frost-100 text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              ≤ 100 mW (no PA)
+            </span>
+          </div>
+        </div>
+      </div>
+
+
+
+
+      <!-- Power & Electrical -->
+      <div class="glass rounded-2xl p-8 card-hover reveal" style="transition-delay:.24s">
+        <div class="flex gap-4 mb-6">
+          <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+               style="background:rgba(22,35,60,.8);border:1px solid var(--border)">
+            <svg class="w-6 h-6 text-amber-glow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-display text-2xl font-medium text-frost-100">Power & Electrical</h3>
+            <p class="text-frost-700 text-sm font-mono">4P3S Li-ion + solar array</p>
+          </div>
+        </div>
+
+
+
+
+        <p class="text-frost-500 text-sm leading-relaxed mb-6 text-justify">
+          Master power from a 4P3S pack of twelve 21700-format Li-ion cells
+          stepped down to a 5 V satellite bus. Twelve 10x10 cm solar panels 
+          (three per long face) borth charge the pack and serve as coarse sun sensors
+          vis shunt-resistor current measurement. A custom relay-based power
+          controller enforces priority-ranked load shedding under low-battery conditions.
+          Kapton tape and aluminized thermal blanketing insulate the battery from 
+          orbital temperature extremes.
+        </p>
+
+
+
+
+        <div class="space-y-0 font-mono text-xs">
+          <div class="flex justify-between items-center py-2 border-b gap-4" style="border-color:rgba(30,46,71,.55)">
+            <span class="text-frost-500 text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              Battery
+            </span>
+        
+            <span class="text-frost-100 text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              4P3S · 12× 21700 Li-ion
+            </span>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b gap-4" style="border-color:rgba(30,46,71,.55)">
+            <span class="text-frost-500 text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              Bus Voltage
+            </span>
+        
+            <span class="text-frost-100 text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              11.1 V → 5 V regulated
+            </span>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b gap-4" style="border-color:rgba(30,46,71,.55)">
+            <span class="text-frost-500 text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              Solar Array
+            </span>
+        
+            <span class="text-frost-100 text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              12× 10 cm² · 3 per long side
+            </span>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b gap-4" style="border-color:rgba(30,46,71,.55)">
+            <span class="text-frost-500 text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              Sun Sensing
+            </span>
+        
+            <span class="text-amber-glow text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              Coarse via panel shunts
+            </span>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b gap-4" style="border-color:rgba(30,46,71,.55)">
+            <span class="text-frost-500 text-xs sm:text-sm w-1/2 text-center sm:text-left">
+              Thermal
+            </span>
+        
+            <span class="text-frost-100 text-xs sm:text-sm w-1/2 text-center sm:text-right break-words">
+              UHF · 435–438 MHz
+            </span>
+          </div>
+        </div>
+      </div>
+
+
+
+
+    </div>
+
+
+
+
+    <!-- Simulation pipeline callout -->
+     <div class="mt-10 glass rounded-2xl p-8 reveal card-hover w-full col-span-full"
+          style="transition-delay:.1s">
+         <div class="flex flex-col lg:flex-row gap-10 items-center lg:items-start w-full">
+        <div class="flex-1">
+          <div class="sec-label">
+            <span class="font-mono text-xs text-amber-glow tracking-widest uppercase">Ground Simulation Pipeline</span>
+          </div>
+          <h3 class="font-display text-3xl font-light text-frost-100 mb-3">
+            Testing the EKF before the first orbit
+          </h3>
+          <p class="text-frost-500 text-sm leading-relaxed">
+            ADCS routines are validated pre-flight in a
+            <strong class="text-frost-300">Basilisk</strong> astrodynamics simulation,
+            a high-performance C++ engine with Python bindings.
+            Simulation nodes exchange satellite attitude/orbit state and raw virtual
+            sensor data over <strong class="text-frost-300">Zenoh</strong>,
+            a publish-subscribe protocol.
+            The control interface accepts <code class="text-frost-300 font-mono">applyTorque</code>
+            and <code class="text-frost-300 font-mono">applyMagneticDipole</code> commands,
+            allowing the complete EKF pipeline to be stress-tested against simulated sensor
+            noise and disturbance torques long before any hardware leaves the ground.
+          </p>
+        </div>
+
+
+
+
+        <!-- Fake terminal -->
+        <div class="font-mono text-xs rounded-xl p-5 shrink-0 lg:w-80"
+             style="background:#040710;border:1px solid var(--border)">
+          <div class="text-amber-glow mb-3">$ python run_sim.py --mission adcs</div>
+          <div class="space-y-1 text-frost-500">
+            <div><span class="text-green-400">[zenoh]</span> peer: adcs_node ✓</div>
+            <div><span class="text-green-400">[zenoh]</span> peer: basilisk_core ✓</div>
+            <div><span class="text-blue-400">[adcs]</span>  EKF initialized · σ=0.02</div>
+            <div><span class="text-blue-400">[adcs]</span>  detumble sequence start</div>
+            <div class="pl-4 text-frost-700">→ applyMagneticDipole(0.4, -0.2, 0.6)</div>
+            <div class="pl-4 text-frost-700">→ applyMagneticDipole(0.3, -0.1, 0.5)</div>
+            <div><span class="text-blue-400">[adcs]</span>  ω = [0.02, 0.01, 0.03] rad/s</div>
+            <div><span class="text-green-400">[sim] </span> ω &lt; threshold — stable</div>
+            <div class="flex items-center gap-1.5 mt-2">
+              <span class="text-green-400">✓</span>
+              <span class="text-frost-300">detumble success</span>
+              <span class="cursor-blink"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+
+  </div>
+</section>
