@@ -1,81 +1,81 @@
 <script>
-  const countdownIds = ['cd-days', 'cd-hours', 'cd-mins', 'cd-secs'];
-  const [daysEl, hoursEl, minsEl, secsEl] = countdownIds.map((id) => document.getElementById(id));
+    const countdownIds = ['cd-days', 'cd-hours', 'cd-mins', 'cd-secs'];
+    const [daysEl, hoursEl, minsEl, secsEl] = countdownIds.map((id) => document.getElementById(id));
 
-  if (daysEl && hoursEl && minsEl && secsEl) {
-    const tick = () => {
-      const target = new Date('2026-11-01T00:00:00Z');
-      const diff = Math.max(0, target.getTime() - Date.now());
-      const d = Math.floor(diff / 86400000);
-      const h = Math.floor((diff % 86400000) / 3600000);
-      const m = Math.floor((diff % 3600000) / 60000);
-      const s = Math.floor((diff % 60000) / 1000);
+    if (daysEl && hoursEl && minsEl && secsEl) {
+        const tick = () => {
+            const target = new Date('2026-11-01T00:00:00Z');
+            const diff = Math.max(0, target.getTime() - Date.now());
+            const d = Math.floor(diff / 86400000);
+            const h = Math.floor((diff % 86400000) / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
 
-      daysEl.textContent = String(d).padStart(3, '0');
-      hoursEl.textContent = String(h).padStart(2, '0');
-      minsEl.textContent = String(m).padStart(2, '0');
-      secsEl.textContent = String(s).padStart(2, '0');
-    };
+            daysEl.textContent = String(d).padStart(3, '0');
+            hoursEl.textContent = String(h).padStart(2, '0');
+            minsEl.textContent = String(m).padStart(2, '0');
+            secsEl.textContent = String(s).padStart(2, '0');
+        };
 
-    tick();
-    setInterval(tick, 1000);
-  }
-
-  const canvas = document.getElementById('starfield');
-  if (canvas instanceof HTMLCanvasElement) {
-    const ctx = canvas.getContext('2d');
-
-    if (ctx) {
-      const resize = () => {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-      };
-
-      resize();
-      window.addEventListener('resize', resize);
-
-      const stars = Array.from({ length: 220 }, () => ({
-        x: Math.random(),
-        y: Math.random(),
-        r: Math.random() * 1.1 + 0.25,
-        a: Math.random() * 0.55 + 0.15,
-        ph: Math.random() * Math.PI * 2,
-        sp: Math.random() * 0.006 + 0.002,
-      }));
-
-      let t = 0;
-      const frame = () => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        t += 0.012;
-
-        for (const star of stars) {
-          const alpha = star.a * (0.55 + 0.45 * Math.sin(star.ph + t * star.sp * 60));
-          ctx.beginPath();
-          ctx.arc(star.x * canvas.width, star.y * canvas.height, star.r, 0, 6.283);
-          ctx.fillStyle = `rgba(195,215,255,${alpha})`;
-          ctx.fill();
-        }
-
-        requestAnimationFrame(frame);
-      };
-
-      frame();
+        tick();
+        setInterval(tick, 1000);
     }
-  }
 
-  const revealEls = document.querySelectorAll('.reveal, .team-member');
-  if ('IntersectionObserver' in window) {
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('up');
-          io.unobserve(entry.target);
+    const canvas = document.getElementById('starfield');
+    if (canvas instanceof HTMLCanvasElement) {
+        const ctx = canvas.getContext('2d');
+
+        if (ctx) {
+            const resize = () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            };
+
+            resize();
+            window.addEventListener('resize', resize);
+
+            const stars = Array.from({length: 220}, () => ({
+                x: Math.random(),
+                y: Math.random(),
+                r: Math.random() * 1.1 + 0.25,
+                a: Math.random() * 0.55 + 0.15,
+                ph: Math.random() * Math.PI * 2,
+                sp: Math.random() * 0.006 + 0.002,
+            }));
+
+            let t = 0;
+            const frame = () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                t += 0.012;
+
+                for (const star of stars) {
+                    const alpha = star.a * (0.55 + 0.45 * Math.sin(star.ph + t * star.sp * 60));
+                    ctx.beginPath();
+                    ctx.arc(star.x * canvas.width, star.y * canvas.height, star.r, 0, 6.283);
+                    ctx.fillStyle = `rgba(195,215,255,${alpha})`;
+                    ctx.fill();
+                }
+
+                requestAnimationFrame(frame);
+            };
+
+            frame();
         }
-      });
-    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+    }
 
-    revealEls.forEach((el) => io.observe(el));
-  } else {
-    revealEls.forEach((el) => el.classList.add('up'));
-  }
+    const revealEls = document.querySelectorAll('.reveal, .team-member');
+    if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('up');
+                    io.unobserve(entry.target);
+                }
+            });
+        }, {threshold: 0.1, rootMargin: '0px 0px -40px 0px'});
+
+        revealEls.forEach((el) => io.observe(el));
+    } else {
+        revealEls.forEach((el) => el.classList.add('up'));
+    }
 </script>
