@@ -24,11 +24,11 @@
     .stat-card,
     .simulation-card,
     .fund-badge {
-        @apply transition-[translate, border-color, box-shadow] duration-300 ease-out hover:-translate-y-[5px] hover:border-accent/30 hover:shadow-card-hover;
+        @apply transition-all duration-300 ease-out hover:-translate-y-[5px] hover:border-accent/30 hover:shadow-card-hover;
     }
 
     .donate-btn {
-        @apply bg-accent text-void transition-[background, translate, box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:bg-accent-pale hover:shadow-donate-glow;
+        @apply bg-accent text-void transition-all duration-200 ease-out hover:-translate-y-0.5 hover:bg-accent-pale hover:shadow-donate-glow;
     }
 
     .nav-shell {
@@ -53,7 +53,7 @@
 
     .reveal,
     .team-member {
-        @apply translate-y-6 opacity-0 transition-[opacity, translate] duration-[650ms] ease-out;
+        @apply translate-y-6 opacity-0 transition-all duration-[650ms] ease-out;
     }
 
     .reveal.up,
