@@ -1,5 +1,5 @@
 <section id="timeline" class="relative bg-sp-900 py-32">
-  <div class="absolute inset-0 bg-grid-space bg-[length:64px_64px] opacity-20 pointer-events-none"></div>
+  <div class="absolute inset-0 grid-bg opacity-20 pointer-events-none"></div>
 
 
 
@@ -10,10 +10,10 @@
 
 
     <div class="reveal mb-20">
-      <div class="mb-[18px] flex items-center gap-2.5 before:block before:h-px before:w-7 before:bg-amber-glow before:content-['']">
+      <div class="section-label">
         <span class="font-mono text-xs text-amber-glow tracking-widest uppercase">Mission Timeline</span>
       </div>
-      <h2 class="font-display font-light text-frost-100 text-[clamp(2.5rem,6vw,4.5rem)]">
+      <h2 class="section-title">
         Sequence of events
       </h2>
     </div>
@@ -22,7 +22,7 @@
 
 
     <div class="relative">
-      <div class="absolute bottom-0 left-[23px] top-0 w-px bg-[linear-gradient(180deg,transparent_0%,#1E2E47_15%,#1E2E47_85%,transparent_100%)]"></div>
+      <div class="timeline-line"></div>
 
 
 
@@ -32,8 +32,8 @@
 
         <div class="flex gap-10 reveal">
           <div class="shrink-0 relative z-10">
-            <div class="flex h-12 w-12 items-center justify-center rounded-full border-2 border-amber-glow bg-sp-900">
-              <div class="h-3 w-3 rounded-full bg-amber-glow"></div>
+            <div class="timeline-marker border-amber-glow">
+              <div class="timeline-dot bg-amber-glow"></div>
             </div>
           </div>
           <div>
@@ -50,8 +50,8 @@
 
         <div class="flex gap-10 reveal">
           <div class="shrink-0 relative z-10">
-            <div class="flex h-12 w-12 items-center justify-center rounded-full border-2 border-amber-glow/45 bg-sp-900">
-              <div class="h-3 w-3 rounded-full bg-amber-glow/45"></div>
+            <div class="timeline-marker border-amber-glow/45">
+              <div class="timeline-dot bg-amber-glow/45"></div>
             </div>
           </div>
           <div>
@@ -70,8 +70,8 @@
 
         <div class="flex gap-10 reveal">
           <div class="shrink-0 relative z-10">
-            <div class="flex h-12 w-12 items-center justify-center rounded-full border-2 border-sp-500/90 bg-sp-900">
-              <div class="h-3 w-3 rounded-full bg-sp-500/90"></div>
+            <div class="timeline-marker border-sp-500/90">
+              <div class="timeline-dot bg-sp-500/90"></div>
             </div>
           </div>
           <div>
@@ -90,7 +90,7 @@
 
         <div class="flex gap-10 reveal">
           <div class="shrink-0 relative z-10">
-            <div class="flex h-12 w-12 items-center justify-center rounded-full border-2 border-amber-glow/25 bg-sp-900">
+            <div class="timeline-marker border-amber-glow/25">
               <svg class="h-5 w-5 text-amber-glow/50" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z"/>
               </svg>
@@ -98,7 +98,7 @@
           </div>
           <div>
             <div class="font-mono text-xs text-amber-mid tracking-widest mb-1">NET NOV 2026</div>
-            <h3 class="font-display text-2xl font-medium bg-[linear-gradient(130deg,#F5D070_0%,#E0A838_45%,#FFE8A0_100%)] bg-clip-text text-transparent mb-2">Launch Day</h3>
+            <h3 class="font-display text-2xl font-medium amber-gradient-text mb-2">Launch Day</h3>
             <p class="text-frost-500 text-sm leading-relaxed">
               P-POD deployment, autonomous detumble, first SatNOGS heartbeat contact,
               TLE derivation, bidirectional handshake, and, finally

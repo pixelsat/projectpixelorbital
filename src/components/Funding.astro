@@ -1,5 +1,5 @@
 <section id="fund" class="py-32 relative overflow-hidden">
-  <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_50%,rgba(200,136,40,.055)_0%,transparent_65%)]">
+  <div class="fund-glow">
   </div>
 
 
@@ -11,7 +11,7 @@
 
 
     <div class="reveal">
-      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-sp-500/90 bg-sp-800/75 backdrop-blur-[14px] mb-12 reveal transition-[translate,border-color,box-shadow] duration-300 ease-out hover:-translate-y-[5px] hover:border-amber-glow/30 hover:shadow-[0_22px_44px_rgba(0,0,0,.35),0_0_36px_rgba(240,192,96,.06)] [transition-delay:.1s]">
+      <div class="fund-badge reveal [transition-delay:.1s]">
         <svg class="w-4 h-4 text-amber-glow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                 d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -24,7 +24,7 @@
 
       <h2 class="font-display font-light text-frost-100 mb-8 leading-tight text-[clamp(2.8rem,8vw,6rem)]">
         Help us put<br>
-        <span class="bg-[linear-gradient(130deg,#F5D070_0%,#E0A838_45%,#FFE8A0_100%)] bg-clip-text text-transparent">PixelSat I</span><br>
+        <span class="amber-gradient-text">PixelSat I</span><br>
         into orbit.
       </h2>
 
@@ -43,7 +43,7 @@
 
       <!-- Budget breakdown -->
       <div class="grid md:grid-cols-3 gap-5 mb-14 text-left">
-        <div class="border border-sp-500/90 bg-sp-800/75 backdrop-blur-[14px] rounded-xl p-6 reveal transition-[translate,border-color,box-shadow] duration-300 ease-out hover:-translate-y-[5px] hover:border-amber-glow/30 hover:shadow-[0_22px_44px_rgba(0,0,0,.35),0_0_36px_rgba(240,192,96,.06)] [transition-delay:.1s]">
+        <div class="fund-card reveal [transition-delay:.1s]">
           <div class="font-mono text-amber-glow text-sm mb-2">~$800</div>
           <div class="font-display text-xl text-frost-100 mb-2">Magnetorquers</div>
           <p class="text-frost-500 text-xs md:text-base leading-relaxed">
@@ -51,7 +51,7 @@
             and current-sensing circuitry for 3-axis attitude control.
           </p>
         </div>
-        <div class="border border-sp-500/90 bg-sp-800/75 backdrop-blur-[14px] rounded-xl p-6 reveal transition-[translate,border-color,box-shadow] duration-300 ease-out hover:-translate-y-[5px] hover:border-amber-glow/30 hover:shadow-[0_22px_44px_rgba(0,0,0,.35),0_0_36px_rgba(240,192,96,.06)] [transition-delay:.1s]">
+        <div class="fund-card reveal [transition-delay:.1s]">
           <div class="font-mono text-amber-glow text-sm mb-2">~$1,200</div>
           <div class="font-display text-xl text-frost-100 mb-2">UHF Transceiver</div>
           <p class="text-frost-500 text-xs md:text-base leading-relaxed">
@@ -59,7 +59,7 @@
             km altitude and our SatNOGS ground stations on Earth.
           </p>
         </div>
-        <div class="border border-sp-500/90 bg-sp-800/75 backdrop-blur-[14px] rounded-xl p-6 reveal transition-[translate,border-color,box-shadow] duration-300 ease-out hover:-translate-y-[5px] hover:border-amber-glow/30 hover:shadow-[0_22px_44px_rgba(0,0,0,.35),0_0_36px_rgba(240,192,96,.06)] [transition-delay:.1s]">
+        <div class="fund-card reveal [transition-delay:.1s]">
           <div class="font-mono text-amber-glow text-sm mb-2">~$600</div>
           <div class="font-display text-xl text-frost-100 mb-2">Sensors & PCBs</div>
           <p class="text-frost-500 text-xs md:text-base leading-relaxed">
@@ -73,7 +73,7 @@
 
 
       <a href="https://www.gofundme.com/f/support-project-pixel-orbital-student-team" target="_blank"
-      class="bg-amber-glow text-sp-950 transition-[background,translate,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:bg-[#F5D070] hover:shadow-[0_16px_40px_rgba(240,192,96,.25)] inline-flex items-center gap-2 px-4 py-3 -mt-6 text-sm rounded-xl font-medium tracking-wide sm:mt-0 sm:gap-3 sm:px-10 sm:py-5 sm:text-lg">
+      class="donate-btn inline-flex items-center gap-2 px-4 py-3 -mt-6 text-sm rounded-xl font-medium tracking-wide sm:mt-0 sm:gap-3 sm:px-10 sm:py-5 sm:text-lg">
      Donate on GoFundMe
      <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
