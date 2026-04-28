@@ -1,26 +1,48 @@
 <script>
     const root = document.documentElement;
     const themeToggle = document.getElementById('theme-toggle');
-    const setTheme = (theme, persist = true) => {
-        const nextTheme = theme === 'light' ? 'light' : 'dark';
-        root.dataset.theme = nextTheme;
+    const systemTheme = window.matchMedia('(prefers-color-scheme: light)');
+    const themeModes = ['system', 'light', 'dark'];
+
+    const resolveTheme = (mode) => {
+        if (mode === 'light' || mode === 'dark') return mode;
+        return systemTheme.matches ? 'light' : 'dark';
+    };
+
+    const setThemeMode = (mode, persist = true) => {
+        const nextMode = themeModes.includes(mode) ? mode : 'system';
+        const resolvedTheme = resolveTheme(nextMode);
+        root.dataset.themeMode = nextMode;
+        root.dataset.theme = resolvedTheme;
+
         if (persist) {
             try {
-                localStorage.setItem('pixel-orbital-theme', nextTheme);
+                localStorage.setItem('pixel-orbital-theme', nextMode);
             } catch {
                 // Theme still applies for the current page if storage is unavailable.
             }
         }
+
         if (themeToggle instanceof HTMLButtonElement) {
-            const isLight = nextTheme === 'light';
-            themeToggle.setAttribute('aria-pressed', String(isLight));
-            themeToggle.setAttribute('aria-label', isLight ? 'Switch to dark mode' : 'Switch to light mode');
+            const nextCycleMode = themeModes[(themeModes.indexOf(nextMode) + 1) % themeModes.length];
+            const systemLabel = `system (${resolvedTheme})`;
+            themeToggle.dataset.nextLabel = nextCycleMode;
+            themeToggle.setAttribute(
+                'aria-label',
+                `Theme: ${nextMode === 'system' ? systemLabel : nextMode}. Click to switch to ${nextCycleMode} mode`,
+            );
         }
     };
 
-    setTheme(root.dataset.theme === 'light' ? 'light' : 'dark', false);
+    setThemeMode(root.dataset.themeMode || 'system', false);
     themeToggle?.addEventListener('click', () => {
-        setTheme(root.dataset.theme === 'light' ? 'dark' : 'light');
+        const currentIndex = themeModes.indexOf(root.dataset.themeMode || 'system');
+        setThemeMode(themeModes[(currentIndex + 1) % themeModes.length]);
+    });
+    systemTheme.addEventListener('change', () => {
+        if (root.dataset.themeMode === 'system') {
+            setThemeMode('system', false);
+        }
     });
 
     const countdownIds = ['cd-days', 'cd-hours', 'cd-mins', 'cd-secs'];

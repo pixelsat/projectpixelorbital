@@ -116,27 +116,33 @@
     }
 
     .theme-toggle {
-        @apply relative inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-stroke/80 bg-panel/70 text-ink-muted backdrop-blur-[14px] transition-all duration-300 hover:-translate-y-0.5 hover:border-accent/45 hover:text-accent;
+        @apply relative inline-flex h-10 min-w-18 items-center justify-center gap-1.5 rounded-full border border-stroke/80 bg-panel/70 px-3 text-ink-muted backdrop-blur-[14px] transition-all duration-300 hover:-translate-y-0.5 hover:border-accent/45 hover:text-accent;
     }
 
     .theme-toggle svg {
-        @apply absolute h-4 w-4 transition-all duration-300;
+        @apply h-4 w-4 transition-all duration-300;
     }
 
-    .theme-toggle .sun-icon {
-        @apply translate-y-0 opacity-100 rotate-0;
+    .theme-slash {
+        @apply -mx-0.5 font-mono text-sm text-stroke-bright transition-colors duration-300;
     }
 
-    .theme-toggle .moon-icon {
-        @apply translate-y-6 opacity-0 -rotate-45;
+    :root[data-theme-mode='light'] .theme-toggle .sun-icon,
+    :root[data-theme-mode='dark'] .theme-toggle .moon-icon {
+        @apply text-accent;
     }
 
-    :root[data-theme='light'] .theme-toggle .sun-icon {
-        @apply -translate-y-6 opacity-0 rotate-45;
+    :root[data-theme-mode='light'] .theme-toggle .moon-icon,
+    :root[data-theme-mode='dark'] .theme-toggle .sun-icon {
+        @apply opacity-35;
     }
 
-    :root[data-theme='light'] .theme-toggle .moon-icon {
-        @apply translate-y-0 opacity-100 rotate-0;
+    :root[data-theme-mode='system'] .theme-toggle {
+        @apply border-accent/35;
+    }
+
+    :root[data-theme-mode='system'] .theme-slash {
+        @apply text-accent;
     }
 
     .accent-gradient-text {
