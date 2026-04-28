@@ -127,16 +127,22 @@
         root.rotation.z = -0.08;
         scene.add(root);
 
+        const getPlanetColor = () => document.documentElement.dataset.theme === 'light' ? 0x9fc5ed : 0x315387;
+        const planetMaterial = new THREE.MeshStandardMaterial({
+            color: getPlanetColor(),
+            roughness: 0.50,
+            metalness: 0.40,
+            reflectivity: 0.8,
+        });
         const planet = new THREE.Mesh(
             new THREE.SphereGeometry(0.66, 72, 72),
-            new THREE.MeshStandardMaterial({
-                color: 0x315387,
-                roughness: 0.50,
-                metalness: 0.40,
-                reflectivity: 0.8,
-            }),
+            planetMaterial,
         );
         root.add(planet);
+
+        new MutationObserver(() => {
+            planetMaterial.color.setHex(getPlanetColor());
+        }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
         scene.add(new THREE.AmbientLight(0x9bb7ff, 0.55));
         const keyLight = new THREE.DirectionalLight(0xffe2a0, 1.65);
