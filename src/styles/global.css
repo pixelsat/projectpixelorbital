@@ -104,11 +104,7 @@
     }
 
     .donate-btn {
-        @apply bg-accent text-void transition-all duration-200 ease-out hover:-translate-y-0.5 hover:bg-accent-pale hover:shadow-donate-glow;
-    }
-
-    :root[data-theme='light'] .donate-btn {
-        @apply hover:bg-accent-deep;
+        @apply bg-accent text-void transition-all duration-200 ease-out hover:-translate-y-0.25 hover:bg-accent-deep hover:shadow-donate-glow;
     }
 
     .nav-shell {
