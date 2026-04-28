@@ -6,27 +6,18 @@
     <!-- Radial vignette -->
     <div class="hero-vignette"></div>
 
-    <!-- Orbital rings -->
-    <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-        <div class="hero-orbit-shell">
-            <!-- Earth-like planet -->
-            <div class="planet-core"></div>
-            <!-- Ring 1 – outermost dashed -->
-            <div class="orbit-ring orbit-ring-outer"></div>
-            <!-- Ring 2 – medium -->
-            <div class="orbit-ring orbit-ring-mid"></div>
-            <!-- Ring 3 – inner (satellite travels on this) -->
-            <div class="orbit-ring orbit-ring-inner"></div>
-            <!-- Satellite dot -->
-            <div class="sat-dot"></div>
+    <!-- Three.js orbital visualization -->
+    <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none" aria-hidden="true">
+        <div class="hero-orbit-shell hero-three-shell">
+            <canvas id="hero-orbit-three" class="hero-three-canvas"></canvas>
         </div>
     </div>
 
 
     <!-- Hero content -->
-    <div class="relative z-10 text-center px-6 w-full max-w-[1400px] mx-auto">
+    <div class="relative z-10 text-center px-6 w-full max-w-350 mx-auto">
         <!-- Badge -->
-        <div class="fi fi-1 reveal hero-badge [transition-delay:.1s]">
+        <div class="fi fi-1 reveal hero-badge delay-100 mt-8">
             <div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-accent animate-pulse"></div>
             <span class="font-mono text-[10px] sm:text-xs text-ink-muted tracking-wide sm:tracking-widest uppercase">
         Targeting SSO · NET Nov 2026
@@ -39,13 +30,13 @@
             PixelSat I
         </h1>
 
-        <p class="fi fi-3 mb-5 font-display text-base italic leading-snug text-ink-muted sm:text-lg md:mb-8 md:text-3xl">
+        <p class="fi fi-3 mb-5 font-display text-base leading-snug text-ink sm:text-lg md:mb-8 md:text-3xl">
             <span class="block">A 3U CubeSat. Built by</span>
             <span class="block">high schoolers. Launched from Earth.</span>
         </p>
 
         <div class="mx-auto max-w-[85%] sm:max-w-md md:max-w-2xl px-2">
-            <p class="fi fi-4 mb-8 text-xs leading-relaxed text-ink-muted sm:text-sm md:mb-14 md:text-lg">
+            <p class="fi fi-4 mb-8 text-xs leading-relaxed text-ink sm:text-sm md:mb-14 md:text-lg">
                 Project Pixel Orbital is a student-led CubeSat team at Stanford Online High
                 School proving that lean, 3D-printed, COTS-driven hardware can reach and operate
                 in low Earth orbit, on only a $10,000 materials budget.
@@ -54,39 +45,39 @@
 
 
         <!-- Live countdown -->
-        <div class="fi fi-5 reveal countdown-panel [transition-delay:.1s]">
+        <div class="fi fi-5 reveal countdown-panel backdrop-blur-[2px] delay-100">
 
 
             <div class="text-center">
                 <div id="cd-days" class="font-mono text-xl md:text-4xl text-accent font-bold tabular-nums">000</div>
-                <div class="text-[10px] md:text-xs text-ink-dim tracking-widest uppercase mt-1">Days</div>
+                <div class="text-[10px] md:text-xs text-ink-muted tracking-widest uppercase mt-1">Days</div>
             </div>
 
 
-            <div class="text-ink-dim text-xl md:text-3xl font-mono self-center">:</div>
+            <div class="text-ink-muted text-xl md:text-3xl font-mono self-center">:</div>
 
 
             <div class="text-center">
                 <div id="cd-hours" class="font-mono text-xl md:text-4xl text-accent font-bold tabular-nums">00</div>
-                <div class="text-[10px] md:text-xs text-ink-dim tracking-widest uppercase mt-1">Hrs</div>
+                <div class="text-[10px] md:text-xs text-ink-muted tracking-widest uppercase mt-1">Hrs</div>
             </div>
 
 
-            <div class="text-ink-dim text-xl md:text-3xl font-mono self-center">:</div>
+            <div class="text-ink-muted text-xl md:text-3xl font-mono self-center">:</div>
 
 
             <div class="text-center">
                 <div id="cd-mins" class="font-mono text-xl md:text-4xl text-accent font-bold tabular-nums">00</div>
-                <div class="text-[10px] md:text-xs text-ink-dim tracking-widest uppercase mt-1">Min</div>
+                <div class="text-[10px] md:text-xs text-ink-muted tracking-widest uppercase mt-1">Min</div>
             </div>
 
 
-            <div class="text-ink-dim text-xl md:text-3xl font-mono self-center">:</div>
+            <div class="text-ink-muted text-xl md:text-3xl font-mono self-center">:</div>
 
 
             <div class="text-center">
                 <div id="cd-secs" class="font-mono text-xl md:text-4xl text-accent font-bold tabular-nums">00</div>
-                <div class="text-[10px] md:text-xs text-ink-dim tracking-widest uppercase mt-1">Sec</div>
+                <div class="text-[10px] md:text-xs text-ink-muted tracking-widest uppercase mt-1">Sec</div>
             </div>
 
 
@@ -106,3 +97,161 @@
         </div>
     </div>
 </section>
+
+<script>
+    import * as THREE from 'three';
+
+    const canvas = document.getElementById('hero-orbit-three');
+
+    if (canvas instanceof HTMLCanvasElement) {
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const scene = new THREE.Scene();
+        const renderer = new THREE.WebGLRenderer({
+            canvas,
+            alpha: true,
+            antialias: true,
+            powerPreference: 'high-performance',
+        });
+
+        renderer.setClearColor(0x000000, 0);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.05;
+
+        const camera = new THREE.OrthographicCamera(-3, 3, 3, -3, 0.1, 30);
+        camera.position.set(0, 0, 8);
+        camera.lookAt(0, 0, 0);
+
+        const root = new THREE.Group();
+        root.rotation.z = -0.08;
+        scene.add(root);
+
+        const planet = new THREE.Mesh(
+            new THREE.SphereGeometry(0.66, 72, 72),
+            new THREE.MeshStandardMaterial({
+                color: 0x315387,
+                roughness: 0.50,
+                metalness: 0.40,
+                reflectivity: 0.8,
+            }),
+        );
+        root.add(planet);
+
+        scene.add(new THREE.AmbientLight(0x9bb7ff, 0.55));
+        const keyLight = new THREE.DirectionalLight(0xffe2a0, 1.65);
+        keyLight.position.set(-3, 3, 5);
+        scene.add(keyLight);
+        const rimLight = new THREE.DirectionalLight(0x60a5fa, 1.1);
+        rimLight.position.set(3, -1.5, 4);
+        scene.add(rimLight);
+
+        const makeOrbit = ({
+            radius = 2,
+            color = 0x93c5fd,
+            opacity = 0.2,
+            rotation = [0, 0, 0],
+            dashed = false,
+        } = {}) => {
+            const points = [];
+            for (let i = 0; i <= 256; i += 1) {
+                const angle = (i / 256) * Math.PI * 2;
+                points.push(new THREE.Vector3(Math.cos(angle) * radius, Math.sin(angle) * radius, 0));
+            }
+
+            const geometry = new THREE.BufferGeometry().setFromPoints(points);
+            const material = dashed
+                ? new THREE.LineDashedMaterial({
+                    color,
+                    transparent: true,
+                    opacity,
+                    dashSize: 0.08,
+                    gapSize: 0.065,
+                    depthWrite: false,
+                })
+                : new THREE.LineBasicMaterial({
+                    color,
+                    transparent: true,
+                    opacity,
+                    depthWrite: false,
+                });
+            const line = new THREE.Line(geometry, material);
+            line.rotation.set(rotation[0], rotation[1], rotation[2]);
+            line.computeLineDistances();
+            root.add(line);
+            return line;
+        };
+
+        makeOrbit({ radius: 2.58, color: 0x7a8caf, opacity: 0.36, rotation: [THREE.MathUtils.degToRad(61), 0, 0], dashed: true });
+        makeOrbit({ radius: 1.83, color: 0xf0c060, opacity: 0.16, rotation: [THREE.MathUtils.degToRad(55), 0, THREE.MathUtils.degToRad(30)] });
+
+        const innerOrbitTilt = new THREE.Euler(THREE.MathUtils.degToRad(7), 0, THREE.MathUtils.degToRad(15));
+        makeOrbit({ radius: 2.08, color: 0x93c5fd, opacity: 0.22, rotation: [innerOrbitTilt.x, innerOrbitTilt.y, innerOrbitTilt.z] });
+
+        const satellitePivot = new THREE.Group();
+        satellitePivot.rotation.copy(innerOrbitTilt);
+        root.add(satellitePivot);
+
+        const satellite = new THREE.Group();
+        satellite.position.x = 2.08;
+        satellite.scale.setScalar(0.82);
+        satellitePivot.add(satellite);
+
+        const bus = new THREE.Mesh(
+            new THREE.BoxGeometry(0.11, 0.15, 0.09),
+            new THREE.MeshStandardMaterial({ color: 0xf0c060, emissive: 0x8a4b10, emissiveIntensity: 0.45, roughness: 0.55 }),
+        );
+        satellite.add(bus);
+
+        const panelMaterial = new THREE.MeshStandardMaterial({
+            color: 0x243a60,
+            emissive: 0x111d35,
+            emissiveIntensity: 0.5,
+            roughness: 0.35,
+            metalness: 0.18,
+        });
+
+        const leftPanel = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.07, 0.012), panelMaterial);
+        leftPanel.position.x = -0.17;
+        satellite.add(leftPanel);
+
+        const rightPanel = leftPanel.clone();
+        rightPanel.position.x = 0.17;
+        satellite.add(rightPanel);
+
+        const clock = new THREE.Clock();
+
+        const resize = () => {
+            const rect = canvas.getBoundingClientRect();
+            const width = Math.max(1, Math.floor(rect.width));
+            const height = Math.max(1, Math.floor(rect.height));
+            renderer.setSize(width, height, false);
+
+            const aspect = width / height;
+            const view = 5.8;
+            camera.left = (-view * aspect) / 2;
+            camera.right = (view * aspect) / 2;
+            camera.top = view / 2;
+            camera.bottom = -view / 2;
+            camera.updateProjectionMatrix();
+        };
+
+        const render = () => {
+            const elapsed = clock.getElapsedTime();
+            const motionScale = reducedMotion ? 0.12 : 1;
+
+            planet.rotation.y = elapsed * 0.09 * motionScale;
+            root.rotation.y = Math.sin(elapsed * 0.12 * motionScale) * 0.08;
+            satellitePivot.rotation.z = innerOrbitTilt.z + elapsed * 0.28 * motionScale;
+            satellite.rotation.z = -satellitePivot.rotation.z;
+            satellite.rotation.y = Math.sin(elapsed * 1.4 * motionScale) * 0.35;
+
+            renderer.render(scene, camera);
+            requestAnimationFrame(render);
+        };
+
+        resize();
+        window.addEventListener('resize', resize, { passive: true });
+        render();
+    }
+</script>

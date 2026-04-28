@@ -109,28 +109,12 @@
         @apply relative h-[min(80vw,580px)] w-[min(80vw,580px)];
     }
 
-    .planet-core {
-        @apply absolute left-1/2 top-1/2 -m-[55px] size-[110px] origin-center rounded-full bg-planet-core shadow-planet;
+    .hero-three-shell {
+        @apply opacity-90 [filter:drop-shadow(0_0_42px_rgba(96,165,250,.16))];
     }
 
-    .orbit-ring {
-        @apply absolute left-1/2 top-1/2 origin-center rounded-full;
-    }
-
-    .orbit-ring-outer {
-        @apply -m-[270px] size-[540px] animate-spin-cw border border-dashed border-stroke/55 [transform:translate(-50%,-50%)_rotate(0deg)_perspective(800px)_rotateX(60deg)];
-    }
-
-    .orbit-ring-mid {
-        @apply -m-[190px] size-[380px] animate-spin-ccw border border-accent/10 [transform:translate(-50%,-50%)_rotate(30deg)_perspective(800px)_rotateX(55deg)];
-    }
-
-    .orbit-ring-inner {
-        @apply -m-[215px] size-[430px] animate-spin-med border border-orbit-track/10 [transform:translate(-50%,-50%)_rotate(15deg)];
-    }
-
-    .sat-dot {
-        @apply absolute left-1/2 top-1/2 -m-[3.5px] size-[7px] animate-sat-travel rounded-full bg-accent shadow-satellite [--r:210px] max-md:[--r:130px];
+    .hero-three-canvas {
+        @apply h-full w-full;
     }
 
     .objective-card {
