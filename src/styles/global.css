@@ -107,6 +107,10 @@
         @apply bg-accent text-void transition-all duration-200 ease-out hover:-translate-y-0.5 hover:bg-accent-pale hover:shadow-donate-glow;
     }
 
+    :root[data-theme='light'] .donate-btn {
+        @apply hover:bg-accent-deep;
+    }
+
     .nav-shell {
         @apply fixed inset-x-0 top-0 z-50 border-b border-stroke/55 bg-void/90 backdrop-blur-[22px];
     }
