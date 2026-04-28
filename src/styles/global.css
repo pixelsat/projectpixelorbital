@@ -2,6 +2,82 @@
 
 @config "../../tailwind.config.mjs";
 
+@layer base {
+    :root {
+        color-scheme: dark;
+        --color-void: 4 7 16;
+        --color-orbit: 7 12 26;
+        --color-panel: 11 20 34;
+        --color-panel-raised: 16 25 46;
+        --color-control: 22 35 60;
+        --color-stroke: 30 46 71;
+        --color-stroke-bright: 38 56 80;
+        --color-orbit-track: 147 197 253;
+        --color-status-success: 74 222 128;
+        --color-status-info: 96 165 250;
+        --color-accent: 240 192 96;
+        --color-accent-warm: 224 168 56;
+        --color-accent-deep: 200 138 40;
+        --color-accent-pale: 253 233 168;
+        --color-ink: 238 242 255;
+        --color-ink-soft: 184 198 224;
+        --color-ink-muted: 122 140 175;
+        --color-ink-dim: 58 74 101;
+        --bg-grid-space: linear-gradient(rgba(30,46,71,.35) 1px, transparent 1px), linear-gradient(90deg, rgba(30,46,71,.35) 1px, transparent 1px);
+        --bg-accent-gradient: linear-gradient(130deg, #F5D070 0%, #E0A838 45%, #FFE8A0 100%);
+        --bg-hero-vignette: radial-gradient(ellipse 80% 80% at 50% 50%, transparent 40%, #040710 100%);
+        --bg-planet-core: radial-gradient(circle at 35% 32%, #1B3B60, #060E1A 72%);
+        --bg-fund-glow: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(200,136,40,.055) 0%, transparent 65%);
+        --bg-team-placeholder: linear-gradient(135deg, #10192E, #16233C);
+        --bg-timeline-line: linear-gradient(180deg, transparent 0%, #1E2E47 15%, #1E2E47 85%, transparent 100%);
+        --bg-scanlines: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,.04) 3px, rgba(0,0,0,.04) 4px);
+        --bg-scroll-fade: linear-gradient(180deg, #7A8CAF, transparent);
+        --shadow-card-hover: 0 22px 44px rgba(0,0,0,.35), 0 0 36px rgba(240,192,96,.06);
+        --shadow-donate-glow: 0 16px 40px rgba(240,192,96,.25);
+        --shadow-planet: 0 0 50px rgba(59,130,246,.14), inset 0 0 20px rgba(0,0,0,.6);
+        --shadow-satellite: 0 0 10px 4px rgba(240,192,96,.55);
+    }
+
+    :root[data-theme='light'] {
+        color-scheme: light;
+        --color-void: 247 242 229;
+        --color-orbit: 239 232 215;
+        --color-panel: 255 251 241;
+        --color-panel-raised: 250 244 232;
+        --color-control: 239 230 211;
+        --color-stroke: 214 198 169;
+        --color-stroke-bright: 187 163 123;
+        --color-orbit-track: 68 116 164;
+        --color-status-success: 16 142 82;
+        --color-status-info: 32 106 171;
+        --color-accent: 174 106 31;
+        --color-accent-warm: 196 126 38;
+        --color-accent-deep: 126 76 28;
+        --color-accent-pale: 255 224 154;
+        --color-ink: 24 32 46;
+        --color-ink-soft: 52 68 91;
+        --color-ink-muted: 90 106 130;
+        --color-ink-dim: 129 140 158;
+        --bg-grid-space: linear-gradient(rgba(163,139,96,.22) 1px, transparent 1px), linear-gradient(90deg, rgba(163,139,96,.22) 1px, transparent 1px);
+        --bg-accent-gradient: linear-gradient(130deg, #7E4C1C 0%, #B77225 44%, #DEAA46 100%);
+        --bg-hero-vignette: radial-gradient(ellipse 80% 80% at 50% 50%, transparent 42%, rgba(247,242,229,.98) 100%);
+        --bg-planet-core: radial-gradient(circle at 35% 32%, #E7EEF8, #87A7C8 68%);
+        --bg-fund-glow: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(174,106,31,.12) 0%, transparent 68%);
+        --bg-team-placeholder: linear-gradient(135deg, #EFE3C7, #DCE8F3);
+        --bg-timeline-line: linear-gradient(180deg, transparent 0%, #D6C6A9 15%, #D6C6A9 85%, transparent 100%);
+        --bg-scanlines: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(80,60,30,.035) 3px, rgba(80,60,30,.035) 4px);
+        --bg-scroll-fade: linear-gradient(180deg, #8F7650, transparent);
+        --shadow-card-hover: 0 22px 44px rgba(70,48,18,.14), 0 0 36px rgba(174,106,31,.10);
+        --shadow-donate-glow: 0 16px 40px rgba(174,106,31,.24);
+        --shadow-planet: 0 0 50px rgba(68,116,164,.16), inset 0 0 20px rgba(255,255,255,.55);
+        --shadow-satellite: 0 0 10px 4px rgba(174,106,31,.35);
+    }
+
+    body {
+        transition: background-color 240ms ease, color 240ms ease;
+    }
+}
+
 @layer components {
     .grid-bg {
         @apply bg-grid-space bg-[length:64px_64px];
@@ -37,6 +113,30 @@
 
     .secondary-btn {
         @apply rounded border border-stroke/90 bg-panel/75 px-8 py-3.5 text-sm font-medium tracking-wide text-ink-soft backdrop-blur-[14px] transition-all hover:border-accent/40 hover:text-accent;
+    }
+
+    .theme-toggle {
+        @apply relative inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-stroke/80 bg-panel/70 text-ink-muted backdrop-blur-[14px] transition-all duration-300 hover:-translate-y-0.5 hover:border-accent/45 hover:text-accent;
+    }
+
+    .theme-toggle svg {
+        @apply absolute h-4 w-4 transition-all duration-300;
+    }
+
+    .theme-toggle .sun-icon {
+        @apply translate-y-0 opacity-100 rotate-0;
+    }
+
+    .theme-toggle .moon-icon {
+        @apply translate-y-6 opacity-0 -rotate-45;
+    }
+
+    :root[data-theme='light'] .theme-toggle .sun-icon {
+        @apply -translate-y-6 opacity-0 rotate-45;
+    }
+
+    :root[data-theme='light'] .theme-toggle .moon-icon {
+        @apply translate-y-0 opacity-100 rotate-0;
     }
 
     .accent-gradient-text {

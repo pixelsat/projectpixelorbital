@@ -21,6 +21,18 @@ const {
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="color-scheme" content="dark light"/>
+    <script is:inline>
+        (() => {
+            try {
+                const stored = localStorage.getItem('pixel-orbital-theme');
+                const theme = stored === 'light' || stored === 'dark' ? stored : 'dark';
+                document.documentElement.dataset.theme = theme;
+            } catch {
+                document.documentElement.dataset.theme = 'dark';
+            }
+        })();
+    </script>
     <title>{title}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -33,7 +45,7 @@ const {
     <meta property="og:url" content={url}/>
     <meta property="og:type" content="website"/>
 </head>
-<body class="overflow-x-hidden bg-void font-body text-ink antialiased">
+<body class="overflow-x-hidden bg-void font-body text-ink antialiased transition-colors duration-300">
 <slot/>
 </body>
 </html>

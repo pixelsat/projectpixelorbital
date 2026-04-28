@@ -5,16 +5,27 @@
                  alt="Pixel Orbital" class="w-8 h-8 object-contain">
             <span class="font-display text-xl font-semibold tracking-wide text-ink">Project Pixel Orbital</span>
         </a>
-        <div class="hidden md:flex items-center gap-8">
-            <a href="#mission" class="text-sm text-ink-muted hover:text-ink transition-colors tracking-wide">Mission</a>
-            <a href="#architecture" class="text-sm text-ink-muted hover:text-ink transition-colors tracking-wide">Structure</a>
-            <a href="#team" class="text-sm text-ink-muted hover:text-ink transition-colors tracking-wide">Team</a>
-            <!--<a href="#timeline"-->
-            <!--   class="text-sm text-ink-muted hover:text-ink transition-colors tracking-wide">Timeline</a>-->
-            <a href="https://www.gofundme.com/f/support-project-pixel-orbital-student-team" target="_blank"
-               class="donate-btn px-5 py-2 rounded text-sm font-medium tracking-wide">
-                Donate
-            </a>
+        <div class="flex items-center gap-3 md:gap-8">
+            <div class="hidden md:flex items-center gap-8">
+                <a href="#mission" class="text-sm text-ink-muted hover:text-ink transition-colors tracking-wide">Mission</a>
+                <a href="#architecture" class="text-sm text-ink-muted hover:text-ink transition-colors tracking-wide">Structure</a>
+                <a href="#team" class="text-sm text-ink-muted hover:text-ink transition-colors tracking-wide">Team</a>
+                <!--<a href="#timeline"-->
+                <!--   class="text-sm text-ink-muted hover:text-ink transition-colors tracking-wide">Timeline</a>-->
+                <a href="https://www.gofundme.com/f/support-project-pixel-orbital-student-team" target="_blank"
+                   class="donate-btn px-5 py-2 rounded text-sm font-medium tracking-wide">
+                    Donate
+                </a>
+            </div>
+            <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to light mode" aria-pressed="false">
+                <svg class="sun-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="12" r="4" stroke-width="1.5"></circle>
+                    <path stroke-linecap="round" stroke-width="1.5" d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+                </svg>
+                <svg class="moon-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 14.5A8.5 8.5 0 019.5 3 7 7 0 101.5 14.5 8.5 8.5 0 0021 14.5z"></path>
+                </svg>
+            </button>
         </div>
     </div>
 </nav>

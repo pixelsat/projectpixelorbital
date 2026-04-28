@@ -1,4 +1,28 @@
 <script>
+    const root = document.documentElement;
+    const themeToggle = document.getElementById('theme-toggle');
+    const setTheme = (theme, persist = true) => {
+        const nextTheme = theme === 'light' ? 'light' : 'dark';
+        root.dataset.theme = nextTheme;
+        if (persist) {
+            try {
+                localStorage.setItem('pixel-orbital-theme', nextTheme);
+            } catch {
+                // Theme still applies for the current page if storage is unavailable.
+            }
+        }
+        if (themeToggle instanceof HTMLButtonElement) {
+            const isLight = nextTheme === 'light';
+            themeToggle.setAttribute('aria-pressed', String(isLight));
+            themeToggle.setAttribute('aria-label', isLight ? 'Switch to dark mode' : 'Switch to light mode');
+        }
+    };
+
+    setTheme(root.dataset.theme === 'light' ? 'light' : 'dark', false);
+    themeToggle?.addEventListener('click', () => {
+        setTheme(root.dataset.theme === 'light' ? 'dark' : 'light');
+    });
+
     const countdownIds = ['cd-days', 'cd-hours', 'cd-mins', 'cd-secs'];
     const [daysEl, hoursEl, minsEl, secsEl] = countdownIds.map((id) => document.getElementById(id));
 
@@ -52,7 +76,8 @@
                     const alpha = star.a * (0.55 + 0.45 * Math.sin(star.ph + t * star.sp * 60));
                     ctx.beginPath();
                     ctx.arc(star.x * canvas.width, star.y * canvas.height, star.r, 0, 6.283);
-                    ctx.fillStyle = `rgba(195,215,255,${alpha})`;
+                    const starColor = root.dataset.theme === 'light' ? '78,105,140' : '195,215,255';
+                    ctx.fillStyle = `rgba(${starColor},${alpha})`;
                     ctx.fill();
                 }
 
