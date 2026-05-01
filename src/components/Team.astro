@@ -1,3 +1,12 @@
+---
+import { Image } from 'astro:assets';
+import wyPhoto from '../assets/images/wy_ppo.jpeg';
+import vvPhoto from '../assets/images/vv_ppo.png';
+import avPhoto from '../assets/images/av_ppo.jpg';
+import vmPhoto from '../assets/images/vm_ppo.png';
+import gzPhoto from '../assets/images/gz_ppo.png';
+---
+
 <section id="team" class="py-32 relative">
     <div class="w-full max-w-5xl mx-auto px-8 lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl">
 
@@ -23,8 +32,7 @@
             <div class="team-member">
                 <div class="team-frame">
                     <div class="team-photo">
-                        <img src="https://static.wixstatic.com/media/a77f8c_38fc6e97a98f4c4a8079098c158020f2~mv2.jpg/v1/fill/w_400,h_400,fp_0.64_0.47,q_85,enc_avif,quality_auto/a77f8c_38fc6e97a98f4c4a8079098c158020f2~mv2.jpg"
-                             alt="Weston Yoo" class="team-img">
+                        <Image src={wyPhoto} alt="Weston Yoo" width={400} height={400} fit="cover" class="team-img" />
                     </div>
                     <div class="p-4">
                         <div class="font-display text-sm sm:text-lg font-medium text-ink">Weston Yoo</div>
@@ -40,8 +48,7 @@
             <div class="team-member [transition-delay:.04s]">
                 <div class="team-frame">
                     <div class="team-photo">
-                        <img src="https://static.wixstatic.com/media/a77f8c_d4bfd419f6344e6ab9df9d35ef13660f~mv2.jpg/v1/fill/w_400,h_400,fp_0.49_0.38,q_85,enc_avif,quality_auto/a77f8c_d4bfd419f6344e6ab9df9d35ef13660f~mv2.jpg"
-                             alt="Vinayak Vikram" class="team-img">
+                        <Image src={vvPhoto} alt="Vinayak Vikram" width={400} height={400} fit="cover" class="team-img" />
                     </div>
                     <div class="p-4">
                         <div class="font-display text-sm sm:text-lg font-medium text-ink">Vinayak Vikram</div>
@@ -57,8 +64,7 @@
             <div class="team-member [transition-delay:.08s]">
                 <div class="team-frame">
                     <div class="team-photo">
-                        <img src="https://static.wixstatic.com/media/a77f8c_a76aa93edc414387bd7b080195050cf4~mv2.jpg/v1/fill/w_400,h_400,fp_0.53_0.5,q_85,enc_avif,quality_auto/a77f8c_a76aa93edc414387bd7b080195050cf4~mv2.jpg"
-                             alt="Aadish Verma" class="team-img">
+                        <Image src={avPhoto} alt="Aadish Verma" width={400} height={400} fit="cover" class="team-img" />
                     </div>
                     <div class="p-4">
                         <div class="font-display text-sm sm:text-lg font-medium text-ink">Aadish Verma</div>
@@ -101,8 +107,7 @@
             <div class="team-member [transition-delay:.20s]">
                 <div class="team-frame">
                     <div class="team-photo">
-                        <img src="https://static.wixstatic.com/media/a77f8c_f0448e88d8ed4080becc57cc10f6858d~mv2.png/v1/fill/w_400,h_400,fp_0.5_0.27,q_85,enc_avif,quality_auto/a77f8c_f0448e88d8ed4080becc57cc10f6858d~mv2.png"
-                             alt="Victoria McLeod" class="team-img">
+                        <Image src={vmPhoto} alt="Victoria McLeod" width={400} height={400} fit="cover" class="team-img" />
                     </div>
                     <div class="p-4">
                         <div class="font-display text-sm sm:text-lg font-medium text-ink">Victoria McLeod</div>
@@ -117,8 +122,7 @@
             <div class="team-member [transition-delay:.24s]">
                 <div class="team-frame">
                     <div class="team-photo">
-                        <img src="https://static.wixstatic.com/media/a77f8c_f8793ab8571d42ea90cd089b0c9af603~mv2.png/v1/fill/w_400,h_400,fp_0.5_0.46,q_85,enc_avif,quality_auto/a77f8c_f8793ab8571d42ea90cd089b0c9af603~mv2.png"
-                             alt="Grace Zheng" class="team-img">
+                        <Image src={gzPhoto} alt="Grace Zheng" width={400} height={400} fit="cover" class="team-img" />
                     </div>
                     <div class="p-4">
                         <div class="font-display text-sm sm:text-lg font-medium text-ink">Grace Zheng</div>
