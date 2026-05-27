@@ -166,6 +166,10 @@
         @apply [animation-delay:1s];
     }
 
+    .fi-7 {
+        @apply [animation-delay:1.16s];
+    }
+
     .hero-vignette {
         @apply absolute inset-0 pointer-events-none bg-hero-vignette;
     }
@@ -180,6 +184,14 @@
 
     .countdown-panel {
         @apply mb-12 inline-flex gap-2 rounded-2xl border border-stroke/90 bg-panel/75 px-3 py-3 backdrop-blur-[14px] md:gap-10 md:px-12 md:py-6;
+    }
+
+    .social-chip {
+        @apply inline-flex items-center gap-2 rounded-full border border-stroke/80 bg-panel/70 px-4 py-2 text-[10px] font-mono uppercase tracking-[0.26em] text-ink-soft backdrop-blur-[14px] transition-all duration-300 hover:-translate-y-0.5 hover:border-accent/45 hover:text-accent sm:text-[11px];
+    }
+
+    .social-chip svg {
+        @apply h-3.5 w-3.5 shrink-0 fill-none stroke-current stroke-[1.7];
     }
 
     .hero-orbit-shell {
