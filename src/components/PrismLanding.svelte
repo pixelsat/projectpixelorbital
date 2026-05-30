@@ -11,22 +11,18 @@
 
     const mission = [
         {
-            id: "01",
             title: "Do it",
             body: "Getting to orbit is genuinely difficult; even university teams with decades of experience can fail. Due to our extremely limited budget, we're building everything from scratch and relying on commercial off-the-shelf hardware in the majority of cases. The chances of failure are high, which makes the mission all the more exhilarating.",
         },
         {
-            id: "02",
             title: "Take an image of the Earth",
-            body: "We aim to 1) detumble (stop spinning after being released from the Neutron launch vehicle), 2) establish contact with the Project Pixel Orbital team on ground with our LoRa UHF comms pipeline, 3) capture an image of the Earth using the onboard OV2640 camera, and 4) beam down the image.",
+            body: "We aim to 1) detumble (stop spinning after being released from the launch vehicle), 2) establish contact with the Project Pixel Orbital team on ground with our LoRa UHF comms pipeline, 3) capture an image of the Earth using the onboard OV2640 camera, and 4) beam down the image.",
         },
         {
-            id: "03",
             title: "Learn stuff",
             body: "Building Pixelsat I is a massive endeavour, not just technically, but also because every member is learning and growing as we go. From embedded Rust to CAD software to control theory, we're pushing our knowledge and gaining new skills along the way.",
         },
         {
-            id: "04",
             title: "Inspire other kids",
             body: "We want to prove to students around the world that it's possible to build a CubeSat from scratch with no prior experience on a meager budget as a high school team, and hopefully get others to follow suit!"
         },
