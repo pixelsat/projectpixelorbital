@@ -10,11 +10,16 @@
     "preview": "astro preview"
   },
   "dependencies": {
+    "@astrojs/svelte": "^8.1.2",
+    "@imput/helium-prism": "^0.1.2",
     "astro": "^6.1.9",
+    "svelte": "^5.56.0",
     "three": "^0.184.0"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.9",
     "@tailwindcss/vite": "^4.2.4",
-    "tailwindcss": "^4.2.4"
+    "tailwindcss": "^4.2.4",
+    "typescript": "^6.0.3"
   }
 }
