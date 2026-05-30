@@ -58,6 +58,9 @@
         { name: "Victoria McLeod", role: "Structural lead", image: victoria },
         { name: "Grace Zheng", role: "Structural · media", image: grace },
         { name: "Ashwin Naren", role: "Software BDFL · electrical", initials: "AN", href: "https://arihant2math.github.io/" },
+        { name: "Daphne F", role: "Outreach lead", initials: "DF" },
+        { name: "Nathan Muruganantham", role: "Electrical · ADCS", initials: "NM" },
+        { name: "Shiv Sareen", role: "Outreach · funding", initials: "SS" },
     ];
 
     const stats = [
@@ -210,7 +213,11 @@
                         </a>
                     {:else}
                         <article class="team-entry">
-                            <img class="team-avatar" src={member.image} alt={member.name} />
+                            {#if member.image}
+                                <img class="team-avatar" src={member.image} alt={member.name} />
+                            {:else}
+                                <div class="team-avatar placeholder">{member.initials}</div>
+                            {/if}
                             <div>
                                 <Text variant="subheading">{member.name}</Text>
                                 <Text variant="body" tone="secondary">{member.role}</Text>
