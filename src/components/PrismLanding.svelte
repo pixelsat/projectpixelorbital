@@ -100,7 +100,7 @@
                 <Text tag="div" tone="tertiary" class="eyebrow">Pixelsat I</Text>
                 <Text variant="display" class="hero-title">A CubeSat built by high schoolers on Earth.</Text>
                 <Text variant="body" tone="secondary" class="hero-body">
-                    Project Pixel Orbital is a fully student-led team at Stanford Online High School building PixelSat I, a 3U cubesat targeting launch into sun-synchronous low Earth orbit in early 2027, from scratch, on an extremely limited budget.
+                    Project Pixel Orbital is a fully student-led team at Stanford Online High School building PixelSat I, a 3U CubeSat targeting launch into sun-synchronous low Earth orbit in early 2027, from scratch, on an extremely limited budget.
                 </Text>
 
                 <div class="hero-actions">
