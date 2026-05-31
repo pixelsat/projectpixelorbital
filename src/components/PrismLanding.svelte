@@ -16,11 +16,11 @@
         },
         {
             title: "Take an image of the Earth",
-            body: "We aim to 1) detumble (stop spinning after being released from the launch vehicle), 2) establish contact with the Project Pixel Orbital team on ground with our LoRa UHF comms pipeline, 3) capture an image of the Earth using the onboard OV2640 camera, and 4) beam down the image.",
+            body: "We aim to 1) detumble (stop spinning after being released from the launch vehicle), 2) establish contact with the Project Pixel Orbital team on ground with our LoRa UHF comms pipeline, 3) capture an image of the Earth using the onboard OV2640 camera, and 4) downlink the image.",
         },
         {
             title: "Learn stuff",
-            body: "Building Pixelsat I is a massive endeavour, not just technically, but also because every member is learning and growing as we go. From embedded Rust to CAD software to control theory, we're pushing our knowledge and gaining new skills along the way.",
+            body: "Building PixelSat I is a massive endeavour, not just technically, but also because every member is learning and growing as we go. From embedded Rust to CAD software to control theory, we're pushing our knowledge and gaining new skills along the way.",
         },
         {
             title: "Inspire other kids",
@@ -31,7 +31,7 @@
     const systems = [
         {
             title: "ADCS",
-            body: "An IMU, magnetometer, and sun sensor readings sourced from solar panel current are merged and fused using an Extended Kalman Filter to estimate the spacecraft's attitude (orientation). Hand-wound magnetorquers are driven through a PID controller to set the satellite's angular velocity and orientation.",
+            body: "IMU, magnetometer, and sun sensor (from solar panels) readings current are merged and fused using an Extended Kalman Filter to estimate the spacecraft's attitude (orientation). Hand-wound magnetorquers are driven through a PID controller to set the satellite's angular velocity and orientation.",
         },
         {
             title: "Flight computer",
@@ -39,11 +39,11 @@
         },
         {
             title: "Communications",
-            body: "We use the 435 Megahertz ultra-high frequency band for communication, with the LoRa modulation scheme. Our transceiver is an Ebyte LoRa module which contains a SEMTECH SX1262-based chip, connected to a tape measure antenna which is deployed in orbit.",
+            body: "We use the 435 Megahertz ultra-high frequency band for communication, with the LoRa modulation scheme. Our transceiver is an E-Byte LoRa module which contains a SemTech SX1262-based chip, connected to a tape measure antenna which is deployed in orbit.",
         },
         {
             title: "Power",
-            body: "Our battery pack is a 4P3S 21700 (21mm x 70mm) lithium ion battery pack powered by high-effiency solar panels. The satellite runs on a 5V bus regulated by a custom power controller. Dedicated watchdog chips power-cycle the ESP32 flight computers in case of a radiation-induced failure.",
+            body: "Our battery pack is a 4P3S 21700 (21mm x 70mm) lithium ion battery pack powered by high-efficiency solar panels. The satellite runs on a 5V bus regulated by a custom power controller. Dedicated watchdog chips power-cycle the ESP32 flight computers in case of a radiation-induced failure.",
         },
     ];
 
@@ -93,7 +93,7 @@
     <main id="top" class="content-shell">
         <section class="hero">
             <div class="hero-copy">
-                <Text tag="div" tone="tertiary" class="eyebrow">Pixelsat I</Text>
+                <Text tag="div" tone="tertiary" class="eyebrow">PixelSat I</Text>
                 <Text variant="display" class="hero-title">A CubeSat built by high schoolers on Earth.</Text>
                 <Text variant="body" tone="secondary" class="hero-body">
                     Project Pixel Orbital is a fully student-led team at Stanford Online High School building PixelSat I, a 3U CubeSat targeting launch into sun-synchronous low Earth orbit in early 2027, from scratch, on an extremely limited budget.
