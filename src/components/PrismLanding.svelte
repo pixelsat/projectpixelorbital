@@ -49,14 +49,10 @@
 
     const team = [
         { name: "Weston Yoo", role: "Overall team lead", image: weston },
-        { name: "Vinayak Vikram", role: "Software co-lead · electrical", image: vinayak },
-        { name: "Aadish Verma", role: "Comms lead · software co-lead", image: aadish },
-        { name: "Victoria McLeod", role: "Structural lead", image: victoria },
-        { name: "Grace Zheng", role: "Structural · media", image: grace },
-        { name: "Ashwin Naren", role: "Software BDFL · electrical", initials: "AN", href: "https://arihant2math.github.io/" },
+        { name: "Ashwin Naren", role: "Software Lead · electrical · structural", initials: "AN", href: "https://arihant2math.github.io/" },
+        { name: "Vinayak Vikram", role: "Electrical Lead · software · structural", image: vinayak },
+        { name: "Aadish Verma", role: "Comms lead · software", image: aadish },
         { name: "Daphne F", role: "Outreach lead", initials: "DF" },
-        { name: "Nathan Muruganantham", role: "Electrical · ADCS", initials: "NM" },
-        { name: "Shiv Sareen", role: "Outreach · funding", initials: "SS" },
     ];
 
     const stats = [
