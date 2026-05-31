@@ -235,10 +235,6 @@
                     Donate on GoFundMe
                     <IconExternalLink />
                 </OuterLink>
-                <OuterLink href="https://www.projectpixelorbital.com" class="button">
-                    projectpixelorbital.com
-                    <IconExternalLink />
-                </OuterLink>
             </div>
         </section>
     </main>
