@@ -43,7 +43,7 @@
         },
         {
             title: "Power",
-            body: "Our battery pack is a 4P3S 21700 (21mm x 70mm) lithium ion battery pack powered by high-efficiency solar panels. The satellite runs on a 5V bus regulated by a custom power controller. Dedicated watchdog chips power-cycle the ESP32 flight computers in case of a radiation-induced failure.",
+            body: "Our battery pack is a 4P3S 21700 (21mm x 70mm) lithium ion battery pack powered by high-efficiency solar panels. The satellite runs on a 5V bus regulated by a custom power controller. A dedicated watchdog chip resets the STM32 flight computer in case of a heartbeat failure.",
         },
     ];
 
