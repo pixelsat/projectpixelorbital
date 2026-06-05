@@ -53,7 +53,7 @@
         { name: "Aadish Verma", role: "Comms lead · software", image: aadish },
         { name: "Victoria McLeod", role: "Structural", image: victoria },
         { name: "Grace Zheng", role: "Structural · media", image: grace },
-        { name: "Ashwin Naren", role: "Software BDFL/Lead · electrical", initials: "AN", href: "https://arihant2math.github.io/" },
+        { name: "Ashwin Naren", role: "Software BDFL/Lead · electrical · structural", initials: "AN", href: "https://arihant2math.github.io/" },
         { name: "Daphne F", role: "Outreach lead", initials: "DF" },
         { name: "Nathan Muruganantham", role: "Electrical", initials: "NM" },
         { name: "Shiv Sareen", role: "Outreach · funding", initials: "SS" },
