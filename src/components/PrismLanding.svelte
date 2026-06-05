@@ -31,15 +31,15 @@
     const systems = [
         {
             title: "ADCS",
-            body: "IMU, magnetometer, and sun sensor (from solar panels) readings current are merged and fused using an Extended Kalman Filter to estimate the spacecraft's attitude (orientation). Hand-wound magnetorquers are driven through a PID controller to set the satellite's angular velocity and orientation.",
+            body: "IMU, magnetometer, and sun sensor readings are merged and fused using an Extended Kalman Filter to estimate the spacecraft's attitude (orientation). Hand-wound magnetorquers are driven through a PID controller to set the satellite's angular velocity and orientation.",
         },
         {
             title: "Flight computer",
-            body: "The onboard flight computer consists of two ESP32 microcontrollers connected over a high-speed SPI bus. Responsibilities are cleanly split between the two controllers; one ESP handles mission-control work such as ADCS and comms, and the other handles image capture and experiment data. All code is no_std Rust.",
+            body: "A STM32-series processor running the RTIC framework handles all onboard operations on a single core. All code is no_std Rust.",
         },
         {
             title: "Communications",
-            body: "We use the 435 Megahertz ultra-high frequency band for communication, with the LoRa modulation scheme. Our transceiver is an E-Byte LoRa module which contains a SemTech SX1262-based chip, connected to a tape measure antenna which is deployed in orbit.",
+            body: "We use the 435 Megahertz ultra-high frequency band for communication, with the LoRa modulation scheme. Our transceiver is an E-Byte LoRa module which wraps a SemTech SX1262-based chip, connected to a tape measure antenna which is deployed via a burn wire into orbit.",
         },
         {
             title: "Power",
@@ -49,13 +49,13 @@
 
     const team = [
         { name: "Weston Yoo", role: "Overall team lead", image: weston },
-        { name: "Vinayak Vikram", role: "Software co-lead · electrical", image: vinayak },
-        { name: "Aadish Verma", role: "Comms lead · software co-lead", image: aadish },
-        { name: "Victoria McLeod", role: "Structural lead", image: victoria },
+        { name: "Vinayak Vikram", role: "Electrical lead · software · structural", image: vinayak },
+        { name: "Aadish Verma", role: "Comms lead · software", image: aadish },
+        { name: "Victoria McLeod", role: "Structural", image: victoria },
         { name: "Grace Zheng", role: "Structural · media", image: grace },
-        { name: "Ashwin Naren", role: "Software BDFL · electrical", initials: "AN", href: "https://arihant2math.github.io/" },
+        { name: "Ashwin Naren", role: "Software BDFL/Lead · electrical", initials: "AN", href: "https://arihant2math.github.io/" },
         { name: "Daphne F", role: "Outreach lead", initials: "DF" },
-        { name: "Nathan Muruganantham", role: "Electrical · ADCS", initials: "NM" },
+        { name: "Nathan Muruganantham", role: "Electrical", initials: "NM" },
         { name: "Shiv Sareen", role: "Outreach · funding", initials: "SS" },
     ];
 
