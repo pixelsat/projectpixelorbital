@@ -273,21 +273,6 @@
         object-fit: contain;
     }
 
-    .brand-name {
-        color: var(--primary);
-        font-size: 15px;
-    }
-
-    .brand-meta,
-    .eyebrow,
-    .system-meta,
-    .stat-label,
-    .mission-id {
-        font-size: 12px;
-        letter-spacing: 0.03em;
-        text-transform: uppercase;
-    }
-
     .nav-links {
         display: flex;
         align-items: center;
