@@ -247,7 +247,7 @@
 
     .topbar,
     .content-shell {
-        width: min(980px, calc(100vw - 40px));
+        width: min(1040px, calc(100vw - 40px));
         margin: 0 auto;
     }
 
