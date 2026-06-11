@@ -7,6 +7,7 @@
     import grace from "../assets/images/gz_ppo.png?url";
     import vinayak from "../assets/images/vv_ppo.png?url";
     import weston from "../assets/images/wy_ppo.jpeg?url";
+    import ashwin from "../assets/images/an_ppo.png?url";
     import render from "../assets/images/pixelsattransparentrender.png?url";
 
     const mission = [
@@ -53,7 +54,8 @@
         { name: "Aadish Verma", role: "Comms lead · software", image: aadish },
         { name: "Victoria McLeod", role: "Structural Lead", image: victoria },
         { name: "Grace Zheng", role: "Structural · media", image: grace },
-        { name: "Ashwin Naren", role: "Software BDFL/Lead · electrical · structural", initials: "AN", href: "https://arihant2math.github.io/" },
+        // TODO: add link to https://arihant2math.github.io/ back
+        { name: "Ashwin Naren", role: "Software BDFL/Lead · electrical · structural", image: ashwin },
         { name: "Daphne F", role: "Outreach lead", initials: "DF" },
         { name: "Nathan Muruganantham · ADCS", role: "Electrical", initials: "NM" },
         { name: "Shiv Sareen", role: "Outreach · funding", initials: "SS" },
