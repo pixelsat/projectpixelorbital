@@ -50,12 +50,12 @@
 
     const team = [
         { name: "Weston Yoo", role: "Overall team lead", image: weston },
-        { name: "Vinayak Vikram", role: "Electrical lead · software · structural", image: vinayak },
-        { name: "Aadish Verma", role: "Comms lead · software", image: aadish },
-        { name: "Victoria McLeod", role: "Structural Lead", image: victoria },
-        { name: "Grace Zheng", role: "Structural · media", image: grace },
         // TODO: add link to https://arihant2math.github.io/ back
         { name: "Ashwin Naren", role: "Software BDFL/Lead · electrical · structural", image: ashwin },
+        { name: "Aadish Verma", role: "Comms lead · software", image: aadish },
+        { name: "Vinayak Vikram", role: "Electrical lead · software · structural", image: vinayak },
+        { name: "Victoria McLeod", role: "Structural Lead", image: victoria },
+        { name: "Grace Zheng", role: "Structural · media", image: grace },
         { name: "Daphne F", role: "Outreach lead", initials: "DF" },
         { name: "Nathan Muruganantham · ADCS", role: "Electrical", initials: "NM" },
         { name: "Shiv Sareen", role: "Outreach · funding", initials: "SS" },
