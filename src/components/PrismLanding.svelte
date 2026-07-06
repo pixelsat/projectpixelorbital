@@ -56,11 +56,11 @@
         { name: "Weston Yoo", role: "Overall team lead", image: weston },
         { name: "Daphne F", role: "Outreach Lead", initials: "DF" },
         { name: "Jahnavi Naren", role: "Software · structural", initials: "JN" },
+        { name: "Caleb Laverty", role: "Outreach", initials: "CL" },
         { name: "Francesca Davies", role: "Outreach · funding", image: francesca },
         { name: "Shiv Sareen", role: "Outreach · funding", initials: "SS" },
         { name: "Victoria McLeod", role: "Structural", image: victoria },
         { name: "Grace Zheng", role: "Structural · media", image: grace },
-        { name: "Nathan Muruganantham · ADCS", role: "Electrical", initials: "NM" },
     ];
 
     const stats = [
