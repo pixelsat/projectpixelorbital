@@ -1,0 +1,25 @@
+---
+import { getCollection, render, type CollectionEntry } from "astro:content";
+import PrismBlog from "../components/PrismBlog.svelte";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import "@imput/helium-prism/styles.css";
+import "../styles/global.css";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog");
+  return posts.map((post: CollectionEntry<"blog">) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { title, authors } = post.data;
+const { Content } = await render(post);
+---
+
+<BaseLayout>
+    <PrismBlog title={title} authors={authors}>
+        <Content />
+    </PrismBlog>
+</BaseLayout>

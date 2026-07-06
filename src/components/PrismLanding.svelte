@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { IconArrowRight, IconExternalLink, OuterLink, Text } from "@imput/helium-prism";
+    import { CardLink, IconArrowRight, IconExternalLink, OuterLink, Text } from "@imput/helium-prism";
 
     import logo from "../assets/images/ppologo.png?url";
     import aadish from "../assets/images/av_ppo.jpg?url";
@@ -10,6 +10,14 @@
     import ashwin from "../assets/images/an_ppo.png?url";
     import francesca from "../assets/images/fd_ppo.webp?url";
     import render from "../assets/images/pixelsattransparentrender.png?url";
+
+    type BlogPost = {
+        slug: string;
+        title: string;
+        authors: string;
+    };
+
+    let { blogPosts = [] }: { blogPosts?: BlogPost[] } = $props();
 
     const mission = [
         {
@@ -134,6 +142,25 @@
 
             <div class="hero-visual">
                 <img src={render} alt="Transparent CAD render of PixelSat I" class="hero-render" />
+            </div>
+        </section>
+
+        <section class="blog-section">
+            <div class="section-heading split-heading">
+                <div>
+                    <Text variant="title">From the blog</Text>
+                </div>
+            </div>
+
+            <div class="blog-row" aria-label="Recent blog posts">
+                {#each blogPosts as post}
+                    <CardLink
+                        class="blog-card"
+                        href={`/${post.slug}`}
+                        title={post.title}
+                        desc={post.authors}
+                    />
+                {/each}
             </div>
         </section>
 
@@ -348,10 +375,26 @@
 
     .snapshot,
     .section-block,
-    .cta-band {
+    .cta-band,
+    .blog-section {
         display: flex;
         flex-direction: column;
         gap: 18px;
+    }
+
+    .blog-row {
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(280px, 340px);
+        gap: 16px;
+        overflow-x: auto;
+        padding-bottom: 6px;
+        scroll-snap-type: x proximity;
+    }
+
+    .blog-card {
+        min-height: 220px;
+        scroll-snap-align: start;
     }
 
     .section-heading {

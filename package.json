@@ -10,9 +10,9 @@
     "preview": "astro preview"
   },
   "dependencies": {
-    "@astrojs/svelte": "^8.1.2",
+    "@astrojs/svelte": "9.0.1",
     "@imput/helium-prism": "^0.1.2",
-    "astro": "^6.1.9",
+    "astro": "7.0.6",
     "svelte": "^5.56.0",
     "three": "^0.184.0"
   },
