@@ -1,0 +1,245 @@
+---
+import CardLink from "./CardLink.astro";
+import IconArrowRight from "./icons/IconArrowRight.astro";
+import IconExternalLink from "./icons/IconExternalLink.astro";
+import OuterLink from "./OuterLink.astro";
+import SiteHeader from "./SiteHeader.astro";
+import Text from "./Text.astro";
+
+import aadish from "../assets/images/av_ppo.jpg";
+import victoria from "../assets/images/vm_ppo.png";
+import grace from "../assets/images/gz_ppo.png";
+import vinayak from "../assets/images/vv_ppo.png";
+import weston from "../assets/images/wy_ppo.jpeg";
+import ashwin from "../assets/images/an_ppo.png";
+import francesca from "../assets/images/fd_ppo.webp";
+import render from "../assets/images/pixelsattransparentrender.png";
+
+interface BlogPost {
+  slug: string;
+  title: string;
+  authors: string;
+}
+
+interface Props {
+  blogPosts?: BlogPost[];
+}
+
+const { blogPosts = [] } = Astro.props as Props;
+
+const mission = [
+  {
+    title: "Do it",
+    body: "Getting to orbit is genuinely difficult; even university teams with decades of experience can fail. Due to our extremely limited budget, we're building everything from scratch and relying on commercial off-the-shelf hardware in the majority of cases. The chances of failure are high, which makes the mission all the more exhilarating.",
+  },
+  {
+    title: "Take an image of the Earth",
+    body: "We aim to 1) detumble (stop spinning after being released from the launch vehicle), 2) establish contact with the Project Pixel Orbital team on ground with our LoRa UHF comms pipeline, 3) capture an image of the Earth using the onboard OV2640 camera, and 4) downlink the image.",
+  },
+  {
+    title: "Learn stuff",
+    body: "Building PixelSat I is a massive endeavour, not just technically, but also because every member is learning and growing as we go. From embedded Rust to CAD software to control theory, we're pushing our knowledge and gaining new skills along the way.",
+  },
+  {
+    title: "Inspire other kids",
+    body: "We want to prove to students around the world that it's possible to build a CubeSat from scratch with no prior experience on a meager budget as a high school team, and hopefully get others to follow suit!",
+  },
+];
+
+const systems = [
+  {
+    title: "ADCS",
+    body: "IMU, magnetometer, and sun sensor readings are merged and fused using an Extended Kalman Filter to estimate the spacecraft's attitude (orientation). Hand-wound magnetorquers are driven through a PID controller to set the satellite's angular velocity and orientation.",
+  },
+  {
+    title: "Flight computer",
+    body: "A STM32-series processor running the RTIC framework handles all onboard operations on a single core. All code is no_std Rust.",
+  },
+  {
+    title: "Communications",
+    body: "We use the 435 Megahertz ultra-high frequency band for communication, with the LoRa modulation scheme. Our transceiver is an E-Byte LoRa module which wraps a SemTech SX1262-based chip, connected to a tape measure antenna which is deployed via a burn wire into orbit.",
+  },
+  {
+    title: "Power",
+    body: "Our battery pack is a 4P3S 21700 (21mm x 70mm) lithium ion battery pack powered by high-efficiency solar panels. The satellite runs on a 5V bus regulated by a custom power controller. A dedicated watchdog chip resets the STM32 flight computer in case of a heartbeat failure.",
+  },
+];
+
+const team = [
+  { name: "Ashwin Naren", role: "Software BDFL/Lead · electrical · structural", image: ashwin.src },
+  { name: "Vinayak Vikram", role: "Electrical lead · software · structural", image: vinayak.src },
+  { name: "Aadish Verma", role: "Comms lead · software", image: aadish.src },
+  { name: "Weston Yoo", role: "Overall team lead", image: weston.src },
+  { name: "Daphne F", role: "Outreach Lead", initials: "DF" },
+  { name: "Jahnavi Naren", role: "Software · structural", initials: "JN" },
+  { name: "Caleb Laverty", role: "Outreach", initials: "CL" },
+  { name: "Francesca Davies", role: "Outreach · funding", image: francesca.src },
+  { name: "Shiv Sareen", role: "Outreach · funding", initials: "SS" },
+  { name: "Victoria McLeod", role: "Structural", image: victoria.src },
+  { name: "Grace Zheng", role: "Structural · media", image: grace.src },
+];
+
+const stats = [
+  { value: "March 2027", label: "current launch target" },
+  { value: "$10k", label: "hardware budget" },
+  { value: "0", label: "adult supervision" },
+];
+
+const snapshot = [
+  ["Form factor", "3U CubeSat (100×100×300 mm)"],
+  ["Orbit", "Sun-synchronous LEO @ 550km"],
+  ["Structure", "Aluminum frame"],
+  ["Comms", "UHF LoRa on 435 MHz"],
+  ["Goal", "Capture & downlink image of the Earth"],
+] as const;
+---
+
+<div class="min-h-screen">
+  <SiteHeader homeHref="#top" />
+
+  <main id="top" class="mx-auto flex w-[min(1040px,calc(100vw-40px))] flex-col gap-14 py-7 pb-16">
+    <section class="grid items-center gap-6 border-b border-elevated-10 pb-6 pt-2.5 md:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)]">
+      <div class="flex flex-col gap-[18px]">
+        <Text variant="eyebrow" tone="tertiary">PixelSat I</Text>
+        <Text variant="display" class="max-w-[14ch] text-balance">A CubeSat built by high schoolers on Earth.</Text>
+        <Text variant="body-lg" tone="secondary" class="max-w-[68ch]">
+          Project Pixel Orbital is a fully student-led team at Stanford Online High School building PixelSat I, a 3U CubeSat targeting launch into sun-synchronous low Earth orbit in early 2027, from scratch, on an extremely limited budget.
+        </Text>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <a href="#mission" class="inline-flex min-h-[38px] items-center gap-[7px] rounded-full bg-blue px-4 py-[9px] text-[16px] font-medium text-white no-underline transition-[background-color,transform] duration-200 hover:bg-blue-hover active:scale-[0.97] active:bg-blue-press">
+            See what we're building
+            <IconArrowRight />
+          </a>
+          <OuterLink href="https://www.instagram.com/projectpixelorbital/" button>
+            Instagram
+            <IconExternalLink />
+          </OuterLink>
+          <OuterLink href="https://www.youtube.com/@projectpixelorbital2026" button>
+            YouTube
+            <IconExternalLink />
+          </OuterLink>
+        </div>
+
+        <div class="mt-1 grid gap-2.5 md:grid-cols-3">
+          {stats.map((stat) => (
+            <div class="border-t border-elevated-10 py-3">
+              <Text tag="div" variant="subheading" class="text-[17px]">{stat.value}</Text>
+              <Text tag="div" variant="caption" tone="tertiary" class="mt-1 text-[14px] leading-[1.3]">{stat.label}</Text>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div class="grid place-items-center">
+        <img src={render.src} alt="Transparent CAD render of PixelSat I" class="h-auto w-full max-w-[380px] object-contain" />
+      </div>
+    </section>
+
+    <section class="flex flex-col gap-[18px]">
+      <div class="flex items-end justify-between gap-5">
+        <Text variant="title">From the blog</Text>
+      </div>
+
+      <div aria-label="Recent blog posts" class="grid auto-cols-[minmax(280px,340px)] grid-flow-col gap-4 overflow-x-auto pb-1.5 [scroll-snap-type:x_proximity]">
+        {blogPosts.map((post: BlogPost) => (
+          <CardLink class="min-h-[220px] [scroll-snap-align:start]" href={`/${post.slug}`} title={post.title} desc={post.authors} />
+        ))}
+      </div>
+    </section>
+
+    <section class="flex flex-col gap-[18px]">
+      <div class="flex flex-col gap-2.5">
+        <Text variant="title">In brief</Text>
+      </div>
+
+      <div class="grid gap-x-6 border-t border-elevated-10 md:grid-cols-3">
+        {snapshot.map(([label, value]) => (
+          <div class="flex flex-col gap-2 border-b border-elevated-10 py-4">
+            <Text tag="div" variant="caption" tone="tertiary">{label}</Text>
+            <Text tag="div" variant="body">{value}</Text>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section id="mission" class="flex flex-col gap-[18px]">
+      <div class="flex flex-col gap-[14px]">
+        <Text variant="title">Mission</Text>
+      </div>
+
+      <div class="grid gap-x-6 border-t border-elevated-10 md:grid-cols-2">
+        {mission.map((item) => (
+          <article class="flex gap-[18px] border-b border-elevated-10 py-4 max-md:flex-col">
+            <div>
+              <Text variant="heading">{item.title}</Text>
+              <Text variant="body-lg" tone="secondary" class="mt-2">{item.body}</Text>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section id="systems" class="flex flex-col gap-[18px]">
+      <div class="flex flex-col gap-[14px]">
+        <Text variant="title">Technical overview</Text>
+      </div>
+
+      <div class="grid gap-x-6 border-t border-elevated-10 md:grid-cols-2">
+        {systems.map((system) => (
+          <article class="flex flex-col gap-2.5 border-b border-elevated-10 py-4">
+            <Text variant="heading">{system.title}</Text>
+            <Text variant="body-lg" tone="secondary">{system.body}</Text>
+          </article>
+        ))}
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3">
+        <OuterLink href="https://www.gofundme.com/f/support-project-pixel-orbital-student-team" button>
+          Help fund the hardware
+          <IconExternalLink />
+        </OuterLink>
+        <OuterLink href="https://www.instagram.com/projectpixelorbital/" button>
+          Follow the build
+          <IconExternalLink />
+        </OuterLink>
+      </div>
+    </section>
+
+    <section id="team" class="flex flex-col gap-[18px]">
+      <div class="flex items-end justify-between gap-5">
+        <Text variant="title">Team</Text>
+      </div>
+
+      <div class="grid gap-x-6 border-t border-elevated-10 sm:grid-cols-2 md:grid-cols-3">
+        {team.map((member) => (
+          <article class="flex flex-col gap-[14px] border-b border-elevated-10 py-4">
+            {member.image ? (
+              <img class="aspect-square w-full bg-[#f2f2f2] object-cover object-center" src={member.image} alt={member.name} />
+            ) : (
+              <div class="grid aspect-square w-full place-items-center border border-elevated-10 bg-[#f2f2f2] text-[42px] font-medium text-primary">{member.initials}</div>
+            )}
+            <div>
+              <Text variant="subheading">{member.name}</Text>
+              <Text variant="body-lg" tone="secondary" class="mt-2">{member.role}</Text>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="flex flex-col gap-[18px] border-t border-elevated-10 pt-2">
+      <Text variant="title">Support us</Text>
+      <Text variant="body-lg" tone="secondary" class="max-w-[72ch]">
+        Launch costs are covered, but we're seeking funding for the actual hardware of the satellite. Our $10,000 budget is already measly compared to the millions available to many university teams, so every dollar helps.
+      </Text>
+
+      <div class="flex flex-wrap items-center gap-3">
+        <OuterLink href="https://www.gofundme.com/f/support-project-pixel-orbital-student-team" button primary>
+          Donate on GoFundMe
+          <IconExternalLink />
+        </OuterLink>
+      </div>
+    </section>
+  </main>
+</div>

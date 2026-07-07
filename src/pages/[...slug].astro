@@ -1,9 +1,7 @@
 ---
 import { getCollection, render, type CollectionEntry } from "astro:content";
-import PrismBlog from "../components/PrismBlog.svelte";
+import Blog from "../components/Blog.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
-import "@imput/helium-prism/styles.css";
-import "../styles/global.css";
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog");
@@ -19,7 +17,7 @@ const { Content } = await render(post);
 ---
 
 <BaseLayout>
-    <PrismBlog title={title} authors={authors}>
+    <Blog title={title} authors={authors}>
         <Content />
-    </PrismBlog>
+    </Blog>
 </BaseLayout>

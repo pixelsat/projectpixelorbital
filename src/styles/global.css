@@ -1,32 +1,107 @@
 @import "tailwindcss";
-@import "@imput/helium-prism/styles.css";
 
-@config "../../tailwind.config.mjs";
+@theme {
+    --font-sans: var(--font);
+
+    --color-primary: var(--primary);
+    --color-secondary: var(--secondary);
+    --color-tertiary: var(--tertiary);
+    --color-white: var(--white);
+
+    --color-blue: var(--blue);
+    --color-blue-hover: var(--blue-hover);
+    --color-blue-press: var(--blue-press);
+
+    --color-background: var(--background);
+    --color-bg-surface: var(--bg-surface);
+    --color-bg-gradient-start: var(--bg-gradient-start);
+    --color-bg-gradient-end: var(--bg-gradient-end);
+
+    --color-elevated-7: var(--elevated-7);
+    --color-elevated-10: var(--elevated-10);
+    --color-elevated-15: var(--elevated-15);
+}
 
 :root {
+    --font: "Instrument Sans Variable", system-ui, Helvetica, Arial, sans-serif;
+
     --primary: #111111;
     --secondary: #4f4f4f;
     --tertiary: #7a7a7a;
     --white: #ffffff;
 
-    --helium-blue: #D92E31; /* #3450d1*/
-    --helium-blue-hover: #cf3032; /* #3a58db*/
-    --helium-blue-press: #d41519; /* #304bc2*/
+    --blue: #d92e31;
+    --blue-hover: #cf3032;
+    --blue-press: #d41519;
 
     --bg-surface: #ffffff;
     --bg-gradient-start: #ffffff;
     --bg-gradient-end: #ffffff;
-    --background: #ffffff;
+    --intro-gradient-start: #e3e8ff;
+    --intro-gradient-end: #f4f7ff;
+    --intro-gradient: linear-gradient(
+        180deg,
+        var(--intro-gradient-start) 0%,
+        var(--intro-gradient-end) 100%
+    );
+    --background: var(--bg-surface);
+
+    --elevated-7: color-mix(in srgb, #3450d1 7%, transparent);
+    --elevated-10: color-mix(in srgb, #3450d1 10%, transparent);
+    --elevated-15: color-mix(in srgb, #3450d1 15%, transparent);
+
+    --mid-border-radius: 12px;
+    --card-border-radius: 20px;
+    --glass-filter: blur(12px) saturate(110%);
 }
 
-html {
-    scroll-behavior: smooth;
-    background: #ffffff;
+@media (prefers-color-scheme: dark) {
+    :root {
+        --primary: #e3e6f2;
+        --secondary: #8f9bcb;
+        --tertiary: #7985b2;
+        --white: var(--primary);
+
+        --bg-surface: #0e1123;
+        --bg-gradient-start: #151932;
+        --bg-gradient-end: #2d3c7f;
+        --intro-gradient-start: var(--bg-gradient-start);
+        --intro-gradient-end: var(--bg-gradient-end);
+        --background: var(--bg-surface);
+
+        --elevated-7: color-mix(in srgb, #b3beec 7%, transparent);
+        --elevated-10: color-mix(in srgb, #b3beec 10%, transparent);
+        --elevated-15: color-mix(in srgb, #b3beec 15%, transparent);
+        --glass-filter: blur(12px);
+    }
 }
 
-body.prism-body {
-    min-height: 100vh;
-    overflow-x: hidden;
-    background: #ffffff;
-    color: #111111;
+@layer base {
+    * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+        scroll-behavior: smooth;
+        background: var(--background);
+    }
+
+    body {
+        min-height: 100vh;
+        margin: 0;
+        overflow-x: hidden;
+        background: var(--background);
+        color: var(--primary);
+        font-family: var(--font);
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    ::selection {
+        color: var(--primary);
+        background-color: var(--elevated-15);
+    }
 }

@@ -1,0 +1,29 @@
+---
+import logo from "../assets/images/ppologo.png";
+import OuterLink from "./OuterLink.astro";
+import IconExternalLink from "./icons/IconExternalLink.astro";
+import Text from "./Text.astro";
+
+interface Props {
+  homeHref?: string;
+}
+
+const { homeHref = "/" } = Astro.props;
+---
+
+<header class="mx-auto flex w-[min(1040px,calc(100vw-40px))] flex-col gap-[18px] border-b border-elevated-10 py-6 pb-[10px] md:flex-row md:items-center md:justify-between">
+  <a href={homeHref} aria-label="Project Pixel Orbital home" class="flex items-center gap-3 no-underline">
+    <img src={logo.src} alt="Project Pixel Orbital logo" class="h-[42px] w-[42px] object-contain" />
+    <Text tag="div" variant="subheading">Project Pixel Orbital</Text>
+  </a>
+
+  <nav aria-label="Primary" class="flex flex-wrap items-center gap-2.5 md:justify-end">
+    <a href="/#mission" class="px-[10px] py-2 text-[16px] font-[400] text-secondary no-underline transition-colors duration-200 hover:text-primary">Mission</a>
+    <a href="/#systems" class="px-[10px] py-2 text-[16px] font-[400] text-secondary no-underline transition-colors duration-200 hover:text-primary">Systems</a>
+    <a href="/#team" class="px-[10px] py-2 text-[16px] font-[400] text-secondary no-underline transition-colors duration-200 hover:text-primary">Team</a>
+    <OuterLink href="https://www.gofundme.com/f/support-project-pixel-orbital-student-team" button primary>
+      Support the launch
+      <IconExternalLink />
+    </OuterLink>
+  </nav>
+</header>
