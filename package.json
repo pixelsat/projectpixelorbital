@@ -12,11 +12,7 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
-    "@astrojs/svelte": "9.0.1",
-    "@imput/helium-prism": "^0.1.2",
-    "astro": "7.0.6",
-    "svelte": "^5.56.0",
-    "three": "^0.184.0"
+    "astro": "7.0.6"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
