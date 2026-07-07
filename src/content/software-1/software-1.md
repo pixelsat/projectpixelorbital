@@ -67,6 +67,9 @@ Compared to VHF, UHF is less affected by the ionosphere, has a smaller antenna f
 
 S-band and X-band do not have cheap, readily available COTS transceivers, and their power draw is also higher to compensate for signal loss.
 
+Our UHF antenna will be a deployable "tape-measure" antenna transmitting in the 435 MHz band.
+The antenna is generally omnidirectional, but pointing it towards the ground increases the link budget significantly.
+
 ## LoRa vs GMSK/GFSK
 
 ### LoRa
@@ -165,7 +168,21 @@ These macros are custom-built, allowing us to achieve the following goals:
 1. No heap allocations
 2. Maximum packing efficiency
 
-For example, we pack boolean values as single bits to minimize packet size.
+We also intern almost all string and use `Vec`s very sparingly.
+
+For example, we use defmt for logs, ensuring that logs are highly compressed when being streamed to the ground.
+
+Additionally, because messages are at most `240` byes,
+we can use a smallvec optimization to guarantee no heap allocation:
+
+```rust
+pub struct CommsVec {
+    array: [u8; MESSAGE_LEN],
+    length: usize,
+}
+```
+
+In terms of size reduction: we pack adjacent boolean values as single bits to minimize packet size.
 
 The following code, for example, occupies 1 byte:
 ```rust
@@ -178,3 +195,25 @@ pub struct Example {
     pub has_tle: bool,
 }
 ```
+
+Furthermore, we have methods to have variable size integers (i.e 48 bit integers will pack cleanly into the message):
+
+```rust
+#[derive(CommsSerialize, CommsDeserialize)]
+pub struct Example {
+    #[size(48)]
+    pub value1: u64,
+    #[size(12)]
+    pub value2: u16
+}
+```
+
+## Closing thoughts
+
+Our current stack is a necessity given the tight requirements we operate under.
+This comms stack costs less than $100: one of, if not, the lowest cost of any cubesat comms system.
+
+As of now, we have verified that the system works with two-way communication on earth,
+but we have yet to extensively vibe test or thermal cycle the system.
+
+We also still need a ground station for uplink capabilities.
