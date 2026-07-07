@@ -1,40 +1,42 @@
 ---
-import '../styles/global.css';
+import "../styles/global.css";
 
 interface Props {
-    title?: string;
-    description?: string;
-    image?: string;
-    url?: string;
+  title?: string;
+  description?: string;
+  image?: string;
+  url?: string;
 }
 
 const {
-    title = 'Project Pixel Orbital',
-    description = 'Student-led CubeSat mission launching by 2026.',
-    image = 'https://ibb.co/XZdLgSc5',
-    url = 'https://www.projectpixelorbital.com',
+  title = "Project Pixel Orbital",
+  description = "Student-led CubeSat mission launching by 2026.",
+  image = "https://ibb.co/XZdLgSc5",
+  url = "https://www.projectpixelorbital.com",
 } = Astro.props;
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" class="scroll-smooth">
-<head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <meta name="color-scheme" content="light dark"/>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
     <title>{title}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com"/>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap"
-          rel="stylesheet"/>
-    <meta name="description" content={description}/>
-    <meta property="og:title" content="Project Pixel Orbital"/>
-    <meta property="og:description" content={description}/>
-    <meta property="og:image" content={image}/>
-    <meta property="og:url" content={url}/>
-    <meta property="og:type" content="website"/>
-</head>
-<body class="prism-body">
-<slot/>
-</body>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap"
+      rel="stylesheet"
+    />
+    <meta name="description" content={description} />
+    <meta property="og:title" content="Project Pixel Orbital" />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={image} />
+    <meta property="og:url" content={url} />
+    <meta property="og:type" content="website" />
+  </head>
+  <body>
+    <slot />
+  </body>
 </html>

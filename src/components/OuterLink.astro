@@ -1,0 +1,69 @@
+---
+interface Props {
+  href: string;
+  class?: string;
+  target?: string;
+  rel?: string;
+  button?: boolean;
+  primary?: boolean;
+  transparent?: boolean;
+  card?: boolean;
+  circle?: boolean;
+  ariaLabel?: string;
+}
+
+const {
+  href,
+  class: className,
+  target: targetProp,
+  rel: relProp,
+  button = false,
+  primary = false,
+  transparent = false,
+  card = false,
+  circle = false,
+  ariaLabel,
+  ...rest
+} = Astro.props;
+
+const isExternal =
+  /^(?:[a-z]+:)?\/\//i.test(href) ||
+  href.startsWith("mailto:") ||
+  href.startsWith("tel:");
+const target = isExternal ? (targetProp ?? "_blank") : targetProp;
+const rel = isExternal ? (relProp ?? "noopener noreferrer") : relProp;
+
+const buttonClasses = button
+  ? [
+      "inline-flex items-center text-[16px] font-medium transition-[background-color,transform,opacity] duration-200 will-change-transform",
+      circle
+        ? "size-[38px] justify-center rounded-full p-0"
+        : card
+          ? "w-full items-start gap-3 rounded-[14px] px-[18px] py-[14px] text-left"
+          : "min-h-[38px] w-fit gap-[7px] rounded-full px-4 py-[9px]",
+      transparent
+        ? "bg-transparent"
+        : primary
+          ? "bg-blue text-white hover:bg-blue-hover active:bg-blue-press"
+          : "bg-elevated-7 text-primary hover:bg-elevated-10 active:bg-elevated-15",
+      !card && !circle && "active:scale-[0.97]",
+    ]
+  : [];
+---
+
+<a
+  href={href}
+  target={target}
+  rel={rel}
+  aria-label={ariaLabel}
+  class:list={[
+    button
+      ? "no-underline focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-primary"
+      : "underline-offset-4 focus-visible:rounded-[5px] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-primary",
+    buttonClasses,
+    className,
+  ]}
+  {...rest}
+>
+  <slot />
+</a>

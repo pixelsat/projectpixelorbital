@@ -7,18 +7,23 @@
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
-    "@astrojs/svelte": "^8.1.2",
+    "@astrojs/svelte": "9.0.1",
     "@imput/helium-prism": "^0.1.2",
-    "astro": "^6.1.9",
+    "astro": "7.0.6",
     "svelte": "^5.56.0",
     "three": "^0.184.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
     "@tailwindcss/vite": "^4.2.4",
+    "prettier": "^3.9.4",
+    "prettier-plugin-astro": "^0.14.1",
+    "prettier-plugin-svelte": "^4.1.1",
     "tailwindcss": "^4.2.4",
     "typescript": "^6.0.3"
   }

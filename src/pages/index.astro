@@ -1,8 +1,19 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import PrismLanding from '../components/PrismLanding.svelte';
+import { getCollection, type CollectionEntry } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Landing from "../components/Landing.astro";
+
+const blogPosts = (await getCollection("blog"))
+  .sort((a: CollectionEntry<"blog">, b: CollectionEntry<"blog">) =>
+    b.id.localeCompare(a.id),
+  )
+  .map((post: CollectionEntry<"blog">) => ({
+    slug: post.id,
+    title: post.data.title,
+    authors: post.data.authors,
+  }));
 ---
 
 <BaseLayout>
-    <PrismLanding />
+  <Landing blogPosts={blogPosts} />
 </BaseLayout>
