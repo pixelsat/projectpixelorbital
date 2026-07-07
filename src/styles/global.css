@@ -57,21 +57,21 @@
 
 @media (prefers-color-scheme: dark) {
     :root {
-        --primary: #e3e6f2;
-        --secondary: #8f9bcb;
-        --tertiary: #7985b2;
+        --primary: #f2e6e6;
+        --secondary: #f7f3f3;
+        --tertiary: #f7f1f1;
         --white: var(--primary);
 
-        --bg-surface: #0e1123;
+        --bg-surface: #0f0f0f;
         --bg-gradient-start: #151932;
         --bg-gradient-end: #2d3c7f;
         --intro-gradient-start: var(--bg-gradient-start);
         --intro-gradient-end: var(--bg-gradient-end);
         --background: var(--bg-surface);
 
-        --elevated-7: color-mix(in srgb, #b3beec 7%, transparent);
-        --elevated-10: color-mix(in srgb, #b3beec 10%, transparent);
-        --elevated-15: color-mix(in srgb, #b3beec 15%, transparent);
+        --elevated-7: color-mix(in srgb, #f8eaea 7%, transparent);
+        --elevated-10: color-mix(in srgb, #f8eaea 10%, transparent);
+        --elevated-15: color-mix(in srgb, #f8eaea 15%, transparent);
         --glass-filter: blur(12px);
 
         --tight-spacing: -0.5rem;

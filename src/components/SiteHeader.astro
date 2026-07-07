@@ -1,5 +1,6 @@
 ---
 import logo from "../assets/images/ppologo.png";
+import logoDark from "../assets/images/ppologodark.png";
 import OuterLink from "./OuterLink.astro";
 import IconExternalLink from "./icons/IconExternalLink.astro";
 import Text from "./Text.astro";
@@ -22,7 +23,12 @@ const { homeHref = "/" } = Astro.props;
         <img
             src={logo.src}
             alt="Project Pixel Orbital logo"
-            class="size-12 object-contain"
+            class="size-12 object-contain dark:hidden"
+        />
+        <img
+            src={logoDark.src}
+            alt="Project Pixel Orbital logo"
+            class="size-12 object-contain dark:block hidden"
         />
         <Text tag="div" variant="subheading">Project Pixel Orbital</Text>
     </a>
