@@ -5,10 +5,12 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog");
-  return posts.map((post: CollectionEntry<"blog">) => ({
-    params: { slug: post.id },
-    props: { post },
-  }));
+  return posts.map((post: CollectionEntry<"blog">) => {
+    return {
+      params: { slug: post.id.split("/").slice(1)[0] },
+      props: { post },
+    };
+  });
 }
 
 const { post } = Astro.props;
@@ -16,7 +18,7 @@ const { title, authors } = post.data;
 const { Content } = await render(post);
 ---
 
-<BaseLayout>
+<BaseLayout title={title + " | Project Pixel Orbital"}>
   <Blog title={title} authors={authors}>
     <Content />
   </Blog>

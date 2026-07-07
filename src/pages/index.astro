@@ -8,7 +8,7 @@ const blogPosts = (await getCollection("blog"))
     b.id.localeCompare(a.id),
   )
   .map((post: CollectionEntry<"blog">) => ({
-    slug: post.id,
+    slug: post.id.split("/").slice(1)[0],
     title: post.data.title,
     authors: post.data.authors,
   }));

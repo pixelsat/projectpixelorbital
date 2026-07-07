@@ -89,6 +89,8 @@ GMSK is a special case of GFSK in which the modulation index is minimized while 
 
 Because LoRa uses chirp spread spectrum, it is generally more tolerant of Doppler-induced frequency offsets than GMSK/GFSK, which rely on detecting small frequency changes around the carrier wave. Therefore, GMSK/GFSK requires accurate knowledge of the satellite's position and velocity to decode the signal reliably.
 
+![Visualization of how LoRa's chirp spread spectrum is more resistent to Doppler shift than GMSK/GFSK](comms-diagram.svg)
+
 Due to Doppler shift and our design constraints, we eventually settled on a pure-LoRa communications stack.
 
 ## Timeline
