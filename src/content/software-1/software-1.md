@@ -43,8 +43,14 @@ authors: Ashwin Naren, Vinayak Vikram, Aadish Verma
 -->
 
 Welcome to the first post in a series about the PixelSat I software stack.
+In this series, we will explore both what we built and also how we arrived there.
 
 PixelSat I is a 3U CubeSat designed entirely by students at Stanford OHS and is scheduled to launch no earlier than March 2027.
+Because we are a student team working under tight budget, power, and time constraints, nearly every part of the spacecraft has had to be designed with custom-of-the-shelf parts.
+
+A satellite can have great software, a capable payload, and a carefully designed avionics stack, but without a reliable radio link it is effectively inaccessible once it leaves the ground. The communications system determines how much data we can return, how confidently we can command the spacecraft, what sort of ground infrastructure we can rely on, and even which regulations we have to design around. In many ways, it sets the operational envelope for the entire mission.
+
+This post focuses on how we chose our radio stack and why we ultimately committed to a low-cost LoRa-based approach. We will walk through the constraints we started with, the modulation schemes we considered, the hardware options we evaluated, and the framing decisions that define the current system.
 
 ## Constraints
 When choosing a transceiver, there were a few constraints we absolutely had to satisfy.
@@ -212,6 +218,8 @@ pub struct Example {
 
 Our current stack is a necessity given the tight requirements we operate under.
 This comms stack costs less than $100: one of, if not, the lowest cost of any cubesat comms system.
+For a relatively low bandwidth mission like this, this stack is of course optimal, however this does not scale:
+COTS chips don't work on S or X bands.
 
 As of now, we have verified that the system works with two-way communication on earth,
 but we have yet to extensively vibe test or thermal cycle the system.
