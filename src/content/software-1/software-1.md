@@ -46,7 +46,7 @@ Welcome to the first post in a series about the PixelSat I software stack.
 In this series, we will explore both what we built and also how we arrived there.
 
 PixelSat I is a 3U CubeSat designed entirely by students at Stanford OHS and is scheduled to launch no earlier than March 2027.
-Because we are a student team working under tight budget, power, and time constraints, nearly every part of the spacecraft has had to be designed with custom-of-the-shelf parts.
+Because we are a student team working under tight budget, power, and time constraints, nearly every part of the spacecraft has had to be designed with commercial off-the-shelf parts.
 
 A satellite can have great software, a capable payload, and a carefully designed avionics stack, but without a reliable radio link it is effectively inaccessible once it leaves the ground. The communications system determines how much data we can return, how confidently we can command the spacecraft, what sort of ground infrastructure we can rely on, and even which regulations we have to design around. In many ways, it sets the operational envelope for the entire mission.
 
