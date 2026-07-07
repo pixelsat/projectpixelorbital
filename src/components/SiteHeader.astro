@@ -40,7 +40,7 @@ const blogPosts = await getCollection("blog");
     class="flex flex-wrap items-center gap-5 md:justify-end"
   >
     {
-      blogPosts && (
+      blogPosts.length > 0 && (
         <a href="/#blog" class="py-2">
           <Text variant="subheading" tone="tertiary">
             Blog
