@@ -182,27 +182,29 @@ const snapshot = [
       </div>
     </section>
 
-    <section class="flex flex-col gap-[18px]" id="blog">
-      <div class="flex items-end justify-between gap-5">
-        <Text variant="title">From the blog</Text>
-      </div>
+    {
+      blogPosts && (
+        <section class="flex flex-col gap-[18px]" id="blog">
+          <div class="flex items-end justify-between gap-5">
+            <Text variant="title">From the blog</Text>
+          </div>
 
-      <div
-        aria-label="Recent blog posts"
-        class="grid auto-cols-[minmax(280px,340px)] grid-flow-col gap-4 overflow-x-auto pb-1.5 [scroll-snap-type:x_proximity]"
-      >
-        {
-          blogPosts.map((post: BlogPost) => (
-            <CardLink
-              class="min-h-[220px] [scroll-snap-align:start]"
-              href={`/${post.slug}`}
-              title={post.title}
-              desc={post.authors}
-            />
-          ))
-        }
-      </div>
-    </section>
+          <div
+            aria-label="Recent blog posts"
+            class="grid auto-cols-[minmax(280px,340px)] grid-flow-col gap-4 overflow-x-auto pb-1.5 [scroll-snap-type:x_proximity]"
+          >
+            {blogPosts.map((post: BlogPost) => (
+              <CardLink
+                class="min-h-[220px] [scroll-snap-align:start]"
+                href={`/${post.slug}`}
+                title={post.title}
+                desc={post.authors}
+              />
+            ))}
+          </div>
+        </section>
+      )
+    }
 
     <section class="flex flex-col gap-[18px]">
       <div class="flex flex-col gap-2.5">

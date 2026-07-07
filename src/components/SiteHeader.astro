@@ -4,58 +4,66 @@ import logoDark from "../assets/images/ppologodark.png";
 import OuterLink from "./OuterLink.astro";
 import IconExternalLink from "./icons/IconExternalLink.astro";
 import Text from "./Text.astro";
+import { getCollection } from "astro:content";
 
 interface Props {
-    homeHref?: string;
+  homeHref?: string;
 }
 
 const { homeHref = "/" } = Astro.props;
+const blogPosts = await getCollection("blog");
 ---
 
 <header
-    class="mx-auto flex w-[min(1040px,calc(100vw-40px))] flex-col gap-[18px] border-b border-elevated-10 py-6 pb-[10px] md:flex-row md:items-center md:justify-between"
+  class="mx-auto flex w-[min(1040px,calc(100vw-40px))] flex-col gap-[18px] border-b border-elevated-10 py-6 pb-[10px] md:flex-row md:items-center md:justify-between"
 >
-    <a
-        href={homeHref}
-        aria-label="Project Pixel Orbital home"
-        class="flex items-center gap-3 no-underline"
-   >
-        <img
-            src={logo.src}
-            alt="Project Pixel Orbital logo"
-            class="size-12 object-contain dark:hidden"
-        />
-        <img
-            src={logoDark.src}
-            alt="Project Pixel Orbital logo"
-            class="size-12 object-contain dark:block hidden"
-        />
-        <Text tag="div" variant="subheading">Project Pixel Orbital</Text>
-    </a>
+  <a
+    href={homeHref}
+    aria-label="Project Pixel Orbital home"
+    class="flex items-center gap-3 no-underline"
+  >
+    <img
+      src={logo.src}
+      alt="Project Pixel Orbital logo"
+      class="size-12 object-contain dark:hidden"
+    />
+    <img
+      src={logoDark.src}
+      alt="Project Pixel Orbital logo"
+      class="size-12 object-contain dark:block hidden"
+    />
+    <Text tag="div" variant="subheading">Project Pixel Orbital</Text>
+  </a>
 
-    <nav
-        aria-label="Primary"
-        class="flex flex-wrap items-center gap-5 md:justify-end"
-    >
+  <nav
+    aria-label="Primary"
+    class="flex flex-wrap items-center gap-5 md:justify-end"
+  >
+    {
+      blogPosts && (
         <a href="/#blog" class="py-2">
-            <Text variant="subheading" tone="tertiary">Blog</Text>
+          <Text variant="subheading" tone="tertiary">
+            Blog
+          </Text>
         </a>
-        <a href="/#mission" class="py-2">
-            <Text variant="subheading" tone="tertiary">Mission</Text>
-        </a>
-        <a href="/#systems" class="py-2">
-            <Text variant="subheading" tone="tertiary">Systems</Text>
-        </a>
-        <a href="/#team" class="py-2">
-            <Text variant="subheading" tone="tertiary">Team</Text>
-        </a>
-        <OuterLink
-            href="https://www.gofundme.com/f/support-project-pixel-orbital-student-team"
-            button
-            primary
-        >
-            Support the launch
-            <IconExternalLink />
-        </OuterLink>
-    </nav>
+      )
+    }
+    <a href="/#mission" class="py-2">
+      <Text variant="subheading" tone="tertiary">Mission</Text>
+    </a>
+    <a href="/#systems" class="py-2">
+      <Text variant="subheading" tone="tertiary">Systems</Text>
+    </a>
+    <a href="/#team" class="py-2">
+      <Text variant="subheading" tone="tertiary">Team</Text>
+    </a>
+    <OuterLink
+      href="https://www.gofundme.com/f/support-project-pixel-orbital-student-team"
+      button
+      primary
+    >
+      Support the launch
+      <IconExternalLink />
+    </OuterLink>
+  </nav>
 </header>

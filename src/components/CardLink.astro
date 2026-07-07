@@ -4,23 +4,23 @@ import IconExternalLink from "./icons/IconExternalLink.astro";
 import Text from "./Text.astro";
 
 interface Props {
-    title: string;
-    desc: string;
-    href: string;
-    class?: string;
+  title: string;
+  desc: string;
+  href: string;
+  class?: string;
 }
 
 const { title, desc, href, class: className } = Astro.props;
 ---
 
 <OuterLink href={href} button card class:list={["group", className]}>
-    <div class="flex w-full flex-col gap-1 overflow-hidden">
-        <Text
-            variant="subheading"
-            class="transition-colors duration-200 group-hover:text-primary"
-            >{title}</Text
-        >
-        <Text variant="body" tone="secondary" class="line-clamp-3">{desc}</Text>
-    </div>
-    <IconExternalLink class="mt-0.5 size-[21px] shrink-0" />
+  <div class="flex w-full flex-col gap-1 overflow-hidden">
+    <Text
+      variant="subheading"
+      class="transition-colors duration-200 group-hover:text-primary"
+      >{title}</Text
+    >
+    <Text variant="body" tone="secondary" class="line-clamp-3">{desc}</Text>
+  </div>
+  <IconExternalLink class="mt-0.5 size-[21px] shrink-0" />
 </OuterLink>

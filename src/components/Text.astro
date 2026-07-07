@@ -1,136 +1,129 @@
 ---
 interface Props {
-    variant?:
-        | "display"
-        | "title"
-        | "heading"
-        | "subheading"
-        | "body"
-        | "caption";
-    tone?: "primary" | "secondary" | "tertiary" | "white";
-    tag?: keyof astroHTML.JSX.IntrinsicElements;
-    center?: boolean;
-    class?: string;
+  variant?: "display" | "title" | "heading" | "subheading" | "body" | "caption";
+  tone?: "primary" | "secondary" | "tertiary" | "white";
+  tag?: keyof astroHTML.JSX.IntrinsicElements;
+  center?: boolean;
+  class?: string;
 }
 
 const {
-    variant = "body",
-    tone = "primary",
-    tag,
-    center = false,
-    class: className,
+  variant = "body",
+  tone = "primary",
+  tag,
+  center = false,
+  class: className,
 } = Astro.props as Props;
 
 const variantClasses = {
-    display:
-        "tracking-[-0.02em] text-5xl",
-    title: "tracking-[-0.02em] text-4xl",
-    heading: "text-2xl tracking-[-0.02em] font-medium",
-    subheading: "text-xl tracking-[-0.02em] font-medium",
-    body: "text-lg",
-    caption: "text-md",
+  display: "tracking-[-0.02em] text-5xl",
+  title: "tracking-[-0.02em] text-4xl",
+  heading: "text-2xl tracking-[-0.02em] font-medium",
+  subheading: "text-xl tracking-[-0.02em] font-medium",
+  body: "text-lg",
+  caption: "text-md",
 } as const;
 
 const toneClasses = {
-    primary: "text-primary",
-    secondary: "text-secondary",
-    tertiary: "text-tertiary",
-    white: "text-white",
+  primary: "text-primary",
+  secondary: "text-secondary",
+  tertiary: "text-tertiary",
+  white: "text-white",
 } as const;
 
 let resolvedTag: keyof astroHTML.JSX.IntrinsicElements;
 
 if (tag) {
-    resolvedTag = tag;
+  resolvedTag = tag;
 } else {
-    switch (variant) {
-        case "display":
-            resolvedTag = "h1";
-            break;
-        case "title":
-            resolvedTag = "h2";
-            break;
-        case "heading":
-            resolvedTag = "h3";
-            break;
-        case "subheading":
-            resolvedTag = "h4";
-            break;
-        default:
-            resolvedTag = "p";
-    }
+  switch (variant) {
+    case "display":
+      resolvedTag = "h1";
+      break;
+    case "title":
+      resolvedTag = "h2";
+      break;
+    case "heading":
+      resolvedTag = "h3";
+      break;
+    case "subheading":
+      resolvedTag = "h4";
+      break;
+    default:
+      resolvedTag = "p";
+  }
 }
 
 const classes = [
-    "font-medium",
-    "m-0",
-    variantClasses[variant],
-    toneClasses[tone],
-    center && "text-center",
-    className,
+  "font-medium",
+  "m-0",
+  variantClasses[variant],
+  toneClasses[tone],
+  center && "text-center",
+  className,
 ];
 ---
 
 {
-    resolvedTag === "h1" && (
-        <h1 class:list={classes}>
-            <slot />
-        </h1>
-    )
+  resolvedTag === "h1" && (
+    <h1 class:list={classes}>
+      <slot />
+    </h1>
+  )
 }
 {
-    resolvedTag === "h2" && (
-        <h2 class:list={classes}>
-            <slot />
-        </h2>
-    )
+  resolvedTag === "h2" && (
+    <h2 class:list={classes}>
+      <slot />
+    </h2>
+  )
 }
 {
-    resolvedTag === "h3" && (
-        <h3 class:list={classes}>
-            <slot />
-        </h3>
-    )
+  resolvedTag === "h3" && (
+    <h3 class:list={classes}>
+      <slot />
+    </h3>
+  )
 }
 {
-    resolvedTag === "h4" && (
-        <h4 class:list={classes}>
-            <slot />
-        </h4>
-    )
+  resolvedTag === "h4" && (
+    <h4 class:list={classes}>
+      <slot />
+    </h4>
+  )
 }
 {
-    resolvedTag === "h5" && (
-        <h5 class:list={classes}>
-            <slot />
-        </h5>
-    )
+  resolvedTag === "h5" && (
+    <h5 class:list={classes}>
+      <slot />
+    </h5>
+  )
 }
 {
-    resolvedTag === "h6" && (
-        <h6 class:list={classes}>
-            <slot />
-        </h6>
-    )
+  resolvedTag === "h6" && (
+    <h6 class:list={classes}>
+      <slot />
+    </h6>
+  )
 }
 {
-    resolvedTag === "div" && (
-        <div class:list={classes}>
-            <slot />
-        </div>
-    )
+  resolvedTag === "div" && (
+    <div class:list={classes}>
+      <slot />
+    </div>
+  )
 }
 {
-    resolvedTag === "span" && (
-        <span class:list={classes}>
-            <slot />
-        </span>
-    )
+  resolvedTag === "span" && (
+    <span class:list={classes}>
+      <slot />
+    </span>
+  )
 }
 {
-    resolvedTag === "p" && (
-        <p class:list={classes}>
-            <slot />
-        </p>
-    )
+  resolvedTag === "p" && (
+    <p class:list={classes}>
+      <slot />
+    </p>
+  )
 }
