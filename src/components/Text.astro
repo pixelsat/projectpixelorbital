@@ -1,6 +1,13 @@
 ---
 interface Props {
-  variant?: "display" | "title" | "heading" | "subheading" | "body" | "caption";
+  variant?:
+    | "display"
+    | "title"
+    | "heading"
+    | "subheading"
+    | "nav"
+    | "body"
+    | "caption";
   tone?: "primary" | "secondary" | "tertiary" | "white";
   tag?: keyof astroHTML.JSX.IntrinsicElements;
   center?: boolean;
@@ -20,6 +27,7 @@ const variantClasses = {
   title: "tracking-[-0.02em] text-4xl",
   heading: "text-2xl tracking-[-0.02em] font-medium",
   subheading: "text-xl tracking-[-0.02em] font-medium",
+  nav: "text-base font-medium",
   body: "text-lg",
   caption: "text-md",
 } as const;
@@ -48,6 +56,9 @@ if (tag) {
       break;
     case "subheading":
       resolvedTag = "h4";
+      break;
+    case "nav":
+      resolvedTag = "span";
       break;
     default:
       resolvedTag = "p";
