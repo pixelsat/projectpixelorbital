@@ -7,7 +7,10 @@ export default defineConfig({
     output: "static",
     markdown: {
         shikiConfig: {
-            theme: "github-light",
+            themes: {
+                light: "github-light",
+                dark: "github-dark"
+            }
         },
     },
     vite: {
