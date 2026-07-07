@@ -225,3 +225,9 @@ As of now, we have verified that the system works with two-way communication on 
 but we have yet to extensively vibe test or thermal cycle the system.
 
 We also still need a ground station for uplink capabilities.
+
+## Future Posts
+
+Part 2: ADCS (Attitude Determination and Control System)
+
+Part 3: OBC (Onboard Computer)
