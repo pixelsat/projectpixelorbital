@@ -73,6 +73,8 @@
         --elevated-10: color-mix(in srgb, #b3beec 10%, transparent);
         --elevated-15: color-mix(in srgb, #b3beec 15%, transparent);
         --glass-filter: blur(12px);
+
+        --tight-spacing: -0.5rem;
     }
 }
 

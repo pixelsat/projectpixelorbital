@@ -13,14 +13,19 @@ const { authors, title } = Astro.props;
 <div class="min-h-screen">
   <SiteHeader />
 
-  <main id="top" class="mx-auto flex w-[min(1040px,calc(100vw-40px))] flex-col gap-8 py-8 pb-[72px] max-md:pb-14">
+  <main
+    id="top"
+    class="mx-auto flex w-[min(1040px,calc(100vw-40px))] flex-col gap-8 py-8 pb-[72px] max-md:pb-14"
+  >
     <section class="flex flex-col gap-[14px]">
       <Text variant="display" class="max-w-none text-balance">{title}</Text>
       <Text tag="div" variant="caption" tone="tertiary">by {authors}</Text>
     </section>
 
     <section class="w-full">
-      <div class="article-prose mx-auto text-[clamp(1rem,0.98rem+0.2vw,1.075rem)] leading-[1.75] text-secondary">
+      <div
+        class="article-prose mx-auto text-[clamp(1rem,0.98rem+0.2vw,1.075rem)] leading-[1.75] text-secondary"
+      >
         <slot />
       </div>
     </section>
@@ -30,6 +35,8 @@ const { authors, title } = Astro.props;
 <style is:global>
   .article-prose * {
     min-width: 0;
+    font-weight: 450;
+    color: var(--primary);
   }
 
   .article-prose h1,
@@ -39,10 +46,9 @@ const { authors, title } = Astro.props;
   .article-prose h5,
   .article-prose h6 {
     margin: 2.5rem 0 0.9rem;
-    color: var(--primary);
     line-height: 1.15;
-    font-weight: 500;
     text-wrap: balance;
+    font-weight: 500;
   }
 
   .article-prose h1 {

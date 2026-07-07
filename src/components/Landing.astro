@@ -66,14 +66,26 @@ const systems = [
 ];
 
 const team = [
-  { name: "Ashwin Naren", role: "Software BDFL/Lead · electrical · structural", image: ashwin.src },
-  { name: "Vinayak Vikram", role: "Electrical lead · software · structural", image: vinayak.src },
+  {
+    name: "Ashwin Naren",
+    role: "Software BDFL/Lead · electrical · structural",
+    image: ashwin.src,
+  },
+  {
+    name: "Vinayak Vikram",
+    role: "Electrical lead · software · structural",
+    image: vinayak.src,
+  },
   { name: "Aadish Verma", role: "Comms lead · software", image: aadish.src },
   { name: "Weston Yoo", role: "Overall team lead", image: weston.src },
   { name: "Daphne F", role: "Outreach Lead", initials: "DF" },
   { name: "Jahnavi Naren", role: "Software · structural", initials: "JN" },
   { name: "Caleb Laverty", role: "Outreach", initials: "CL" },
-  { name: "Francesca Davies", role: "Outreach · funding", image: francesca.src },
+  {
+    name: "Francesca Davies",
+    role: "Outreach · funding",
+    image: francesca.src,
+  },
   { name: "Shiv Sareen", role: "Outreach · funding", initials: "SS" },
   { name: "Victoria McLeod", role: "Structural", image: victoria.src },
   { name: "Grace Zheng", role: "Structural · media", image: grace.src },
@@ -97,54 +109,98 @@ const snapshot = [
 <div class="min-h-screen">
   <SiteHeader homeHref="#top" />
 
-  <main id="top" class="mx-auto flex w-[min(1040px,calc(100vw-40px))] flex-col gap-14 py-7 pb-16">
-    <section class="grid items-center gap-6 border-b border-elevated-10 pb-6 pt-2.5 md:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)]">
-      <div class="flex flex-col gap-[18px]">
-        <Text variant="eyebrow" tone="tertiary">PixelSat I</Text>
-        <Text variant="display" class="max-w-[14ch] text-balance">A CubeSat built by high schoolers on Earth.</Text>
-        <Text variant="body-lg" tone="secondary" class="max-w-[68ch]">
-          Project Pixel Orbital is a fully student-led team at Stanford Online High School building PixelSat I, a 3U CubeSat targeting launch into sun-synchronous low Earth orbit in early 2027, from scratch, on an extremely limited budget.
+  <main
+    id="top"
+    class="mx-auto flex w-[min(1040px,calc(100vw-40px))] flex-col gap-14 py-7 pb-16"
+  >
+    <section
+      class="grid items-center gap-6 border-b border-elevated-10 pb-6 pt-2.5 md:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)]"
+    >
+      <div class="flex flex-col gap-5">
+        <Text variant="caption" tone="tertiary">PixelSat I</Text>
+        <Text variant="display"
+          >A CubeSat built by high schoolers on Earth.</Text
+        >
+        <Text variant="subheading" tone="secondary" class="max-w-[68ch]">
+          Project Pixel Orbital is a fully student-led team at Stanford Online
+          High School building PixelSat I, a 3U CubeSat targeting launch into
+          sun-synchronous low Earth orbit in early 2027, from scratch, on an
+          extremely limited budget.
         </Text>
 
         <div class="flex flex-wrap items-center gap-3">
-          <a href="#mission" class="inline-flex min-h-[38px] items-center gap-[7px] rounded-full bg-blue px-4 py-[9px] text-[16px] font-medium text-white no-underline transition-[background-color,transform] duration-200 hover:bg-blue-hover active:scale-[0.97] active:bg-blue-press">
+          <a
+            href="#mission"
+            class="inline-flex min-h-[38px] items-center gap-[7px] rounded-full bg-blue px-4 py-[9px] text-[16px] font-medium text-white no-underline transition-[background-color,transform] duration-200 hover:bg-blue-hover active:scale-[0.97] active:bg-blue-press"
+          >
             See what we're building
             <IconArrowRight />
           </a>
-          <OuterLink href="https://www.instagram.com/projectpixelorbital/" button>
+          <OuterLink
+            href="https://www.instagram.com/projectpixelorbital/"
+            button
+          >
             Instagram
             <IconExternalLink />
           </OuterLink>
-          <OuterLink href="https://www.youtube.com/@projectpixelorbital2026" button>
+          <OuterLink
+            href="https://www.youtube.com/@projectpixelorbital2026"
+            button
+          >
             YouTube
             <IconExternalLink />
           </OuterLink>
         </div>
 
         <div class="mt-1 grid gap-2.5 md:grid-cols-3">
-          {stats.map((stat) => (
-            <div class="border-t border-elevated-10 py-3">
-              <Text tag="div" variant="subheading" class="text-[17px]">{stat.value}</Text>
-              <Text tag="div" variant="caption" tone="tertiary" class="mt-1 text-[14px] leading-[1.3]">{stat.label}</Text>
-            </div>
-          ))}
+          {
+            stats.map((stat) => (
+              <div class="border-t border-elevated-10 py-3">
+                <Text tag="div" variant="subheading" class="text-[17px]">
+                  {stat.value}
+                </Text>
+                <Text
+                  tag="div"
+                  variant="caption"
+                  tone="tertiary"
+                  class="mt-1 text-[14px] leading-[1.3]"
+                >
+                  {stat.label}
+                </Text>
+              </div>
+            ))
+          }
         </div>
       </div>
 
       <div class="grid place-items-center">
-        <img src={render.src} alt="Transparent CAD render of PixelSat I" class="h-auto w-full max-w-[380px] object-contain" />
+        <img
+          src={render.src}
+          alt="Transparent CAD render of PixelSat I"
+          class="h-auto w-full max-w-[380px] object-contain"
+        />
       </div>
     </section>
 
-    <section class="flex flex-col gap-[18px]">
+    <section class="flex flex-col gap-[18px]" id="blog">
       <div class="flex items-end justify-between gap-5">
         <Text variant="title">From the blog</Text>
       </div>
 
-      <div aria-label="Recent blog posts" class="grid auto-cols-[minmax(280px,340px)] grid-flow-col gap-4 overflow-x-auto pb-1.5 [scroll-snap-type:x_proximity]">
-        {blogPosts.map((post: BlogPost) => (
-          <CardLink class="min-h-[220px] [scroll-snap-align:start]" href={`/${post.slug}`} title={post.title} desc={post.authors} />
-        ))}
+      <div
+        aria-label="Recent blog posts"
+        class="grid auto-cols-[minmax(280px,340px)] grid-flow-col gap-4 overflow-x-auto pb-1.5 [scroll-snap-type:x_proximity]"
+      >
+        {
+          blogPosts.map((post: BlogPost) => (
+            <CardLink
+              class="min-h-[220px] [scroll-snap-align:start]"
+              href={`/${post.slug}`}
+              title={post.title}
+              desc={post.authors}
+            />
+          ))
+        }
       </div>
     </section>
 
@@ -154,12 +210,18 @@ const snapshot = [
       </div>
 
       <div class="grid gap-x-6 border-t border-elevated-10 md:grid-cols-3">
-        {snapshot.map(([label, value]) => (
-          <div class="flex flex-col gap-2 border-b border-elevated-10 py-4">
-            <Text tag="div" variant="caption" tone="tertiary">{label}</Text>
-            <Text tag="div" variant="body">{value}</Text>
-          </div>
-        ))}
+        {
+          snapshot.map(([label, value]) => (
+            <div class="flex flex-col gap-2 border-b border-elevated-10 py-4">
+              <Text tag="div" variant="caption" tone="tertiary">
+                {label}
+              </Text>
+              <Text tag="div" variant="body">
+                {value}
+              </Text>
+            </div>
+          ))
+        }
       </div>
     </section>
 
@@ -169,14 +231,18 @@ const snapshot = [
       </div>
 
       <div class="grid gap-x-6 border-t border-elevated-10 md:grid-cols-2">
-        {mission.map((item) => (
-          <article class="flex gap-[18px] border-b border-elevated-10 py-4 max-md:flex-col">
-            <div>
-              <Text variant="heading">{item.title}</Text>
-              <Text variant="body-lg" tone="secondary" class="mt-2">{item.body}</Text>
-            </div>
-          </article>
-        ))}
+        {
+          mission.map((item) => (
+            <article class="flex gap-[18px] border-b border-elevated-10 py-4 max-md:flex-col">
+              <div>
+                <Text variant="heading">{item.title}</Text>
+                <Text variant="subheading" tone="secondary" class="mt-2">
+                  {item.body}
+                </Text>
+              </div>
+            </article>
+          ))
+        }
       </div>
     </section>
 
@@ -186,16 +252,23 @@ const snapshot = [
       </div>
 
       <div class="grid gap-x-6 border-t border-elevated-10 md:grid-cols-2">
-        {systems.map((system) => (
-          <article class="flex flex-col gap-2.5 border-b border-elevated-10 py-4">
-            <Text variant="heading">{system.title}</Text>
-            <Text variant="body-lg" tone="secondary">{system.body}</Text>
-          </article>
-        ))}
+        {
+          systems.map((system) => (
+            <article class="flex flex-col gap-2.5 border-b border-elevated-10 py-4">
+              <Text variant="heading">{system.title}</Text>
+              <Text variant="subheading" tone="secondary">
+                {system.body}
+              </Text>
+            </article>
+          ))
+        }
       </div>
 
       <div class="flex flex-wrap items-center gap-3">
-        <OuterLink href="https://www.gofundme.com/f/support-project-pixel-orbital-student-team" button>
+        <OuterLink
+          href="https://www.gofundme.com/f/support-project-pixel-orbital-student-team"
+          button
+        >
           Help fund the hardware
           <IconExternalLink />
         </OuterLink>
@@ -211,31 +284,50 @@ const snapshot = [
         <Text variant="title">Team</Text>
       </div>
 
-      <div class="grid gap-x-6 border-t border-elevated-10 sm:grid-cols-2 md:grid-cols-3">
-        {team.map((member) => (
-          <article class="flex flex-col gap-[14px] border-b border-elevated-10 py-4">
-            {member.image ? (
-              <img class="aspect-square w-full bg-[#f2f2f2] object-cover object-center" src={member.image} alt={member.name} />
-            ) : (
-              <div class="grid aspect-square w-full place-items-center border border-elevated-10 bg-[#f2f2f2] text-[42px] font-medium text-primary">{member.initials}</div>
-            )}
-            <div>
-              <Text variant="subheading">{member.name}</Text>
-              <Text variant="body-lg" tone="secondary" class="mt-2">{member.role}</Text>
-            </div>
-          </article>
-        ))}
+      <div
+        class="grid gap-x-6 border-t border-elevated-10 sm:grid-cols-2 md:grid-cols-3"
+      >
+        {
+          team.map((member) => (
+            <article class="flex flex-col gap-[14px] border-b border-elevated-10 py-4">
+              {member.image ? (
+                <img
+                  class="aspect-square w-full bg-[#f2f2f2] object-cover object-center"
+                  src={member.image}
+                  alt={member.name}
+                />
+              ) : (
+                <div class="grid aspect-square w-full place-items-center border border-elevated-10 bg-[#f2f2f2] text-[42px] font-medium text-primary">
+                  {member.initials}
+                </div>
+              )}
+              <div>
+                <Text variant="subheading">{member.name}</Text>
+                <Text variant="body" tone="secondary">
+                  {member.role}
+                </Text>
+              </div>
+            </article>
+          ))
+        }
       </div>
     </section>
 
     <section class="flex flex-col gap-[18px] border-t border-elevated-10 pt-2">
       <Text variant="title">Support us</Text>
-      <Text variant="body-lg" tone="secondary" class="max-w-[72ch]">
-        Launch costs are covered, but we're seeking funding for the actual hardware of the satellite. Our $10,000 budget is already measly compared to the millions available to many university teams, so every dollar helps.
+      <Text variant="subheading" tone="secondary" class="max-w-[72ch]">
+        Launch costs are covered, but we're seeking funding for the actual
+        hardware of the satellite. Our $10,000 budget is already measly compared
+        to the millions available to many university teams, so every dollar
+        helps.
       </Text>
 
       <div class="flex flex-wrap items-center gap-3">
-        <OuterLink href="https://www.gofundme.com/f/support-project-pixel-orbital-student-team" button primary>
+        <OuterLink
+          href="https://www.gofundme.com/f/support-project-pixel-orbital-student-team"
+          button
+          primary
+        >
           Donate on GoFundMe
           <IconExternalLink />
         </OuterLink>

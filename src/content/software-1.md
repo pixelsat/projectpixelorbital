@@ -47,6 +47,7 @@ Welcome to the first post in a series about the PixelSat I software stack.
 PixelSat I is a 3U cubesat designed entirely by students at Stanford OHS and will be launched NET March 2027.
 
 # Constraints
+
 When choosing a transceiver there were a few constraints that we were absolutely bound to.
 
 Firstly, the transceiver could not be expensive. Ideally it was under $500 after discounts.
@@ -76,37 +77,44 @@ LoRa operates by transmitting each symbol as a frequency sweep (described as a "
 ## GMSK/GFSK
 
 ### FSK (frequency shift keying)
+
 FSK simply switches the frequency of a carrier wave between a set of discrete frequencies. For example, in BFSK (binary FSK), we might have a specific frequency for 0's and another for 1's, and the receiver matches which frequency is present during each symbol period and decodes the bit.
 
 ### GFSK (Gaussian FSK)
+
 GFSK simply applies a Gaussian filter to the input data before frequency modulation, smoothing transitions between symbols. This reduces out-of-band emissions and occupied bandwidth compared to plain FSK while maintaining the same basic modulation scheme. The resulting signal is more spectrally efficient and supports higher symbol rates in a given band.
 
 ### GMSK (Gaussian minimum shift keying)
+
 GMSK is simply a special case of GFSK where during modulation the shift is minimized while still allowing different symbols to be easily recognized (relatively, it still requires a bit more processing than plain GFSK).
 
 ## Handling Doppler shift
+
 **Doppler shift** is the apparent carrier frequency shift due to the velocity differential between the transmitter and the receiver. If the transmitter is moving towards the receiver, the received frequency appears higher than the transmitted frequency, and the converse applies too.
 
 Since LoRa uses chirp spread spectrum, it is generally more tolerant of frequency offsets caused by Doppler shift than GMSK/GFSK, since the latter protocols rely on detecting the small frequency changes around the carrier wave. Therefore, GMSK/GFSK requires accurately knowing the position and velocity of the satellite to properly decode the signal.
 
-Due to Doppler shift and our design constraints, we eventually settled on a pure-LoRa communications stack. 
+Due to Doppler shift and our design constraints, we eventually settled on a pure-LoRa communications stack.
 
 # Timeline
 
 We have considered an inordinate amount of transceivers throughout this project, before settling on the Ebyte E22-400T30D LoRa module in May.
 
 ### GomSpace AX100
+
 The GomSpace AX100 is a UHF/VHF transceiver used in many CubeSat missions. It operates with the GMSK/GFSK protocols, supporting configurable data rates and forward error correction. We first considered this because of its extensive flight heritage and the prevalence of GMSK ground stations. However, after talking to GomSpace, we were unable get a quote below $10k for one transceiver, which forced us to our next option...
 
 ### Needronix Cormorant
+
 The Cormorant is another UHF/VHF CubeSat-first transceiver that interfaces over the PC/104 bus. It promises low power consumption, has extensive flight heritage, and supports various framing protocols such as CSP. It also has internal bitflip correction and reset mechanisms as well as RSSI measurement and various other features. Unfortunately, we were priced out of this option as well.
 
 It was around this time that we first seriously considered LoRa. This opened up an entirely new ecosystem for us, one that was significantly more affordable as well as better documented.
 
 ### Semtech SX-series transceivers
-The Semtech SX-series is a family of UHF transceivers that support both LoRa *and* GMSK. The SX-series transceivers were initially designed for high-volume, low-power IoT applications, which is where their affordability stems from. Various CubeSat missions such as the Stanford SAMWISE mission and multiple FossaSat missions used SX-series transceivers over LoRa (either wrapped by a COTS module or just the bare transceiver) for their comms stack, and those missions were all very well documented and had proven success with the transceiver.
 
-The only problem with this approach was the TCXO. A TCXO (temperature-controlled crystal oscillator) is a key component of most transceivers, 
+The Semtech SX-series is a family of UHF transceivers that support both LoRa _and_ GMSK. The SX-series transceivers were initially designed for high-volume, low-power IoT applications, which is where their affordability stems from. Various CubeSat missions such as the Stanford SAMWISE mission and multiple FossaSat missions used SX-series transceivers over LoRa (either wrapped by a COTS module or just the bare transceiver) for their comms stack, and those missions were all very well documented and had proven success with the transceiver.
+
+The only problem with this approach was the TCXO. A TCXO (temperature-controlled crystal oscillator) is a key component of most transceivers,
 
 # Ground Network
 
@@ -118,7 +126,6 @@ however specific operators might be able to provide it on a case-by-case basis.
 SatNOGS supports VHF, UHF, and S-band and is more widely used. It additionally supports a variety of modulation schemes, including LoRa and GMSK.
 
 Meanwhile TinyGS has a lower station cost and is more accessible to hobbyists, but only targets UHF LoRa.
-
 
 # Current Comms Framing
 
@@ -146,6 +153,7 @@ These macros are custom implemented, allowing to achieve the following goals:
 For example, we pack boolean values as single bits to minimize the size of the packet.
 
 The following code, for example, takes 1 byte:
+
 ```rust
 #[derive(CommsSerialize, CommsDeserialize)]
 pub struct Example {
