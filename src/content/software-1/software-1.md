@@ -1,46 +1,8 @@
 ---
 title: |
     PixelSat I Software Part 1: Comms System
-authors: Ashwin Naren, Vinayak Vikram, Aadish Verma
+authors: Ashwin Naren, Vinayak Vikram, and Aadish Verma
 ---
-
-<!--
-### Outline
-
-- Constraints
-  - Large link budget
-  - Very low cost
-  - Relatively low power
-  - Small footprint
-- UHF
-- LoRa vs GMSK/GFSK
-  - LoRa
-  - GMSK/GFSK
-  - Handling Doppler shift (us being dumb with GPS)
-- Ground stations
-- Encryption & Regulation
-- Quadratic Model & RSSI
-- Framing
-  - AX.25
-  - CSP
-  - HDLC
-- Low cost blah blah blah
-- Timeline
-  - AX1000
-  - Cormorant
-  - Various SX-series transceivers considered
-      - SX1272
-      - SX1278
-      - SX1268
-      - SX1262
-    - The pains of TCXO
-  - EBYTE E22-400T30D (has TCXO, wraps SX1262)
-    - `AT+UFREQ` pain
-    - Power budget
-    - Link budget
-- Current comms framing etc
-- comms serialization macros stuff
--->
 
 Welcome to the first post in a series about the PixelSat I software stack.
 In this series, we will explore both what we built and also how we arrived there.
@@ -104,7 +66,7 @@ Due to Doppler shift and our design constraints, we eventually settled on a pure
 
 ## Timeline
 
-We considered an inordinate number of transceivers throughout this project before settling on the EByte E22-400T30D LoRa module in May 2027.
+We considered an inordinate number of transceivers throughout this project before settling on the EByte E22-400T30D LoRa module in May 2026.
 
 ### GomSpace AX100
 The GomSpace AX100 is a UHF/VHF transceiver used in many CubeSat missions. It operates with GMSK/GFSK, supporting configurable data rates and forward error correction. We first considered it because of its extensive flight heritage and the prevalence of GMSK ground stations. However, after talking to GomSpace, we were unable to get a quote below $10k for a single transceiver, which pushed us to our next option.
