@@ -66,7 +66,7 @@ Due to Doppler shift and our design constraints, we eventually settled on a pure
 
 ## Timeline
 
-We considered an inordinate number of transceivers throughout this project before settling on the EByte E22-400T30D LoRa module in May 2027.
+We considered an inordinate number of transceivers throughout this project before settling on the EByte E22-400T30D LoRa module in May 2026.
 
 ### GomSpace AX100
 The GomSpace AX100 is a UHF/VHF transceiver used in many CubeSat missions. It operates with GMSK/GFSK, supporting configurable data rates and forward error correction. We first considered it because of its extensive flight heritage and the prevalence of GMSK ground stations. However, after talking to GomSpace, we were unable to get a quote below $10k for a single transceiver, which pushed us to our next option.
