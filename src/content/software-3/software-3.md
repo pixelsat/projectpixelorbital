@@ -130,6 +130,63 @@ Our implementation of the model follows [Vallado's excellent description of SGP4
 TEME (True Equator, Mean Equinox) is SGP4's native output frame, and though it is not exactly the same as a true inertial frame like J2000 (TEME has a small precession offset we currently treat as negligible) it works well enough for us to use directly with our sun/magnetometer reference-vector comparisons. 
 From the TEME position we compute GMST from the current UTC time, rotate into ECEF, and convert to geodetic latitude/longitude/altitude over WGS84 for ground-station pass prediction and the EKF's reference vectors.
 
+### Coarse sun sensor
+
+Each of the six faces carries a single OSRAM BPW34 FS photodiode. The FS variant has a daylight-blocking filter built in; it is essentially blind to visible light and only responds from roughly 780 nm to 1100 nm, peaking near 950 nm in the near-infrared. This is actually a feature for us, since it makes the sensor far less sensitive to albedo, which is one of the largest error sources for a coarse sun sensor.
+
+We use the photodiode in reverse-biased (photoconductive) mode: we tie the cathode to a bias rail (3.3V) and let the photocurrent flow through a load resistor $R$ to ground. The photodiode behaves like a current source whose output is proportional to the incident light, so the voltage the analog pin actually reads is simply
+
+$$
+V = I_p R .
+$$
+
+When the sun is directly normal to a face, $I_p$ is at its maximum, and as the face tilts away the current falls off following a cosine law,
+
+$$
+I_p(\theta) = I_{p,\text{max}}\cos\theta .
+$$
+
+Comparing the six faces against each other lets us reconstruct a body-frame sun vector. However, to pick the resistor we first need to know how much current full sun in LEO actually produces.
+
+We aim to find the short-circuit photocurrent produced by the diode under full sunlight in orbit. Getting it wrong in one direction pushes far too much voltage into our OBC; getting it wrong in the other wastes most of our dynamic range.
+
+As far as we are concerned there is no atmosphere, so the relevant spectrum is AM0 (air mass zero). We use the standard [ASTM E-490](https://www.nrel.gov/grid/solar-resource/spectra-astm-e490) reference spectrum, which gives spectral irradiance $E(\lambda)$ in $\text{W}\,\text{m}^{-2}\,\text{nm}^{-1}$.
+
+However, the diode does not convert every wavelength equally. Its spectral responsivity $S(\lambda)$, in amps of photocurrent per watt of incident light, is the datasheet's relative spectral sensitivity curve (a bell shape peaking at 950 nm) scaled by the peak responsivity $S_\text{peak} = 0.7\ \text{A/W}$:
+
+$$
+S(\lambda) = S_\text{peak}\, s_\text{rel}(\lambda).
+$$
+
+Only the part of the solar spectrum that falls under this bell curve generates current. We multiply the AM0 spectrum by the responsivity curve point-by-point and integrate. Visually, the photodiode only sees the shaded region in the graph below.
+
+![AM0 solar spectrum overlaid with the BPW34 FS relative spectral sensitivity](solar-spectrum-response.png)
+
+Notice that even though the solar spectrum peaks in the visible (around 450–500 nm), the filtered photodiode throws all of that away and only harvests a slice of the near-infrared tail. Of the ~$1366 W/m^2$ of total sunlight, only about $193 W/m^2$ of irradiance is available to the sensor.
+
+The current density is the weighted integral, and the total photocurrent is that density times the radiant-sensitive area of the die, $A = 7.02\ \text{mm}^2$:
+
+$$
+I_p = A \int_{\lambda_1}^{\lambda_2} E(\lambda)\, S(\lambda)\, d\lambda .
+$$
+
+Evaluating this integral numerically gives
+
+$$
+I_{p,\text{max}} \approx 0.95\ \text{mA}
+$$
+
+at full normal-incidence sun.
+
+The photodiode feeds a 16-bit ADC on the STM32 whose reference is 3.3 V. We want a full, normal sun to swing the ADC close to full-scale (to use the whole dynamic range) but *never* clip. Solving $V = I_p R$ for the resistor:
+
+$$
+R = \frac{V_\text{FS}}{I_{p,\text{max}}} = \frac{3.3\ \text{V}}{0.95\ \text{mA}} \approx 3.5\ \text{k}\Omega .
+$$
+
+We round down to a standard $3.3 k\Omega$ resistor, which puts a full sun at roughly $0.95\ \text{mA} \times 3.3\ \text{k}\Omega \approx 3.1\ \text{V}$. Because the diode is reverse-biased, it stays in its linear current-source region across the whole range (unlike an unbiased photovoltaic setup, where the ~$0.4 V$ open-circuit ceiling of silicon would make a swing this large impossible).
+
+
 ## Attitude Control System
 
 ### Overview
