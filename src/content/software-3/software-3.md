@@ -169,3 +169,9 @@ $$
 $$
 
 We clamp the integral term to prevent windup; without this if a large error appears the integral term will accumulate to gigantic proportions and would overshoot badly.
+
+## Conclusion
+
+The ADCS system provides an excellent fusion of 3 sensors, each of which have their own pros/cons.
+
+In doing so it provides excellent pointing accuracy at a surprisingly low cost.
