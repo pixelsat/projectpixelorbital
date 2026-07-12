@@ -51,15 +51,21 @@ More specifically, the current implementation is a multiplicative error-state EK
 
 ### Attitude representation
 
-Internally, the estimator propagates attitude as a unit quaternion. Quaternions avoid singularities, compose efficiently, and are the standard representation for spacecraft dynamics. 
+Internally, the estimator propagates attitude as a unit quaternion.
+Quaternions avoid singularities, compose efficiently, and are the standard representation for spacecraft dynamics. 
 
-Other software components, however, work more naturally with a minimal three-parameter representation. For those interfaces we convert the outputequaternion into Modified Rodrigues Parameters (MRPs).
+Other software components, however, work more naturally with a minimal three-parameter representation.
+For those interfaces we convert the output quaternion into Modified Rodrigues Parameters (MRPs).
 
-Because MRPs have a singularity at a full 360° rotation, we map the MRPs into the shadow set, which is simply an alternate MRP representation of the same physical orientation that stays well-behaved exactly where the primary representation blows up. Our estimator always checks the magnitude of the current MRP vector and swaps to the shadow set whenever it would otherwise approach that singularity, so the reported attitude never becomes numerically unstable in flight.
+Because MRPs have a singularity at a full 360° rotation, we map the MRPs into the shadow set, which is simply an alternate MRP representation of the same physical orientation that stays well-behaved exactly where the primary representation blows up.
+Our estimator always checks the magnitude of the current MRP vector and swaps to the shadow set whenever it would otherwise approach that singularity, so the reported attitude never becomes numerically unstable in flight.
+
+TODO: Example
 
 ### Position propagation
 
-The project was full of dhristimaxxers who believed that Keplerian propagation was the best way to go about deriving our instantaneous position from a TLE. Unfortunately, it is not that simple. Earth is not a simple point mass (which a perfect sphere models...), its gravitational field has extra terms (the zonal harmonics $J_2$, $J_3$, $J_4$) that steadile rotate our orbital plane and argument of perigee. On top of that, our orbit is low enough that there is enough atmosphere left that the drag measurably shrinks our orbit even over a few days/weeks.
+The project was full of dhristimaxxers who believed that Keplerian propagation was the best way to go about deriving our instantaneous position from a TLE.
+Unfortunately, it is not that simple. Earth is not a simple point mass (which a perfect sphere models...), its gravitational field has extra terms (the zonal harmonics $J_2$, $J_3$, $J_4$) that steadile rotate our orbital plane and argument of perigee. On top of that, our orbit is low enough that there is enough atmosphere left that the drag measurably shrinks our orbit even over a few days/weeks.
 
 The SGP4 (Simplified General Pertubations 4) model solves all these problems compactly by folding both gravitational pertubations and a drag model into a closed-form propagator (no need to numerically solve ODE's, for example...).
 
