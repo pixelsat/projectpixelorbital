@@ -26,7 +26,15 @@ Given those constraints, our sensor suite ended up being:
 - **Magnetometer** (PNI RM3100-CB): gives us a body-frame measurement of Earth's magnetic field, which we compare against a reference field.
 - **Gyroscope**: gives us angular velocity directly, and is the main sensor for short-timescale attitude propagation.
 
-Our sole actuator is a set of three orthogonal magnetorquers, which produce a magnetic dipole that reacts against Earth's local magnetic field to produce torque. Due to this: magnetorquers come with one major drawback: they cannot generate arbitrary torques. A magnetorquer produces a magnetic dipole $m$, which interacts with Earth's magnetic field $B$ according to $\tau=m \times B$.
+Our sole actuator is a set of three orthogonal magnetorquers, which produce a magnetic dipole that reacts against Earth's local magnetic field to produce torque.
+Due to this: magnetorquers come with one major drawback: they cannot generate arbitrary torques.
+A magnetorquer produces a magnetic dipole $m$, which interacts with Earth's magnetic field $B$ according to
+
+$$
+\tau=m\times B,
+\qquad
+\tau\cdot B=0.
+$$
 
 Since the torque is always the cross product of these vectors, it is necessarily perpendicular to the local magnetic field. At any instant there is therefore one direction in which the spacecraft simply cannot produce torque.
 
