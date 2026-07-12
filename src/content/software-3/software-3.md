@@ -60,8 +60,6 @@ For those interfaces we convert the output quaternion into Modified Rodrigues Pa
 Because MRPs have a singularity at a full 360° rotation, we map the MRPs into the shadow set, which is simply an alternate MRP representation of the same physical orientation that stays well-behaved exactly where the primary representation blows up.
 Our estimator always checks the magnitude of the current MRP vector and swaps to the shadow set whenever it would otherwise approach that singularity, so the reported attitude never becomes numerically unstable in flight.
 
-TODO: Example
-
 ### Position propagation
 
 Our sun sensor and magnetometer measure vectors in the spacecraft's body frame.
@@ -124,5 +122,11 @@ The controller simply outputs a weighted sum of the **P**roportional, **I**ntegr
 - **Proportional**: the proportional term takes the attitude error
 - **Integral**: the integral term accumulates the attitude error over time
 - **Derivative**: the derivative term takes in the angular velocity error (to provide damping)
+
+As an equation:
+
+$$
+\tau_c = -K_p e - K_d \omega - K_i \int e\,dt
+$$
 
 We clamp the integral term to prevent windup; without this if a large error appears the integral term will accumulate to gigantic proportions and would overshoot badly.
