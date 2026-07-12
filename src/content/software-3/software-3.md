@@ -151,7 +151,9 @@ The controller simply outputs a weighted sum of the **P**roportional, **I**ntegr
 As an equation:
 
 $$
-\tau_c = -K_p e - K_d \omega - K_i \int e\,dt
+\omega_e = \omega-\omega_d,
+\qquad
+\tau_c = -K_p\ e -K_d\ \omega_e - K_i\ \int e\,dt.
 $$
 
 We clamp the integral term to prevent windup; without this if a large error appears the integral term will accumulate to gigantic proportions and would overshoot badly.
