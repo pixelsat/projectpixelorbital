@@ -100,13 +100,35 @@ To compare those measurements against reality, we need to know what those vector
 
 To do this we have to propagate the orbit from what we know (i.e. some initial parameters we've uplinked) to the current position.
 
-We initially considered propagating the orbit using classical Keplerian elements. Unfortunately, Earth refuses to cooperate by behaving like a perfect sphere.
+Prior to us joining the project, they were initially considering propagating the orbit using classical Keplerian elements. Unfortunately, Earth refuses to cooperate by behaving like a perfect sphere.
 The Earth is not a simple point mass, its gravitational field has extra terms (the zonal harmonics $J_2$, $J_3$, $J_4$) that steadly rotate our orbital plane and argument of perigee.
 On top of that, our orbit is low enough that there is enough atmosphere left that the drag measurably shrinks our orbit even over a few weeks.
+Most importantly, a TLE encodes the *mean motion* of the satellite, which poses problems when the motion of the satellite is nonuniform.
 
 The SGP4 (Simplified General Pertubations 4) model solves all these problems compactly by folding both gravitational pertubations and a drag model into a closed-form propagator (no need to numerically solve ODE's, for example...).
 
-Our implementation of the model follows [Vallado's excellent description of SGP4](https://celestrak.org/publications/AIAA/2006-6753/)
+Our implementation of the model follows [Vallado's excellent description of SGP4](https://celestrak.org/publications/AIAA/2006-6753/). We split the propagator into a one-time initialization from the TLE and a cheap `propagate(t)` call for any later time:
+
+**Initialization:**
+
+- Recover the "true" mean motion $n_0''$ and semi-major axis $a_0''$ that the rest of the algorithm actually works with from the TLE's mean motion
+- From the recovered perigee height, decide whether the orbit needs the full drag-perturbation terms or can use SGP4's simplified branch for very low perigees (under 220 km)
+- Derive the drag coefficients from BSTAR
+- Compute the secular drift rates for mean anomaly, argument of perigee, and RAAN driven by $J_2$ and $J_4$
+- Precompute the long-period $J_3$ coefficients that capture Earth's north/south asymmetry
+- Compute some remaining time-polynomial coefficients reused every propagation
+
+**Propagation:**
+
+- Advance mean anomaly, argument of perigee, and RAAN using the secular rates from initialization over the elapsed time since epoch
+- Apply the drag-driven corrections to semi-major axis, eccentricity, and mean longitude built from the BSTAR-derived coefficients above
+- Add the small $J_3$ long-period correction to the eccentricity vector
+- Solve Kepler's equation for the eccentric-anomaly-like variable via a damped Newton iteration (capped at 10 steps, which converges comfortably in practice)
+- Apply the short-period $J_2$ corrections back onto radius, argument of latitude, RAAN, and inclination
+- Convert the corrected elements into a Cartesian position and velocity using the standard perifocal basis vectors, giving us a state in the TEME frame
+
+TEME (True Equator, Mean Equinox) is SGP4's native output frame, and though it is not exactly the same as a true inertial frame like J2000 (TEME has a small precession offset we currently treat as negligible) it works well enough for us to use directly with our sun/magnetometer reference-vector comparisons. 
+From the TEME position we compute GMST from the current UTC time, rotate into ECEF, and convert to geodetic latitude/longitude/altitude over WGS84 for ground-station pass prediction and the EKF's reference vectors.
 
 ## Attitude Control System
 
