@@ -71,8 +71,6 @@ The SGP4 (Simplified General Pertubations 4) model solves all these problems com
 
 Our implementation of the model follows [Vallado's excellent description of SGP4](https://celestrak.org/publications/AIAA/2006-6753/)
 
-@arihant2math i gtg now, will be back around 1pm pst
-
 ## Attitude Control System
 
 ### Overview
