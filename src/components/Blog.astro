@@ -33,10 +33,13 @@ const { authors, title } = Astro.props;
 </div>
 
 <style is:global>
+  .article-prose {
+    color: var(--primary);
+    font-weight: 450;
+  }
+
   .article-prose * {
     min-width: 0;
-    font-weight: 450;
-    color: var(--primary);
   }
 
   .article-prose h1,
@@ -191,6 +194,18 @@ const { authors, title } = Astro.props;
 
   .article-prose sup {
     font-size: 0.72em;
+  }
+
+  .article-prose .katex {
+    color: inherit;
+    font-size: 1.08em;
+  }
+
+  .article-prose .katex-display {
+    margin: 1.5rem 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0.25rem 0;
   }
 
   .article-prose .footnotes {
