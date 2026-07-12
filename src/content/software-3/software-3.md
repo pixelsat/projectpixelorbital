@@ -32,8 +32,8 @@ Since the torque is always the cross product of these vectors, it is necessarily
 
 Additionally due to only having 3 magnetorquers the strength of the produced magnetic dipole varies with the direction of the torque with respect to the spacecraft's body frame.
 
-Our ACS system has to pick the closest possible dipole direction to the desired torque direction. TODO(yappy): explain more. yeah yeah i will after reading that paper
-gotta explain sgp4 and torquers and photodiodes first
+Our ACS system has to pick the closest possible dipole direction to the desired torque direction.
+<!-- TODO(yappy): explain more. yeah yeah i will after reading that paper gotta explain sgp4 and torquers and photodiodes first -->
 
 ## Attitude Determination System
 
