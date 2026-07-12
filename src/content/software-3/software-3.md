@@ -129,6 +129,10 @@ This is very useful during right after launch: at this time the satellite is rap
 so it's unable to use the sun sensors or magnetometer, which are the two absolute sensors available.
 As such it relies solely on the gyro measurement to cancel the satellite's angular velocity.
 
+$$
+\tau_c=-K_\omega\omega.
+$$
+
 #### Fixed attitude
 
 During nominal operations, PixelSat maintains a nadir-pointing attitude, keeping its antenna directed toward Earth.
