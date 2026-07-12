@@ -69,7 +69,11 @@ const { authors, title } = Astro.props;
     font-size: clamp(1.3rem, 1.22rem + 0.35vw, 1.6rem);
   }
 
-  .article-prose h4,
+  .article-prose h4 {
+    font-size: clamp(1.1rem, 1.05rem + 0.2vw, 1.3rem);
+    font-weight: 600;
+  }
+
   .article-prose h5,
   .article-prose h6 {
     font-size: 1.05rem;
