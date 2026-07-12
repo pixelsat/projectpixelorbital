@@ -97,17 +97,3 @@ We use a PID controller to generate our commanded torque profile. The controller
 - **Derivative**: the derivative term takes in the angular velocity error (to provide damping)
 
 We clamp the integral term to prevent windup; without this if a large error appears the integral term will accumulate to gigantic proportions and would overshoot badly.
-
-# DELETE THIS
-GPT review: 
-The structure is already good. What makes it read like engineering notes rather than a technical blog is mostly tone. Right now you're explaining what each component is, but readers will be much more engaged if you explain why you made each decision and what engineering problems it solves.
-
-Some specific suggestions:
-
-Replace textbook explanations ("The proportional term...") with mission-specific reasoning.
-Add transitions between sections so it feels like a narrative rather than documentation.
-Be more precise in a few places ("MRPs are not taken well by other subsystems" is vague).
-Avoid apologetic wording ("cheap, noisy") and instead frame them as engineering constraints.
-Whenever you introduce a concept, motivate it before defining it.
-
-kk rebased main onto us
