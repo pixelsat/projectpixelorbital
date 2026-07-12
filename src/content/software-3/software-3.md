@@ -64,8 +64,14 @@ TODO: Example
 
 ### Position propagation
 
-The project was full of dhristimaxxers who believed that Keplerian propagation was the best way to go about deriving our instantaneous position from a TLE.
-Unfortunately, it is not that simple. Earth is not a simple point mass (which a perfect sphere models...), its gravitational field has extra terms (the zonal harmonics $J_2$, $J_3$, $J_4$) that steadile rotate our orbital plane and argument of perigee. On top of that, our orbit is low enough that there is enough atmosphere left that the drag measurably shrinks our orbit even over a few days/weeks.
+Our sun sensor and magnetometer measure vectors in the spacecraft's body frame.
+To compare those measurements against reality, we need to know what those vectors should look like in inertial space.
+
+To do this we have to propagate the orbit from what we know (i.e. some initial parameters we've uplinked) to the current position.
+
+We initially considered propagating the orbit using classical Keplerian elements. Unfortunately, Earth refuses to cooperate by behaving like a perfect sphere.
+The Earth is not a simple point mass, its gravitational field has extra terms (the zonal harmonics $J_2$, $J_3$, $J_4$) that steadly rotate our orbital plane and argument of perigee.
+On top of that, our orbit is low enough that there is enough atmosphere left that the drag measurably shrinks our orbit even over a few weeks.
 
 The SGP4 (Simplified General Pertubations 4) model solves all these problems compactly by folding both gravitational pertubations and a drag model into a closed-form propagator (no need to numerically solve ODE's, for example...).
 
@@ -112,7 +118,9 @@ This allows the antenna's main lobe to remain aligned with the receiving station
 
 ### PID
 
-We use a PID controller to generate our commanded torque profile. The controller simply outputs a weighted sum of the **P**roportional, **I**ntegral, and **D**erivative terms. More specifically:
+For PixelSat's relatively slow dynamics and limited actuator authority, a well-tuned PID controller provides excellent performance without introducing the complexity of more advanced nonlinear control techniques.
+
+The controller simply outputs a weighted sum of the **P**roportional, **I**ntegral, and **D**erivative terms. More specifically:
 - **Proportional**: the proportional term takes the attitude error
 - **Integral**: the integral term accumulates the attitude error over time
 - **Derivative**: the derivative term takes in the angular velocity error (to provide damping)
