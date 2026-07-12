@@ -74,7 +74,13 @@ Our implementation of the model follows [Vallado's excellent description of SGP4
 ## Attitude Control System
 
 ### Overview
-The attitude controller simply takes in the estimated attitude and the angular velocity coming out of the EKF, as well as a specific mode and profile to execute. We have 3 attitude control system modes: omega kill, fixed attitude, and ground point tracking. The controller then outputs a commanded body torque. As noted earlier, this torque often cannot be executed perfectly since we can only torque around a vector orthogonal to the local magnetic field line. 
+The attitude controller simply takes in the estimated attitude and the angular velocity coming out of the EKF,
+as well as a specific mode and profile to execute.
+
+We have 3 attitude control system modes: omega kill, fixed attitude, and ground point tracking.
+The controller then outputs a commanded body torque.
+As noted earlier, this torque often cannot be executed perfectly since we can only torque around a vector orthogonal to the local magnetic field line.
+
 
 <!-- https://www.sciencedirect.com/science/article/pii/S1474667017589156 -->
 
@@ -82,16 +88,27 @@ The attitude controller simply takes in the estimated attitude and the angular v
 
 This is the simplest mode, where the controller simply stops the satellite from rotating.
 
-This is very useful during detumble: at this time the satellite does not know anything about the current time or its TLE, so it's unable to use the sun sensors or magnetometer, which are the two absolute sensors available. As such it relies solely on the gyro measurement to cancel the satellite's angular velocity.
+This is very useful during right after launch: at this time the satellite is rapidly rotating and does not know anything about the current time or its TLE,
+so it's unable to use the sun sensors or magnetometer, which are the two absolute sensors available.
+As such it relies solely on the gyro measurement to cancel the satellite's angular velocity.
 
 #### Fixed attitude
 
-Most of the time we want to be pointing the satallite directly down at the earth, so the antenna has the widest coverage. This allows us to just point straight at the earth. We use a PID controller to generate our commanded torque here.
+During nominal operations, PixelSat maintains a nadir-pointing attitude, keeping its antenna directed toward Earth.
+This maximizes communication performance over the majority of each orbit while also providing a consistent reference frame for the rest of the spacecraft.
+
+Additionally we can adjust this attitude as needed to take pictures.
+
+We use a PID controller to generate our commanded torque here.
 
 #### Ground point tracking
 
-The last case is when we want to maximize link quality by pointing straight at a ground station, just to eek out the maximum gain. This is quite similar to the fixed attitude mode, in that a PID is still used, we just have a variable target angle that is calculated based on the satallites position.
+When communicating with one of our ground stations, we can do even better than simply pointing.
 
+Rather than pointing toward Earth's center, the controller computes the line-of-sight vector to the selected ground station from the spacecraft's current orbit estimate.
+The same feedback controller is then used, but with this continuously changing reference attitude.
+
+This allows the antenna's main lobe to remain aligned with the receiving station throughout the pass, improving the available link margin.
 
 ### PID
 
