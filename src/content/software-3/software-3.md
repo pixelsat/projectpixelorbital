@@ -57,7 +57,32 @@ Quaternions avoid singularities, compose efficiently, and are the standard repre
 Other software components, however, work more naturally with a minimal three-parameter representation.
 For those interfaces we convert the output quaternion into Modified Rodrigues Parameters (MRPs).
 
+$$
+q
+=
+\begin{bmatrix}
+q_0 \\
+q_v
+\end{bmatrix},
+\qquad
+q^{\mathsf T}q=1,
+\qquad
+\sigma
+=
+\frac{q_v}{1+q_0}.
+$$
+
 Because MRPs have a singularity at a full 360° rotation, we map the MRPs into the shadow set, which is simply an alternate MRP representation of the same physical orientation that stays well-behaved exactly where the primary representation blows up.
+
+$$
+\sigma^{S}
+=
+-\frac{\sigma}
+{\sigma^{\mathsf T}\sigma},
+\qquad
+\lVert\sigma\rVert>1.
+$$
+
 Our estimator always checks the magnitude of the current MRP vector and swaps to the shadow set whenever it would otherwise approach that singularity, so the reported attitude never becomes numerically unstable in flight.
 
 ### Position propagation
