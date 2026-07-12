@@ -7,7 +7,7 @@ authors: Ashwin Naren, Vinayak Vikram, and Aadish Verma
 **N.B. We've swapped the ordering of posts 2 and 3.**
 
 ## Previous Dumb Ideas
-Before we joined the project, the previous software stack was a monolithic python file launched on user login via systemd on a vanilla Raspberry Pi 5 (the 8gb ram model, fwiw !!). I don't believe I need to explain why this was idiotic, not if the reader has any degree of intelligence.
+Before we joined the project, the previous software stack was a monolithic python file launched on user login via systemd on a vanilla Raspberry Pi 5. This naturally had... major issues... so the first thing we did was scrap this.
 
 ## ESP32
 The first major OBC refactor occured in Feburary 2026, when we decided to use an ESP32 as our main computer. We originally kept the raspi around as a payload computer, linked over UART to the ESP32 solely for sending images and microbio experiment data (yet another thing we cut). The ESP ran an Embassy async executor to handle everything, including our comms and ADCS routines.
