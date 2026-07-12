@@ -249,6 +249,48 @@ $$
 
 We clamp the integral term to prevent windup; without this if a large error appears the integral term will accumulate to gigantic proportions and would overshoot badly.
 
+### Magnetorquer Design
+
+A magnetorquer is, at its core, just a coil of wire: run current through it and it produces a magnetic dipole $m$, which reacts against Earth's field $B$ to make torque $\tau = m \times B$. The design question is how to build a coil that produces as large a dipole as possible within our power and volume budgets.
+
+#### Calculating dipole
+
+Take a single square coil with side length $s$, so its enclosed area is $A = s^2$, wound with $N$ turns of magnet wire that has resistance $\lambda$ per unit length. Driven at bus voltage $V$, its magnetic dipole moment is
+
+$$
+m = N \cdot I \cdot A .
+$$
+
+The total length of wire is (perimeter)$\times$(turns) $= 4Ns$, so its resistance is $R = 4 N \lambda s$ and the current is $I = V/R = V/(4N\lambda s)$. Substituting back:
+
+$$
+m = N \cdot \frac{V}{4N\lambda s} \cdot s^2 = \frac{V s}{4\lambda}.
+$$
+
+We see that the number of turns $N$ cancels out entirely. At a fixed drive voltage, adding turns increases the dipole-per-amp but raises resistance and cuts the current by exactly the same factor. This has a slightly counterintuitive consequence: **turns buy us no torque authority at all.** Every winding produces the same dipole at a given bus voltage, so we cannot wind our way to a stronger torquer. What $N$ *does* control is power: since $P = V^2/R = V^2/(4N\lambda s)$, more turns means less current and therefore less power dissipated for the same dipole. (In practice we don't have perfectly square corners; rounded corners shave the constant slightly, to something closer to $Vs/(3.8\lambda)$, but that's a small correction.)
+
+#### Design
+
+We want to maximize the number of turns we use to reduce power consumption (since $P=V^2/R$), but if we have too many our current sensing becomes challenging.
+
+Those bounds leave a wide window, and we just eyeball 100 turns to sit comfortably in the middle of it. We drive the coils from the unregulated bus (more to come on this in our first electrical blog post), nominally 7.2 V (though this sags and varies with battery state of charge). Using AWG-42-class magnet wire (0.066 mm diameter copper with $\lambda \approx 4.9\ \Omega/\text{m}$) on a coil roughly $s=8\ \text{cm}$ per side, the dipole works out to
+
+$$
+m = \frac{V s}{4\lambda} = \frac{7.2 \times 0.08}{4 \times 4.9} \approx 0.029\ \text{A·m}^2 .
+$$
+
+At 100 turns the coil resistance is $R = 4N\lambda s \approx 157\ \Omega$, drawing $\approx 46\ \text{mA}$ and dissipating only $\approx 0.33\ \text{W}$ per torquer (about 1 W across all three). This is a small enough slice of our generation that it does not eat into our power budget significantly. We could wind more turns to shave the power further, but below a few tenths of a watt it stops mattering to the energy budget while the current drifts toward our sensing floor.
+
+Physically, each torquer is a copper winding around a central rectangular bobbin, with guardrails on the top and bottom edges so the wire cannot slip off during winding or launch vibration.
+
+![One of our custom-designed magnetorquer bobbins viewed in CAD](torquer.png)
+
+#### Driving the coil
+
+Open-loop PWM alone would not be good enough here. The coil's resistance climbs as the copper heats up, and the bus voltage itself drifts with battery state, so a fixed duty cycle would produce a drifting, unpredictable dipole. Instead we close the loop: a current monitor IC measures the actual coil current and the STM32 adjusts PWM to hit the commanded value.
+
+Of course, the STM32 also cannot source the coil voltage or reverse polarity on its own, and we need both directions to torque either way about an axis. So each coil is driven through an H-bridge, which is simply an arrangement of four MOSFETs that let the controller flip the full bus voltage across the coil in either direction, giving us a signed, closed-loop-regulated dipole on every axis.
+
 ## Conclusion
 
 The ADCS system provides an excellent fusion of 3 sensors, each of which have their own pros/cons.
