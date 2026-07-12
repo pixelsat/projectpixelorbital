@@ -38,7 +38,7 @@ $$
 
 Since the torque is always the cross product of these vectors, it is necessarily perpendicular to the local magnetic field. At any instant there is therefore one direction in which the spacecraft simply cannot produce torque.
 
-Additionally due to only having 3 magnetorquers the strength of the produced magnetic dipole varies with the direction of the torque with respect to the spacecraft's body frame.
+Additionally due to only having 3 magnetorquers the strength of the produced magnetic dipole varies due to per-axis saturation.
 
 Our ACS system has to pick the closest possible dipole direction to the desired torque direction.
 <!-- TODO(yappy): explain more. yeah yeah i will after reading that paper gotta explain sgp4 and torquers and photodiodes first -->
@@ -193,7 +193,7 @@ We round down to a standard $3.3 k\Omega$ resistor, which puts a full sun at rou
 The attitude controller simply takes in the estimated attitude and the angular velocity coming out of the EKF,
 as well as a specific mode and profile to execute.
 
-We have 3 attitude control system modes: omega kill, fixed attitude, and ground point tracking.
+We have 3 attitude control system modes: omega kill, reference attitude tracking, and ground point tracking.
 The controller then outputs a commanded body torque.
 As noted earlier, this torque often cannot be executed perfectly since we can only torque around a vector orthogonal to the local magnetic field line.
 
@@ -212,7 +212,7 @@ $$
 \tau_c=-K_\omega\omega.
 $$
 
-#### Fixed attitude
+#### Reference attitude tracking
 
 During nominal operations, PixelSat maintains a nadir-pointing attitude, keeping its antenna directed toward Earth.
 This maximizes communication performance over the majority of each orbit while also providing a consistent reference frame for the rest of the spacecraft.
