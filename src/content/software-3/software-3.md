@@ -126,7 +126,7 @@ As noted earlier, this torque often cannot be executed perfectly since we can on
 This is the simplest mode, where the controller simply stops the satellite from rotating.
 
 This is very useful during right after launch: at this time the satellite is rapidly rotating and does not know anything about the current time or its TLE,
-so it's unable to use the sun sensors or magnetometer, which are the two absolute sensors available.
+so it's unable to convert the data from the sun sensors or magnetometer into anything useful, which are the two absolute sensors available.
 As such it relies solely on the gyro measurement to cancel the satellite's angular velocity.
 
 $$
