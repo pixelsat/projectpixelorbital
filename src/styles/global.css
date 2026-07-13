@@ -46,10 +46,11 @@
   );
   --background: var(--bg-surface);
 
-  --elevated-5: color-mix(in srgb, #3450d1 5%, transparent);
-  --elevated-7: color-mix(in srgb, #3450d1 7%, transparent);
-  --elevated-10: color-mix(in srgb, #3450d1 10%, transparent);
-  --elevated-15: color-mix(in srgb, #3450d1 15%, transparent);
+  --elevated-color: #3450d1;
+  --elevated-5: color-mix(in srgb, var(--elevated-color) 5%, transparent);
+  --elevated-7: color-mix(in srgb, var(--elevated-color) 7%, transparent);
+  --elevated-10: color-mix(in srgb, var(--elevated-color) 10%, transparent);
+  --elevated-15: color-mix(in srgb, var(--elevated-color) 15%, transparent);
 
   --mid-border-radius: 12px;
   --card-border-radius: 20px;
@@ -68,12 +69,8 @@
     --bg-gradient-end: #2d3c7f;
     --intro-gradient-start: var(--bg-gradient-start);
     --intro-gradient-end: var(--bg-gradient-end);
-    --background: var(--bg-surface);
 
-    --elevated-5: color-mix(in srgb, #eaeaea 7%, transparent);
-    --elevated-7: color-mix(in srgb, #eaeaea 7%, transparent);
-    --elevated-10: color-mix(in srgb, #eaeaea 10%, transparent);
-    --elevated-15: color-mix(in srgb, #eaeaea 15%, transparent);
+    --elevated-color: #eaeaea;
     --glass-filter: blur(12px);
 
     --tight-spacing: -0.5rem;
