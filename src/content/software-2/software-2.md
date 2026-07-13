@@ -294,3 +294,8 @@ Of course, the STM32 also cannot source the coil voltage or reverse polarity on 
 The ADCS system provides an excellent fusion of 3 sensors, each of which have their own pros/cons.
 
 In doing so it provides excellent pointing accuracy at a surprisingly low cost.
+
+Of course, the disadvantages are visible: we can't make extremely precise corrections at times and we have around
+1 degree of inaccuracy when predicting our attitude.
+
+Thank you for reading till the next! The next post in the software blog series will be about the Onboard Computer. 
