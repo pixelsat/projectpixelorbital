@@ -2,6 +2,7 @@
 title: |
     PixelSat I Software Part 2: Attitude Determination and Control System
 authors: Ashwin Naren, Vinayak Vikram, and Aadish Verma
+date: 7/13/2026
 ---
 
 Welcome to the second post in our series about the PixelSat I software stack. If you haven't read [Part 1](/software-1) on our comms system, we'd recommend starting there for context on the mission.
