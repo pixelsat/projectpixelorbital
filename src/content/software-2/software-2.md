@@ -312,4 +312,4 @@ In doing so it provides excellent pointing accuracy at a surprisingly low cost.
 Of course, the disadvantages are visible: we can't make extremely precise corrections at times and we have around
 1 degree of inaccuracy when predicting our attitude.
 
-Thank you for reading till the next! The next post in the software blog series will be about the Onboard Computer.
+Thank you for reading till the end! The next post in the software blog series will be about the Onboard Computer.
