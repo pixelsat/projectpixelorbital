@@ -111,12 +111,12 @@ To compare those measurements against reality, we need to know what those vector
 
 To do this, we have to propagate the orbit from what we know (i.e. some initial parameters we've uplinked) to the current position.
 
-Prior to us joining the project, they were initially considering propagating the orbit using classical Keplerian elements. Unfortunately, Earth refuses to cooperate by behaving like a perfect sphere.
-The Earth is not a simple point mass, its gravitational field has extra terms (the zonal harmonics $J_2$, $J_3$, $J_4$) that steadly rotate our orbital plane and argument of perigee.
-On top of that, our orbit is low enough that there is enough atmosphere left that the drag measurably shrinks our orbit even over a few weeks.
+Prior to us joining the project, the team was initially considering propagating the orbit using classical Keplerian elements. Unfortunately, Earth refuses to cooperate by behaving like a perfect sphere.
+The Earth is not a simple point mass; its gravitational field has extra terms (the zonal harmonics $J_2$, $J_3$, $J_4$) that steadily rotate our orbital plane and argument of perigee.
+On top of that, our orbit is low enough that the residual atmospheric drag measurably shrinks our orbit even over a few weeks.
 Most importantly, a TLE encodes the *mean motion* of the satellite, which poses problems when the motion of the satellite is nonuniform.
 
-The SGP4 (Simplified General Pertubations 4) model solves all these problems compactly by folding both gravitational pertubations and a drag model into a closed-form propagator (no need to numerically solve ODE's, for example...).
+The SGP4 (Simplified General Perturbations 4) model solves all these problems compactly by folding both gravitational perturbations and a drag model into a closed-form propagator (no need to numerically solve ODE's, for example...).
 
 Our implementation of the model follows [Vallado's excellent description of SGP4](https://celestrak.org/publications/AIAA/2006-6753/). We split the propagator into a one-time initialization from the TLE and a cheap `propagate(t)` call for any later time:
 
@@ -127,7 +127,7 @@ Our implementation of the model follows [Vallado's excellent description of SGP4
 - Derive the drag coefficients from BSTAR
 - Compute the secular drift rates for mean anomaly, argument of perigee, and RAAN driven by $J_2$ and $J_4$
 - Precompute the long-period $J_3$ coefficients that capture Earth's north/south asymmetry
-- Compute some remaining time-polynomial coefficients reused every propagation
+- Compute some remaining time-polynomial coefficients reused during each propagation
 
 **Propagation:**
 
@@ -145,7 +145,7 @@ From the TEME position we compute GMST from the current UTC time, rotate into EC
 
 Each of the six faces carries a single OSRAM BPW34 FS photodiode. The FS variant has a daylight-blocking filter built in; it is essentially blind to visible light and only responds from roughly 780 nm to 1100 nm, peaking near 950 nm in the near-infrared. This is actually a feature for us, since it makes the sensor far less sensitive to albedo, which is one of the largest error sources for a coarse sun sensor.
 
-We use the photodiode in reverse-biased (photoconductive) mode: we tie the cathode to a bias rail (3.3V) and let the photocurrent flow through a load resistor $R$ to ground. The photodiode behaves like a current source whose output is proportional to the incident light, so the voltage the analog pin actually reads is simply
+We use the photodiode in reverse-biased (photoconductive) mode: we tie the cathode to a bias rail (3.3 V) and let the photocurrent flow through a load resistor $R$ to ground. The photodiode behaves like a current source whose output is proportional to the incident light, so the voltage the analog pin actually reads is simply
 
 $$
 V = I_p R .
@@ -173,7 +173,7 @@ Only the part of the solar spectrum that falls under this bell curve generates c
 
 ![AM0 solar spectrum overlaid with the BPW34 FS relative spectral sensitivity](solar-spectrum-response.png)
 
-Notice that even though the solar spectrum peaks in the visible (around 450–500 nm), the filtered photodiode throws all of that away and only harvests a slice of the near-infrared tail. Of the ~$1366 W/m^2$ of total sunlight, only about $193 W/m^2$ of irradiance is available to the sensor.
+Notice that even though the solar spectrum peaks in the visible (around 450–500 nm), the filtered photodiode throws all of that away and only harvests a slice of the near-infrared tail. Of the ~$1366 \text{W/m}^2$ of total sunlight, only about $193 W/m^2$ of irradiance is available to the sensor.
 
 The current density is the weighted integral, and the total photocurrent is that density times the radiant-sensitive area of the die, $A = 7.02\ \text{mm}^2$:
 
@@ -189,7 +189,7 @@ $$
 
 at full normal-incidence sun.
 
-The photodiode feeds a 16-bit ADC on the STM32 whose reference is 3.3 V. We want a full, normal sun to swing the ADC close to full-scale (to use the whole dynamic range) but *never* clip. Solving $V = I_p R$ for the resistor:
+The photodiode feeds a 16-bit ADC on the STM32 whose reference is 3.3 V. We want full sunlight at normal incidence to swing the ADC close to full-scale (to use the whole dynamic range) but *never* clip. Solving $V = I_p R$ for the resistor:
 
 $$
 R = \frac{V_\text{FS}}{I_{p,\text{max}}} = \frac{3.3\ \text{V}}{0.95\ \text{mA}} \approx 3.5\ \text{k}\Omega .
@@ -215,7 +215,7 @@ As noted earlier, this torque often cannot be executed perfectly since we can on
 
 This is the simplest mode, where the controller simply stops the satellite from rotating.
 
-This is very useful during right after launch: at this time the satellite is rapidly rotating and does not know anything about the current time or its TLE, so we are unable to use the sun sensors or the IGRF. As such, we simply use the famous B-dot control law:
+This is very useful immediately after launch: at this time the satellite is rapidly rotating and does not know anything about the current time or its TLE, so we are unable to use the sun sensors or the IGRF. As such, we simply use the famous B-dot control law:
 $$
 \mathbf{m} = -k \dot{\mathbf{B}}
 $$
@@ -228,7 +228,7 @@ This ensures that our detumble is rapid and that we are not wasting any power on
 During nominal operations, PixelSat maintains a nadir-pointing attitude, keeping its antenna directed toward Earth.
 This maximizes communication performance over the majority of each orbit while also providing a consistent reference frame for the rest of the spacecraft.
 
-Additionally we can adjust this attitude as needed to take pictures.
+Additionally, we can adjust this attitude as needed to take pictures.
 
 We use a PID controller to generate our commanded torque here. As previously noted, we are always unable to torque along the axis of the local magnetic field, but the controller intrinsically corrects for that and eventually will stabilize. We are also exploring LQR options (keep an eye out for a future blog post!).
 
