@@ -17,6 +17,8 @@
   --color-bg-gradient-start: var(--bg-gradient-start);
   --color-bg-gradient-end: var(--bg-gradient-end);
 
+  --color-elevated-3: var(--elevated-3);
+  --color-elevated-5: var(--elevated-5);
   --color-elevated-7: var(--elevated-7);
   --color-elevated-10: var(--elevated-10);
   --color-elevated-15: var(--elevated-15);
@@ -47,6 +49,7 @@
   --background: var(--bg-surface);
 
   --elevated-color: #3450d1;
+  --elevated-3: color-mix(in srgb, var(--elevated-color) 3%, transparent);
   --elevated-5: color-mix(in srgb, var(--elevated-color) 5%, transparent);
   --elevated-7: color-mix(in srgb, var(--elevated-color) 7%, transparent);
   --elevated-10: color-mix(in srgb, var(--elevated-color) 10%, transparent);
