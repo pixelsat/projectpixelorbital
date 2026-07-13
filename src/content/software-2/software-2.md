@@ -1,6 +1,6 @@
 ---
 title: |
-    PixelSat I Software Part 3: Attitude Determination and Control System
+    PixelSat I Software Part 2: Attitude Determination and Control System
 authors: Ashwin Naren, Vinayak Vikram, and Aadish Verma
 ---
 
