@@ -230,7 +230,7 @@ This maximizes communication performance over the majority of each orbit while a
 
 Additionally, we can adjust this attitude as needed to take pictures.
 
-We use a PID controller to generate our commanded torque here. As previously noted, we are always unable to torque along the axis of the local magnetic field, but the controller intrinsically corrects for that and eventually will stabilize. We are also exploring LQR options (keep an eye out for a future blog post!).
+We use a PID controller to generate our commanded torque here. As previously noted, we are always unable to torque along the axis of the local magnetic field, but the controller intrinsically corrects for that and eventually will stabilize the spacecraft. We are also exploring LQR options (keep an eye out for a future blog post!).
 
 #### Ground point tracking
 
@@ -282,7 +282,7 @@ We see that the number of turns $N$ cancels out entirely. At a fixed drive volta
 
 #### Design
 
-We want to maximize the number of turns we use to reduce power consumption (since $P=V^2/R$), but if we have too many our current sensing becomes challenging.
+We want to maximize the number of turns we use to reduce power consumption (since $P=V^2/R$), but if we have too many, our current sensing becomes challenging.
 
 Those bounds leave a wide window, so we apply the time-honored aerospace optimization technique of choosing a comfortably round number: 100 turns.
 We drive the coils from the unregulated bus (more to come on this in our first electrical blog post), nominally 7.2 V (though this sags and varies with battery state of charge). Using AWG-42-class magnet wire (0.066 mm diameter copper with $\lambda \approx 4.9\ \Omega/\text{m}$) on a coil roughly $s=8\ \text{cm}$ per side, the dipole works out to
@@ -291,7 +291,7 @@ $$
 m = \frac{V s}{4\lambda} = \frac{7.2 \times 0.08}{4 \times 4.9} \approx 0.029\ \text{A·m}^2 .
 $$
 
-At 100 turns the coil resistance is $R = 4N\lambda s \approx 157\ \Omega$, drawing $\approx 46\ \text{mA}$ and dissipating only $\approx 0.33\ \text{W}$ per torquer (about 1 W across all three). This is a small enough slice of our generation that it does not eat into our power budget significantly. We could wind more turns to shave the power further, but below a few tenths of a watt it stops mattering to the energy budget while the current drifts toward our sensing floor.
+At 100 turns, the coil resistance is $R = 4N\lambda s \approx 157\ \Omega$, draws $\approx 46\ \text{mA}$, and dissipates only $\approx 0.33\ \text{W}$ per torquer (about 1 W across all three). This is a small enough slice of our generation that it does not eat into our power budget significantly. We could wind more turns to shave the power further, but below a few tenths of a watt it stops mattering to the energy budget while the current drifts toward our sensing floor.
 
 Physically, each torquer is a copper winding around a central rectangular bobbin, with guardrails on the top and bottom edges so the wire cannot slip off during winding or launch vibration.
 
@@ -305,11 +305,12 @@ Of course, the STM32 also cannot source the coil voltage or reverse polarity on 
 
 ## Conclusion
 
-The ADCS system provides an excellent fusion of 3 sensors, each of which have their own pros/cons.
+The ADCS system provides an excellent fusion of 3 sensors, each of which has their own pros/cons.
+This ensures that we can have accurate pointing at all times.
 
-In doing so it provides excellent pointing accuracy at a surprisingly low cost.
+In doing so, it provides excellent pointing accuracy at a surprisingly low cost.
 
-Of course, the disadvantages are visible: we can't make extremely precise corrections at times and we have around
-1 degree of inaccuracy when predicting our attitude.
+Of course, the disadvantages are visible:
+we cannot always make highly precise corrections, and our attitude estimates have approximately 1° of error.
 
-Thank you for reading till the end! The next post in the software blog series will be about the Onboard Computer.
+Thank you for reading to the end! The next post in the software blog series will be about the Onboard Computer.
