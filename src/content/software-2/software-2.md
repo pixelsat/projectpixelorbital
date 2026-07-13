@@ -9,18 +9,18 @@ Welcome to the second post in our series about the PixelSat I software stack. If
 
 ## Attitude Determination and Control System
 
-Put simply, ADCS is the subsystem that answers two questions continuously throughout the mission: "which way is the satellite currently pointing, and how fast is it rotating?" (determination), and "what do we need to do to point it somewhere else, or stop it from tumbling?" (control).
+Put simply, ADCS is the subsystem that answers two questions continuously throughout the mission: "Which way is the satellite currently pointing, and how fast is it rotating?" (determination) and "What do we need to do to point it somewhere else, or stop it from tumbling?" (control).
 
 Like comms, ADCS is a subsystem where the "correct" solution used on larger missions (star trackers, reaction wheels, etc.) is completely out of reach for our budget. So a lot of this post is about the tradeoffs we made to get a working attitude system out of cheap, noisy, and somewhat sparse sensors.
 
 ## Constraints
 
 We cannot use reaction wheels or control moment gyroscopes.
-On most higher-cost satellites these are widely used, since they let you apply torque in any direction independent of your environment as well as simply generate much more torque.
-However, due to the fact that they are a) expensive b) extremely mechanically complex (we're trying to keep moving parts off this satellite) and c) draw power we don't have to spare, we committed early to magnetorquers only
+On most higher-cost satellites, these are widely used, since they let you apply torque in any direction independent of your environment as well as simply generate much more torque.
+However, due to the fact that they are a) expensive b) extremely mechanically complex (we're trying to keep moving parts off this satellite) and c) draw power we don't have to spare, we committed early to magnetorquers only.
 Magnetorquers are wonderfully simple, provided you are comfortable letting Earth’s magnetic field participate in every steering decision.
 
-We cannot use a star tracker either. We do not have neither the (cost) budget to get one (they require extremely good optics) as well as the computing budget to process their data. 
+We cannot use a star tracker either. We  have neither the (cost) budget to get one (they require extremely good optics) nor the computing budget to process their data. 
 
 Finally, sensors need to be cheap, low power, and easy to interface with over standard buses (I2C, SPI) from our onboard computer.
 
@@ -31,7 +31,7 @@ Given those constraints, our sensor suite ended up being:
 - **Gyroscope**: gives us angular velocity directly, and is the main sensor for short-timescale attitude propagation.
 
 Our sole actuator is a set of three orthogonal magnetorquers, which produce a magnetic dipole that reacts against Earth's local magnetic field to produce torque.
-Due to this: magnetorquers come with one major drawback: they cannot generate arbitrary torques.
+However, magnetorquers have one major drawback: they cannot generate arbitrary torques.
 A magnetorquer produces a magnetic dipole $m$, which interacts with Earth's magnetic field $B$ according to
 
 $$
@@ -42,9 +42,9 @@ $$
 
 Since the torque is always the cross product of these vectors, it is necessarily perpendicular to the local magnetic field. At any instant there is therefore one direction in which the spacecraft simply cannot produce torque.
 
-Additionally due to only having 3 magnetorquers the strength of the produced magnetic dipole varies due to per-axis saturation.
+Additionally, due to only having three magnetorquers, the strength of the produced magnetic dipole varies due to per-axis saturation.
 
-Our ACS system has to pick the closest possible dipole direction to the desired torque direction. We solve this in a few ways, outlined later.
+Our system chooses the closest possible dipole direction to the desired torque direction. We solve this in a few ways, outlined later.
 
 ## Attitude Determination System
 
@@ -57,7 +57,7 @@ The gyro gives us a relative, high-rate measurement of angular velocity. However
 The sun sensor and magnetometer, on the other hand, give us absolute vector references, but at a lower rate and lower individual accuracy.
 For example magnetometer readings are not taken while we are applying torque from the magnetorquers, as that heavily affects the readings.
 Reading the magnetometer while running the magnetorquer would be a bit like checking a compass while holding a magnet right next to it.
-Instead, we have to temporarily pause the magnetotorquers every 500ms to take a reading.
+Instead, we have to temporarily pause the magnetorquers every 500ms to take a reading.
 On the other hand, while the coarse sun sensor is not affected by this, it remains far less accurate than either the magnetometer or the IMU.
 
 The EKF combines these complementary measurements.
@@ -66,7 +66,7 @@ An EKF allows you to fuse a fast, drifting relative sensor with slower absolute 
 
 More specifically, the current implementation is a multiplicative error-state EKF.
 What this means is that instead of tracking the full attitude as a linear filter state, we propagate the nominal attitude on its own using proper nonlinear quaternion kinematics, and let the Kalman filter only track a small, linearizable error on top of that nominal estimate.
-Every update cycle, that small error correction gets folded multiplicatively into the nominal quaternion, and the error state resets back near zero.
+During every update cycle, that small error correction gets folded multiplicatively into the nominal quaternion, and the error state resets back near zero.
 
 ### Attitude representation
 
@@ -74,7 +74,7 @@ Internally, the estimator propagates attitude as a unit quaternion.
 Quaternions avoid singularities, compose efficiently, and are the standard representation for spacecraft dynamics. 
 
 Other software components, however, work more naturally with a minimal three-parameter representation.
-For those interfaces we convert the output quaternion into Modified Rodrigues Parameters (MRPs).
+For those interfaces, we convert the output quaternion into Modified Rodrigues Parameters (MRPs).
 
 $$
 q
@@ -109,7 +109,7 @@ Our estimator always checks the magnitude of the current MRP vector and swaps to
 Our sun sensor and magnetometer measure vectors in the spacecraft's body frame.
 To compare those measurements against reality, we need to know what those vectors should look like in inertial space.
 
-To do this we have to propagate the orbit from what we know (i.e. some initial parameters we've uplinked) to the current position.
+To do this, we have to propagate the orbit from what we know (i.e. some initial parameters we've uplinked) to the current position.
 
 Prior to us joining the project, they were initially considering propagating the orbit using classical Keplerian elements. Unfortunately, Earth refuses to cooperate by behaving like a perfect sphere.
 The Earth is not a simple point mass, its gravitational field has extra terms (the zonal harmonics $J_2$, $J_3$, $J_4$) that steadly rotate our orbital plane and argument of perigee.
