@@ -285,7 +285,8 @@ We see that the number of turns $N$ cancels out entirely. At a fixed drive volta
 
 We want to maximize the number of turns we use to reduce power consumption (since $P=V^2/R$), but if we have too many our current sensing becomes challenging.
 
-Those bounds leave a wide window, and we just eyeball 100 turns to sit comfortably in the middle of it. We drive the coils from the unregulated bus (more to come on this in our first electrical blog post), nominally 7.2 V (though this sags and varies with battery state of charge). Using AWG-42-class magnet wire (0.066 mm diameter copper with $\lambda \approx 4.9\ \Omega/\text{m}$) on a coil roughly $s=8\ \text{cm}$ per side, the dipole works out to
+Those bounds leave a wide window, so we apply the time-honored aerospace optimization technique of choosing a comfortably round number: 100 turns.
+We drive the coils from the unregulated bus (more to come on this in our first electrical blog post), nominally 7.2 V (though this sags and varies with battery state of charge). Using AWG-42-class magnet wire (0.066 mm diameter copper with $\lambda \approx 4.9\ \Omega/\text{m}$) on a coil roughly $s=8\ \text{cm}$ per side, the dipole works out to
 
 $$
 m = \frac{V s}{4\lambda} = \frac{7.2 \times 0.08}{4 \times 4.9} \approx 0.029\ \text{A·m}^2 .
