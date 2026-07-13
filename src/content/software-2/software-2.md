@@ -57,6 +57,7 @@ The gyro gives us a relative, high-rate measurement of angular velocity. However
 
 The sun sensor and magnetometer, on the other hand, give us absolute vector references, but at a lower rate and lower individual accuracy.
 For example magnetometer readings are not taken while we are applying torque from the magnetorquers, as that heavily affects the readings.
+Reading the magnetometer while running the magnetorquer would be a bit like checking a compass while holding a magnet right next to it.
 Instead, we have to temporarily pause the magnetotorquers every 500ms to take a reading.
 On the other hand, while the coarse sun sensor is not affected by this, it remains far less accurate than either the magnetometer or the IMU.
 
