@@ -44,8 +44,7 @@ Since the torque is always the cross product of these vectors, it is necessarily
 
 Additionally due to only having 3 magnetorquers the strength of the produced magnetic dipole varies due to per-axis saturation.
 
-Our ACS system has to pick the closest possible dipole direction to the desired torque direction.
-<!-- TODO(yappy): explain more. yeah yeah i will after reading that paper gotta explain sgp4 and torquers and photodiodes first -->
+Our ACS system has to pick the closest possible dipole direction to the desired torque direction. We solve this in a few ways, outlined later.
 
 ## Attitude Determination System
 
@@ -216,13 +215,13 @@ As noted earlier, this torque often cannot be executed perfectly since we can on
 
 This is the simplest mode, where the controller simply stops the satellite from rotating.
 
-This is very useful during right after launch: at this time the satellite is rapidly rotating and does not know anything about the current time or its TLE,
-so it's unable to convert the data from the sun sensors or magnetometer into anything useful, which are the two absolute sensors available.
-As such it relies solely on the gyro measurement to cancel the satellite's angular velocity.
-
+This is very useful during right after launch: at this time the satellite is rapidly rotating and does not know anything about the current time or its TLE, so we are unable to use the sun sensors or the IGRF. As such, we simply use the famous B-dot control law:
 $$
-\tau_c=-K_\omega\omega.
+\mathbf{m} = -k \dot{\mathbf{B}}
 $$
+where $\dot{\mathbf{B}}=\frac{\mathrm{d}\mathbf{B}}{\mathrm{d}t}=\frac{\Delta \mathbf{B}}{\Delta t}$ (which we *can* measure with our magnetometer)
+to generate magnetic moments that are always orthogonal to the local magnetic field (since $\mathbf{B} \perp \dot{\mathbf{B}}$).
+This ensures that our detumble is rapid and that we are not wasting any power on un-executable torque profiles in the most power-draw-intensive part of the flight.
 
 #### Reference attitude tracking
 
@@ -231,7 +230,7 @@ This maximizes communication performance over the majority of each orbit while a
 
 Additionally we can adjust this attitude as needed to take pictures.
 
-We use a PID controller to generate our commanded torque here.
+We use a PID controller to generate our commanded torque here. As previously noted, we are always unable to torque along the axis of the local magnetic field, but the controller intrinsically corrects for that and eventually will stabilize. We are also exploring LQR options (keep an eye out for a future blog post!).
 
 #### Ground point tracking
 
@@ -313,4 +312,4 @@ In doing so it provides excellent pointing accuracy at a surprisingly low cost.
 Of course, the disadvantages are visible: we can't make extremely precise corrections at times and we have around
 1 degree of inaccuracy when predicting our attitude.
 
-Thank you for reading till the next! The next post in the software blog series will be about the Onboard Computer. 
+Thank you for reading till the next! The next post in the software blog series will be about the Onboard Computer.
