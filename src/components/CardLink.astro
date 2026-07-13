@@ -13,14 +13,13 @@ interface Props {
 const { title, desc, href, class: className } = Astro.props;
 ---
 
-<OuterLink href={href} button card class:list={["group", className]}>
+<OuterLink href={href} button card class:list={["group", "shadow-md", className]}>
   <div class="flex w-full flex-col gap-1 overflow-hidden">
     <Text
       variant="subheading"
       class="transition-colors duration-200 group-hover:text-primary"
       >{title}</Text
     >
-    <Text variant="body" tone="secondary" class="line-clamp-3">{desc}</Text>
+    <Text variant="caption" tone="secondary" class="line-clamp-3">{desc}</Text>
   </div>
-  <IconExternalLink class="mt-0.5 size-[21px] shrink-0" />
 </OuterLink>
