@@ -215,7 +215,8 @@ As noted earlier, this torque often cannot be executed perfectly since we can on
 
 This is the simplest mode, where the controller simply stops the satellite from rotating.
 
-This is very useful immediately after launch: at this time the satellite is rapidly rotating and does not know anything about the current time or its TLE, so we are unable to use the sun sensors or the IGRF. As such, we simply use the famous B-dot control law:
+This is very useful immediately after launch: at this time the satellite is rapidly rotating and does not know anything about the current time or its TLE, so we are unable to use the sun sensors (while they function, they require a TLE to be useful) or the IGRF.
+As such, we simply use the famous B-dot control law:
 $$
 \mathbf{m} = -k \dot{\mathbf{B}}
 $$
