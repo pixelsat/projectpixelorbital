@@ -14,12 +14,12 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props;
-const { title, authors } = post.data;
+const { title, authors, date } = post.data;
 const { Content } = await render(post);
 ---
 
 <BaseLayout title={title + " | Project Pixel Orbital"}>
-  <Blog title={title} authors={authors}>
+  <Blog title={title} authors={authors} date={date}>
     <Content />
   </Blog>
 </BaseLayout>

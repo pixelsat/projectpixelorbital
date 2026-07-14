@@ -2,6 +2,7 @@
 title: |
     PixelSat I Software Part 1: Comms System
 authors: Ashwin Naren, Vinayak Vikram, and Aadish Verma
+date: 7/7/2026
 ---
 
 Welcome to the first post in a series about the PixelSat I software stack.

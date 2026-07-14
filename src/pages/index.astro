@@ -11,6 +11,7 @@ const blogPosts = (await getCollection("blog"))
     slug: post.id.split("/").slice(1)[0],
     title: post.data.title,
     authors: post.data.authors,
+    date: post.data.date
   }));
 ---
 

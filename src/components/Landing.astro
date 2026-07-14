@@ -14,11 +14,13 @@ import weston from "../assets/images/wy_ppo.jpeg";
 import ashwin from "../assets/images/an_ppo.png";
 import francesca from "../assets/images/fd_ppo.webp";
 import render from "../assets/images/pixelsattransparentrender.png";
+import {formatDate} from "../scripts/date.ts"
 
 interface BlogPost {
   slug: string;
   title: string;
   authors: string;
+  date: string;
 }
 
 interface Props {
@@ -195,10 +197,10 @@ const snapshot = [
           >
             {blogPosts.map((post: BlogPost) => (
               <CardLink
-                class="min-h-[220px] [scroll-snap-align:start]"
+                class="min-h-[150px] [scroll-snap-align:start]"
                 href={`/${post.slug}`}
                 title={post.title}
-                desc={post.authors}
+                desc={post.authors + " on " + formatDate(new Date(post.date))}
               />
             ))}
           </div>
