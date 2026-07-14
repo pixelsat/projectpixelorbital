@@ -22,7 +22,7 @@ Magnetorquers are wonderfully simple, provided you are comfortable letting Earth
 
 We cannot use a star tracker either. We  have neither the (cost) budget to get one (they require extremely good optics) nor the computing budget to process their data. 
 
-Finally, sensors need to be cheap, low power, and easy to interface with over standard buses (I2C, SPI) from our onboard computer.
+Finally, sensors need to be cheap, low power, and easy to interface with over standard buses (I<sup>2</sup>C, SPI) from our onboard computer.
 
 Given those constraints, our sensor suite ended up being:
 
@@ -57,8 +57,8 @@ The gyro gives us a relative, high-rate measurement of angular velocity. However
 The sun sensor and magnetometer, on the other hand, give us absolute vector references, but at a lower rate and lower individual accuracy.
 For example magnetometer readings are not taken while we are applying torque from the magnetorquers, as that heavily affects the readings.
 Reading the magnetometer while running the magnetorquer would be a bit like checking a compass while holding a magnet right next to it.
-Instead, we have to temporarily pause the magnetorquers every 500ms to take a reading.
-On the other hand, while the coarse sun sensor is not affected by this, it remains far less accurate than either the magnetometer or the IMU.
+Instead, we have to temporarily pause the magnetorquers every 500 ms to take a reading.
+And while the coarse sun sensor is not affected by this, it remains far less accurate than either the magnetometer or the IMU.
 
 The EKF combines these complementary measurements.
 An EKF allows you to fuse a fast, drifting relative sensor with slower absolute references, weighted by how much you trust each one at any given moment.
@@ -111,12 +111,12 @@ To compare those measurements against reality, we need to know what those vector
 
 To do this, we have to propagate the orbit from what we know (i.e. some initial parameters we've uplinked) to the current position.
 
-Prior to us joining the project, the team was initially considering propagating the orbit using classical Keplerian elements. Unfortunately, Earth refuses to cooperate by behaving like a perfect sphere.
+Before we joined the project, the team was considering propagating the orbit using classical Keplerian elements. Unfortunately, Earth refuses to cooperate by behaving like a perfect sphere.
 The Earth is not a simple point mass; its gravitational field has extra terms (the zonal harmonics $J_2$, $J_3$, $J_4$) that steadily rotate our orbital plane and argument of perigee.
 On top of that, our orbit is low enough that the residual atmospheric drag measurably shrinks our orbit even over a few weeks.
 Most importantly, a TLE encodes the *mean motion* of the satellite, which poses problems when the motion of the satellite is nonuniform.
 
-The SGP4 (Simplified General Perturbations 4) model solves all these problems compactly by folding both gravitational perturbations and a drag model into a closed-form propagator (no need to numerically solve ODE's, for example...).
+The SGP4 (Simplified General Perturbations 4) model solves all these problems compactly by folding both gravitational perturbations and a drag model into a closed-form propagator (no need to numerically solve ODEs, for example...).
 
 Our implementation of the model follows [Vallado's excellent description of SGP4](https://celestrak.org/publications/AIAA/2006-6753/). We split the propagator into a one-time initialization from the TLE and a cheap `propagate(t)` call for any later time:
 
@@ -230,7 +230,9 @@ This maximizes communication performance over the majority of each orbit while a
 
 Additionally, we can adjust this attitude as needed to take pictures.
 
-We use a PID controller to generate our commanded torque here. As previously noted, we are always unable to torque along the axis of the local magnetic field, but the controller intrinsically corrects for that and eventually will stabilize the spacecraft. We are also exploring LQR options (keep an eye out for a future blog post!).
+We use a PID controller to generate our commanded torque here.
+As previously noted, we are always unable to torque along the axis of the local magnetic field, but the controller intrinsically corrects for that and will eventually stabilize.
+We are also exploring LQR options (keep an eye out for a future blog post!).
 
 #### Ground point tracking
 
@@ -305,7 +307,7 @@ Of course, the STM32 also cannot source the coil voltage or reverse polarity on 
 
 ## Conclusion
 
-The ADCS system provides an excellent fusion of 3 sensors, each of which has their own pros/cons.
+The ADCS provides an excellent fusion of 3 sensors, each of which has their own pros/cons.
 This ensures that we can have accurate pointing at all times.
 
 In doing so, it provides excellent pointing accuracy at a surprisingly low cost.
