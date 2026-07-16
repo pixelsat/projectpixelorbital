@@ -31,6 +31,69 @@ RTIC converts task priorities into interrupt priorities, so higher priority can 
 
 Tasks can also be triggered by external interrupts, allowing for event-driven execution without polling.
 
-By being async, tasks can easily suspend and resume execution, without blocking the CPU in spinloops. This lets lower priority tasks run while higher priority tasks are waiting for I/O or other resources. Tasks on the same priority level run in a round-robin fashion and cooperatetively share the CPU time.
+By being async, tasks can easily suspend and resume execution, without blocking the CPU in spinloops.
+This lets lower priority tasks run while higher priority tasks are waiting for I/O or other resources.
+Tasks on the same priority level run in a round-robin fashion and cooperatetively share the CPU time.
+
+For example:
+
+```rust
+#[task(priority = 6, local = [watchdog])]
+async fn watchdog(ctx: watchdog::Context) {
+    loop {
+        ctx.local.watchdog.feed(); // Feeds a watchdog to prevent shutdown
+        Mono::delay(1_u64.secs()).await; // Lets tasks of any priority go on
+    }
+}
+```
+
+This is a rather simple loop task that prevents the stm from shutting down by feeding the watchdog.
+
+You might notice the `local = [watchdog]`, this indicates that a local context variable, `watchdog`, needs to be initialized
+in the init function.
+
+To indicate this, we have a local struct:
+```rust
+    #[local]
+    pub struct LocalResources {
+        // ...
+        pub watchdog: IndependentWatchdog,
+        // ...
+    }
+```
+
+which we initialize in the `init` routine:
+
+```rust
+#[init]
+pub fn init(
+    mut ctx: init::Context,
+) -> (SharedResources, LocalResources) {
+    // ...
+    let imu = ...;
+    // ...
+    (
+        SharedResources {
+            imu,
+            mag,
+            css,
+            rtc,
+            tle,
+            rad,
+            // ...
+        },
+        LocalResources {
+            imu_int,
+            mag_drdy,
+            // ...
+            transceiver_tx,
+            transceiver_rx,
+            watchdog,
+            ramecc,
+            // ...
+        },
+    )
+}
+```
 
 ## Synchronization and preventing deadlocks
