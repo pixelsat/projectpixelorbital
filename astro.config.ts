@@ -11,13 +11,13 @@ export default defineConfig({
     processor: unified({
       remarkPlugins: [remarkMath],
       rehypePlugins: [rehypeKatex],
-      shikiConfig: {
-        themes: {
-          light: "github-light",
-          dark: "github-dark",
-        },
-      },
     }),
+    shikiConfig: {
+      themes: {
+        light: "github-light",
+        dark: "github-dark",
+      },
+    },
   },
   vite: {
     plugins: [tailwindcss()],

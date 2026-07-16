@@ -20,7 +20,7 @@ interface BlogPost {
   slug: string;
   title: string;
   authors: string;
-  date: string;
+  date: Date;
 }
 
 interface Props {
@@ -200,7 +200,7 @@ const snapshot = [
                 class="min-h-[150px] [scroll-snap-align:start]"
                 href={`/${post.slug}`}
                 title={post.title}
-                desc={post.authors + " on " + formatDate(new Date(post.date))}
+                desc={post.authors + " on " + formatDate(post.date)}
               />
             ))}
           </div>

@@ -6,7 +6,7 @@ import {formatDate} from "../scripts/date.ts"
 interface Props {
   authors: string;
   title: string;
-  date: string;
+  date: Date;
 }
 
 const { authors, title, date } = Astro.props;
@@ -22,7 +22,7 @@ const { authors, title, date } = Astro.props;
     <section class="flex flex-col gap-[14px]">
       <Text variant="display" class="max-w-none text-balance">{title}</Text>
       <Text tag="div" variant="caption" tone="tertiary">by {authors}</Text>
-      <Text tag="div" variant="caption" tone="tertiary">{formatDate(new Date(date))}</Text>
+      <Text tag="div" variant="caption" tone="tertiary">{formatDate(date)}</Text>
     </section>
 
     <section class="w-full">
