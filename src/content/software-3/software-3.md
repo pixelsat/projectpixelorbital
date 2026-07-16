@@ -11,9 +11,11 @@ This naturally had ... major issues ... so the first thing we did was scrap this
 ## ESP32
 
 The first major OBC refactor occurred in Feburary 2026, when we decided to use an ESP32 as our main computer.
-We originally kept the raspi around as a payload computer, linked over UART to the ESP32 solely for sending images and microbio experiment data.
+
+This also marked a shift towards bare-metal rust.
 The ESP ran an Embassy async executor to handle everything, including our comms and ADCS routines.
 
+We originally kept the raspi around as a payload computer, linked over UART to the ESP32 solely for sending images and microbio experiment data.
 After we cut the microbio experiment and found a camera that natively supported the JPEG codec, we eventually cut the raspi altogether.
 To handle all the tasks, we were planning on using a dual-esp architecture where esp0 handled comms, ADCS, and scheduling, and esp1 handled telemetry and image processing.
 
