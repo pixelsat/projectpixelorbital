@@ -1,0 +1,14 @@
+{
+  "name": "simpleanalytics-proxy",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-04-01",
+  "vars": {
+    "SITE_HOSTNAME": "www.projectpixelorbital.com",
+  },
+  "routes": [
+    {
+      "pattern": "www.projectpixelorbital.com/_sa/*",
+      "zone_name": "projectpixelorbital.com",
+    },
+  ],
+}
