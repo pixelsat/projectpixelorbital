@@ -5,14 +5,20 @@ authors: Ashwin Naren, Vinayak Vikram, and Aadish Verma
 ---
 
 ## Previous Dumb Ideas
-Before we joined the project, the previous software stack was a monolithic python file launched on user login via systemd on a vanilla Raspberry Pi 5. This naturally had... major issues... so the first thing we did was scrap this.
+Before we joined the project, the previous software stack was a monolithic python file launched on user login via systemd on a vanilla Raspberry Pi 5.
+This naturally had ... major issues ... so the first thing we did was scrap this.
 
 ## ESP32
-The first major OBC refactor occured in Feburary 2026, when we decided to use an ESP32 as our main computer. We originally kept the raspi around as a payload computer, linked over UART to the ESP32 solely for sending images and microbio experiment data (yet another thing we cut). The ESP ran an Embassy async executor to handle everything, including our comms and ADCS routines.
 
-After we cut the microbio experiment and found a camera that natively supported the JPEG codec, we eventually cut the raspi altogether. To handle all the tasks, we were planning on using a dual-esp architecture where esp0 handled comms, ADCS, and scheduling, and esp1 handled telemetry and image processing. 
-  
+The first major OBC refactor occurred in Feburary 2026, when we decided to use an ESP32 as our main computer.
+We originally kept the raspi around as a payload computer, linked over UART to the ESP32 solely for sending images and microbio experiment data.
+The ESP ran an Embassy async executor to handle everything, including our comms and ADCS routines.
+
+After we cut the microbio experiment and found a camera that natively supported the JPEG codec, we eventually cut the raspi altogether.
+To handle all the tasks, we were planning on using a dual-esp architecture where esp0 handled comms, ADCS, and scheduling, and esp1 handled telemetry and image processing.
+
 ## STM32
+
 We decided to use an STM32 as our main computer, since it has an extensive flight heritage in satellites such as FossaSat-2. 
 
 ## RTIC
