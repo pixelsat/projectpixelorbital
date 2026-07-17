@@ -22,7 +22,6 @@ Because of our unique environment and tasks, there are a few other nice-to-haves
 * Real-time clock (RTC). We need to keep time on the OBC (the ADCS relies on having a somewhat accurate UNIX timestamp), so a real-time clock is ideal. After launch, when the satellite powers on, the ground will broadcast the current time via our comms system, which allows us to initialize the RTC and the corresponding ADCS parts to start. This isn't a deal breaker as dedicated RTC chips are available.
 * Watchdog. We use a watchdog timer as part of our radiation resistance strategy. A watchdog is essentially a tiny chip which has the power to reset the OBC. The OBC has to send some kind of "heartbeat" -- say, one pulse on a digital pin every 5 seconds -- to the watchdog to avoid getting reset. If the heartbeat is dropped or the watchdog detects an atypical heartbeat, well, the OBC restarts. The thinking is that the heartbeat will only be corrupted if the OBC is in serious trouble -- for example, if radiation causes a bitflip, if a task starves the heartbeat task (which implies all other tasks are also being starved), or if the code latches up for another reason. Again, off-the-shelf dedicated watchdogs are available so this isn't a necessity.
 
-
 ## ESP32
 
 Early in the project, the original software stack was a monolithic Python file launched on user login via systemd on a vanilla Raspberry Pi 5. This naturally had major issues; primarily, the use of a full-on Linux operating system added a massive degree of bloat and uncertainty to the system. Our Raspberry Pi has experienced issues with unexpectedly shutting down. RPis in general aren't the best w/r/t radiation resistance, and the idle power draw is much higher than we would prefer. When we finally got around to seriously working on flight software, the first thing we did was ditch this idea.
@@ -40,9 +39,7 @@ We finally decided to use an STM32, specifically, the STM32H753ZI, as our main c
 
 ### RTIC
 
-RTIC is a Rust concurrency framework designed for embedded environments. It essentially maps tasks to ISRs (interrupt handlers). Task priorities are directly converted into interrupt priorities. This creates a semi-preemptive scheduling system where higher priority tasks, because of the underlying interrupt model, are able to preempt a running lower priority task. On ARM Cortex-M-based processors including our STM32, RTIC functions by (ab)using the NVIC (Nested Vectored Interrupt Controller) to have a lightweight strict priority-based scheduling system.
-
-RTIC has two types of tasks: "hardware tasks" are triggered by peripheral-bound IRQs (interrupts), while "software tasks" are spawned by pending an otherwise-unused "dispatch" IRQ.
+RTIC is a Rust concurrency framework designed for embedded environments. It essentially maps tasks to ISRs (interrupt handlers), so triggering an IRQ (interrupt request) spawns a task. Task priorities are directly converted into interrupt priorities. This creates a semi-preemptive scheduling system where higher priority tasks, because of the underlying interrupt model, are able to preempt a running lower priority task. For the STM32 and other ARM Cortex-M-based processors, RTIC (ab)uses the NVIC (Nested Vectored Interrupt Controller) for its scheduling system.
 
 RTIC's biggest advantage is that we can still use Rust's powerful async model, idiomatically suspending and resuming execution, without blocking the CPU in spinloops. This lets lower priority tasks run while higher priority tasks are waiting for I/O or other resources. Tasks on the same priority level run in a round-robin fashion and cooperatively share the CPU time.
 
@@ -69,7 +66,31 @@ async fn rad_task(mut ctx: rad_task::Context) {
     }
 }
 ```
-Similarly here, `shared = [rad]` indicates that a shared resource `rad` needs to be provided by our init function.
+Similarly here, `shared = [rad]` indicates that a shared resource `rad` needs to be provided by our init function. However, this task only aggregates statistics. A separate task is triggered by a click received from the radiation sensor's GPIO pin and updates a counter (which `rad.update()` then reads to update our statistics):
+```rs
+#[task(binds = EXTI15_10, priority = 7, shared = [/* ... */], local = [rad_out, /* ... */])]
+fn mag_and_rad_interrupt(mut ctx: mag_and_rad_interrupt::Context) {
+    if ctx.local.rad_out.check_interrupt() {
+        ctx.local.rad_out.clear_interrupt_pending_bit();
+        click();
+    }
+
+    // ...
+}
+```
+Unlike the previous tasks, this has the `binds` argument passed to the `task` attribute. This essentially tells RTIC that `mag_and_rad_interrupt` is a hardware task (more on that below). Also, the `EXTI15_10` interrupt line isn't just for the radiation sensor; as you may have inferred from the name, the task is also triggered by the magnetometer's DRDY (data ready) pin to inform the STM32 that the magnetometer has new data to be read over SPI. To ensure this interrupt was indeed triggered by the radiation sensor, we check the pin's interrupt before recording a click. A similar process for the magnetometer is omitted.
+
+RTIC has two types of tasks: "hardware tasks" like `mag_and_rad_interrupt` are triggered by peripheral-bound IRQs (interrupts), while "software tasks" like `rad_task` and `watchdog` are spawned by pending an otherwise-unused "dispatcher" IRQ. We essentially donate some IRQ lines to RTIC and guarantee that we won't trigger those interrupts ourselves, so RTIC can use them to dispatch software tasks. This is done at the top of our `app` module:
+```rs
+#[rtic::app(
+    device = stm32h7xx_hal::stm32,
+    peripherals = true,
+    dispatchers = [EXTI0, EXTI1, EXTI2, EXTI3, EXTI4],
+)]
+mod app {
+    // ...
+}
+```
 
 To indicate the resources we use, we have a struct for each type of resource:
 ```rs
@@ -84,6 +105,8 @@ pub struct LocalResources {
     // ...
     pub watchdog: IndependentWatchdog,
     // ...
+    pub rad_out: Pin<'D', 15, Input>,
+    // ...
 }
 ```
 
@@ -96,7 +119,15 @@ pub fn init(
 ) -> (SharedResources, LocalResources) {
     // ...
     
+    // rad sensor
+    let mut rad_out = gpiod.pd15.into_pull_down_input();
+    rad_out.make_interrupt_source(&mut ctx.device.SYSCFG);
+    rad_out.trigger_on_edge(&mut ctx.device.EXTI, Edge::Rising);
+    rad_out.enable_interrupt(&mut ctx.device.EXTI);
+    rad_out.clear_interrupt_pending_bit();
+
     let rad = Rad::new();
+    
     // ...
     let mut watchdog = IndependentWatchdog::new(ctx.device.IWDG);
     watchdog.start(10.secs());
@@ -112,6 +143,8 @@ pub fn init(
         crate::app::LocalResources {
             // ...
             watchdog,
+            // ...
+            rad_out,
             // ...
         },
     )
