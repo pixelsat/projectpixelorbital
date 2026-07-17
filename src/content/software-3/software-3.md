@@ -156,7 +156,10 @@ pub fn init(
 Since RTIC targets single-core exclusively and has hard priorities, using a wait-based `Mutex` for resource management would result in hangs when priorities are different.
 
 RTIC mutexes, therefore, elevate a task's priority to the priority of the highest-prority task that shares the resource.
-This prevents priority inversion by ensuring critical sections cannot be preempted by any other task using the resource.
+This acts as an improved version of a critical section.
+Rather than completely disabling interrupts, it allows higher-priority tasks to still run.
 
-When a resource is shared exclusively by tasks with the same priority, it can be considered lockless because
+This still prevents priority inversion by ensuring critical sections cannot be preempted by any other task using the resource.
+
+When a resource is shared exclusively by tasks of the same priority, it can be considered lockless because
 there will never be preemption of the resource.
