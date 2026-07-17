@@ -119,3 +119,9 @@ pub fn init(
 ```
 
 ## Synchronization and preventing deadlocks
+
+Since RTIC targets single-core exclusively and has hard priorities, using a wait-based `Mutex` for resource management would result in hangs when priorities are different.
+
+RTIC mutexes, therefore, elevate a task's priority to the priority of the highest-prority task that shares the resource.
+
+This prevents priority inversion by ensuring critical sections cannot be preempted by any other task using the resource.
