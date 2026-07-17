@@ -11,11 +11,11 @@ Welcome to the third post in our series about the PixelSat I software stack. If 
 
 The onboard computer (OBC) is the actual thing on the satellite that manages all of the electronic subsystems and handles the very important business logic. For CubeSat projects and in general in space, these are generally some variant of a microcontroller unit (MCU).
 
-Following a theme established in our design processes for comms and ADCS, the industry standard for OBCs is exorbitantly expensive for our -- comparatively measly -- budget. For example, the [PyCubed](https://pycubed.org/), advertising radiation resistance and specialized for CubeSats, has to be fabbed (it cannot be bought off the shelf) which is not possible for us. Products offered by established manufacturers such as [GomSpace](https://gomspace.com/product/nanomind-a3200/) also turn out to be overpriced and often overpowered for our needs.
+Following a theme established in our design processes for comms and ADCS, the industry standard for OBCs is exorbitantly expensive for our comparatively measly budget. For example, the [PyCubed](https://pycubed.org/), advertising radiation resistance and specialized for CubeSats, has to be fabbed (it cannot be bought off the shelf) which is not possible for us. Products offered by established manufacturers such as [GomSpace](https://gomspace.com/product/nanomind-a3200/) also turn out to be overpriced and often overpowered for our needs.
 
 ## Constraints
 
-Ultimately, the OBC has two tasks: run our flight firmware, and connect to our various peripherals. Each of these, of course, entail several constraints. Firstly, the OBC, of course, has to have sufficient computing power to run our ADCS models and algorithms and various tasks. Secondly, it has to have peripherals for our various sensors, the magnetorquers, and the transceiver, such as UART, I2C, SPI, and generic GPIO pins. An implied third constraint is that the methods available to program it in Rust (including the HAL and concurrency framework) are available and idiomatic. 
+Ultimately, the OBC has two tasks: run our flight firmware, and connect to our various peripherals. Each of these entails several constraints. Firstly, the OBC, of course, has to have sufficient computing power to run our ADCS models and algorithms and various tasks. Secondly, it has to have peripherals for our various sensors, the magnetorquers, and the transceiver, such as UART, I2C, SPI, and generic GPIO pins. An implied third constraint is that the methods available to program it in Rust (including the HAL and concurrency framework) are available and idiomatic. 
 
 Because of our unique environment and tasks, there are a few other nice-to-haves:
 * Radiation resistance. Obviously, we can't use MCUs specialized for CubeSat tasks that are built with radiation in mind because of budget, but ideally our OBC is at least somewhat radiation-resistant.
@@ -27,16 +27,16 @@ Because of our unique environment and tasks, there are a few other nice-to-haves
 
 Early in the project, the original software stack was a monolithic Python file launched on user login via systemd on a vanilla Raspberry Pi 5. This naturally had major issues; primarily, the use of a full-on Linux operating system added a massive degree of bloat and uncertainty to the system. Our Raspberry Pi has experienced issues with unexpectedly shutting down. RPis in general aren't the best w/r/t radiation resistance, and the idle power draw is much higher than we would prefer. When we finally got around to seriously working on flight software, the first thing we did was ditch this idea.
 
-The first major OBC refactor occurred in Feburary 2026, when we decided to use an ESP32 as our main computer. This also marked a shift towards bare-metal Rust: the ESP ran an Embassy async executor to handle everything, including our comms and ADCS routines. 
+The first major OBC refactor occurred in February 2026, when we decided to use an ESP32 as our main computer. This also marked a shift towards bare-metal Rust: the ESP ran an Embassy async executor to handle everything, including our comms and ADCS routines. 
 
-We originally kept the RPi around as a payload computer, linked over UART to the ESP32. It's sole task was to handle nonessential peripherals: capturing, compressing, and sending images, and transmitting experiment data from our planned microbiology protein crystallization experiment.
+We originally kept the RPi around as a payload computer, linked over UART to the ESP32. Its sole task was to handle nonessential peripherals: capturing, compressing, and sending images, and transmitting experiment data from our planned microbiology protein crystallization experiment.
 
 
 We ultimately had to cut the microbiology experiment for various reasons, and the camera module we finalized on turned out to handle JPEG compression on its end. This left basically no use for the Raspberry Pi, so we set out to remove it from the stack altogether. Our next plan was to use a dual-ESP32 architecture where `esp0` handled comms, ADCS, and scheduling, and `esp1` handled telemetry and image processing. We chose this over a single ESP32 so that we could devote an entire `esp0` core to ADCS and not have to worry at all about it being interrupted by some scheduler. However, this was still unnecessarily complicated.
 
 ## STM32
 
-We finally decided to use an STM32 as our main computer, since it has an extensive flight heritage in satellites such as FOSSASAT-2. Furthermore, it has significantly more processing power, peripherals (for example, unlike the ESP32, it has an internal watchdog), and on-device amenities than the ESP32.
+We finally decided to use an STM32, specifically, the STM32H753ZI, as our main computer, since it has an extensive flight heritage in satellites such as FOSSASAT-2. Furthermore, it has significantly more processing power, peripherals, and on-device amenities than the ESP32. For example, unlike the ESP32, it has an internal watchdog. It also has more RAM than the ESP32.
 
 ### RTIC
 
