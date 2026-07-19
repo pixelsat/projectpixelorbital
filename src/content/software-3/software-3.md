@@ -2,7 +2,7 @@
 title: |
   PixelSat I Software Part 3: Onboard Computer
 authors: Ashwin Naren, Vinayak Vikram, and Aadish Verma
-date: 7/20/26
+date: 7/20/2026
 ---
 
 Welcome to the third post in our series about the PixelSat I software stack. If you haven't read [Part 1](/software-1) on our comms system, we'd recommend starting there for context on the mission. We also have a [Part 2](/software-2) about our attitude determination and control system.
