@@ -11,52 +11,88 @@ This post is about the microcontroller tying both together, and the software run
 
 ## Onboard computer
 
-The onboard computer (OBC) is the actual thing on the satellite that manages all of the electronic subsystems and handles the very important business logic. For CubeSat projects and in general in space, these are generally some variant of a microcontroller unit (MCU).
+Every input and output eventually passes through the onboard computer (OBC).
+It runs the flight firmware and coordinates the satellite's electronic subsystems.
+On a CubeSat, that usually means a low-power microcontroller that is hardened for space use.
 
-Following a theme established in our design processes for comms and ADCS, the industry standard for OBCs is exorbitantly expensive for our comparatively measly budget. For example, the [PyCubed](https://pycubed.org/), advertising radiation resistance and specialized for CubeSats, has to be fabbed (it cannot be bought off the shelf) which is not possible for us. Products offered by established manufacturers such as [GomSpace](https://gomspace.com/product/nanomind-a3200/) also turn out to be overpriced and often overpowered for our needs.
+Following a theme established by our comms and ADCS designs, the standard space-qualified answer is far outside our budget.
+Open designs such as [PyCubed](https://pycubed.org/) would still require us to fabricate and qualify a board, while established products such as the [GomSpace NanoMind](https://gomspace.com/product/nanomind-a3200/) are expensive and more capable than our mission needs.
+We instead looked for a commercial microcontroller with the right peripherals, enough performance, and useful resilience features already on the chip.
 
 ## Constraints
 
-Ultimately, the OBC has two tasks: run our flight firmware, and connect to our various peripherals. Each of these entails several constraints. Firstly, the OBC, of course, has to have sufficient computing power to run our ADCS models and algorithms and various tasks. Secondly, it has to have peripherals for our various sensors, the magnetorquers, and the transceiver, such as UART, I2C, SPI, and generic GPIO pins. An implied third constraint is that the methods available to program it in Rust (including the HAL and concurrency framework) are available and idiomatic. 
+Ultimately, the OBC has two tasks: run our flight firmware and talk to everything around it.
+It needs enough computational power for orbit propagation and the ADCS logic,
+plus handling interrupts or periodically reading UART, I2C, SPI, ADCs, timers, and a healthy number of GPIO pins.
+Just as importantly, it needs a mature Rust hardware abstraction layer and a concurrency model we can reason about.
 
-Because of our unique environment and tasks, there are a few other nice-to-haves:
-* Radiation resistance. Obviously, we can't use MCUs specialized for CubeSat tasks that are built with radiation in mind because of budget, but ideally our OBC is at least somewhat radiation-resistant.
-* Real-time clock (RTC). We need to keep time on the OBC (the ADCS relies on having a somewhat accurate UNIX timestamp), so a real-time clock is ideal. After launch, when the satellite powers on, the ground will broadcast the current time via our comms system, which allows us to initialize the RTC and the corresponding ADCS parts to start. This isn't a deal breaker as dedicated RTC chips are available.
-* Watchdog. We use a watchdog timer as part of our radiation resistance strategy. A watchdog is essentially a tiny chip which has the power to reset the OBC. The OBC has to send some kind of "heartbeat" -- say, one pulse on a digital pin every 5 seconds -- to the watchdog to avoid getting reset. If the heartbeat is dropped or the watchdog detects an atypical heartbeat, well, the OBC restarts. The thinking is that the heartbeat will only be corrupted if the OBC is in serious trouble -- for example, if radiation causes a bitflip, if a task starves the heartbeat task (which implies all other tasks are also being starved), or if the code latches up for another reason. Again, off-the-shelf dedicated watchdogs are available so this isn't a necessity.
+A few less obvious requirements follow from the environment:
+
+- Fault tolerance: Hardware memory/flash protection and proper fault and error handling can stop some faults from becoming fatal.
+- Real-time clock: ADCS needs UTC to propagate the orbit and calculate reference vectors. Ground control sets the clock after launch, and the RTC maintains it across resets.
+- Watchdog: A watchdog is a timer the firmware must continually feed. If execution hangs, higher-priority work starves the feeder, or a fault places the processor somewhere unexpected, the internal watchdog expires and triggers a reset. An internal independent watchdog is especially useful because it runs separately from the main MCU while being well coupled to the reset pin.
 
 ## ESP32
 
-Early in the project, the original software stack was a monolithic Python file launched on user login via systemd on a vanilla Raspberry Pi 5. This naturally had major issues; primarily, the use of a full-on Linux operating system added a massive degree of bloat and uncertainty to the system. Our Raspberry Pi has experienced issues with unexpectedly shutting down. RPis in general aren't the best w/r/t radiation resistance, and the idle power draw is much higher than we would prefer. When we finally got around to seriously working on flight software, the first thing we did was ditch this idea.
+Early in the project, our "flight software" was a monolithic Python file launched by `systemd` on login to a Raspberry Pi 5. 
+It was a poor spacecraft architecture.
 
-The first major OBC refactor occurred in February 2026, when we decided to use an ESP32 as our main computer. This also marked a shift towards bare-metal Rust: the ESP ran an Embassy async executor to handle everything, including our comms and ADCS routines. 
+Linux brings in power draw, scheduling, unexpected tasks, and many other issues.
+Additionally, we had already seen the Pi shut down unexpectedly on the bench, so putting it beyond physical reach did not seem likely to improve matters.
 
-We originally kept the RPi around as a payload computer, linked over UART to the ESP32. Its sole task was to handle nonessential peripherals: capturing, compressing, and sending images, and transmitting experiment data from our planned microbiology protein crystallization experiment.
+Our first major redesign came in February 2026, when we moved the main flight software to bare-metal Rust on a classic dual-core ESP32.
+An Embassy async executor ran comms, ADCS, and the rest of the spacecraft tasks.
+We kept the Pi as a payload computer over UART, responsible only for image processing and data from a planned protein-crystallization experiment.
 
+Then the experiment was cut, and we found a camera that could encode JPEGs itself.
+In doing so we put the RPI out of a job.
+We briefly designed a dual-ESP32 system to replace the RPI, with one processor handling comms and ADCS while the other handled images and telemetry,
+but the boundary created more failure modes and complication than it removed.
 
-We ultimately had to cut the microbiology experiment for various reasons, and the camera module we finalized on turned out to handle JPEG compression on its end. This left basically no use for the Raspberry Pi, so we set out to remove it from the stack altogether. Our next plan was to use a dual-ESP32 architecture where `esp0` handled comms, ADCS, and scheduling, and `esp1` handled telemetry and image processing. We chose this over a single ESP32 so that we could devote an entire `esp0` core to ADCS and not have to worry at all about it being interrupted by some scheduler. However, this was still unnecessarily complicated.
+For example, handling esp1 (the camera ESP) failures with timeouts and choosing whe to reset it was an unneeded complication.
 
 ## STM32
 
-We finally decided to use an STM32, specifically, the STM32H753ZI, as our main computer, since it has an extensive flight heritage in satellites such as FOSSASAT-2. Furthermore, it has significantly more processing power, peripherals, and on-device amenities than the ESP32. For example, unlike the ESP32, it has an internal watchdog. It also has more RAM than the ESP32.
+We finally consolidated the satellite around an [STM32H753](https://www.st.com/en/microcontrollers-microprocessors/stm32h753zi.html), a 32-bit ARM Cortex-M7.
+The chip can run at up to 480 MHz; however our firmware uses a 300 MHz system clock and a 150 MHz HCLK to reduce heat generation and power consumption.
+It gives us 1 MB of SRAM, 2 MB of internal flash, far more GPIO pins than we need, a real-time clock, an independent watchdog, hardware memory error correction, and cryptographic acceleration.
+
+That headroom let one MCU replace the Pi and both proposed ESP32s.
+
+It also yielded some nice quality of life improvements:
+
+- RAM and Flash ECC: No manual ECC implementations
+- Built in watchdog: No external watchdog needed, yet another part cut out.
+- More built in flash: No need for external flash
+- Better tooling support: The classic ESP32 runs on XTENSA, an architecture from Cadence. Rust does not natively support it, so switching to a more supported architecture was a relief.
 
 ### RTIC
 
-RTIC is a Rust concurrency framework designed for embedded environments. It essentially maps tasks to ISRs (interrupt handlers), so triggering an IRQ (interrupt request) spawns a task. Task priorities are directly converted into interrupt priorities. This creates a semi-preemptive scheduling system where higher priority tasks, because of the underlying interrupt model, are able to preempt a running lower priority task. For the STM32 and other ARM Cortex-M-based processors, RTIC (ab)uses the NVIC (Nested Vectored Interrupt Controller) for its scheduling system.
+A fast processor is not very useful if multitasking is inefficient.
+We use [RTIC](https://rtic.rs/), a Rust concurrency framework built around hardware interrupts.
+Tasks have fixed priorities which map directly onto interrupt priorities.
+When two tasks are ready, the higher-priority one runs; if it becomes ready later, it preempts the lower-priority task immediately.
+On ARM Cortex-M, RTIC turns the [NVIC](https://developer.arm.com/documentation/100166/0001/Nested-Vectored-Interrupt-Controller), the chip's interrupt controller, into a compact real-time scheduler.
 
-RTIC's biggest advantage is that we can still use Rust's powerful async model, idiomatically suspending and resuming execution, without blocking the CPU in spinloops. This lets lower priority tasks run while higher priority tasks are waiting for I/O or other resources. Tasks on the same priority level run in a round-robin fashion and cooperatively share the CPU time.
+RTIC also supports async Rust. A task waiting for a timer, command, or sensor can suspend at an `.await` instead of wasting the CPU in a spin loop. Lower-priority work can then proceed, while tasks at the same priority cooperate at those suspension points. We get predictable preemption without carrying a full RTOS.
 
 Here's the task we use to feed the internal watchdog (which is an on-chip timer which resets the STM32 if we stop feeding it a heartbeat):
+
 ```rust
 #[task(priority = 6, local = [watchdog])]
 async fn watchdog(ctx: watchdog::Context) {
     loop {
-        ctx.local.watchdog.feed(); // Feeds a watchdog to prevent shutdown
-        Mono::delay(1_u64.secs()).await; // Lets tasks of any priority go on
+        ctx.local.watchdog.feed();
+        Mono::delay(1_u64.secs()).await;
     }
 }
 ```
-You might notice the `local = [watchdog]`; this indicates that a local resource, `watchdog`, needs to be initialized
-in the init function. Local resources are only accessible to one task, enforced by RTIC's context structure; there are also shared resources, which can be accessed by several tasks. To avoid data races and deadlocks, RTIC uses a mutex-like locking pattern for tasks to borrow shared resources. For example, here's the task we use to update the statistics for our radiation sensor: 
+
+The `local = [watchdog]` declaration matters.
+RTIC gives that resource exclusively to this task, and the generated context makes it impossible for another task to borrow it.
+Resources needed by several tasks are declared `shared` and accessed through short critical sections.
+For example, this task periodically updates the accumulated radiation statistics:
+
 ```rs
 #[task(priority = 2, shared = [rad])]
 async fn rad_task(mut ctx: rad_task::Context) {
@@ -68,7 +104,10 @@ async fn rad_task(mut ctx: rad_task::Context) {
     }
 }
 ```
-Similarly here, `shared = [rad]` indicates that a shared resource `rad` needs to be provided by our init function. However, this task only aggregates statistics. A separate task is triggered by a click received from the radiation sensor's GPIO pin and updates a counter (which `rad.update()` then reads to update our statistics):
+
+The actual radiation events arrive asynchronously.
+A [rising edge interrupt](https://en.wikipedia.org/wiki/Interrupt#Edge-triggered) from the sensor triggers a GPIO interrupt and increments a counter; `rad_task` later folds that counter into its statistics:
+
 ```rs
 #[task(binds = EXTI15_10, priority = 7, shared = [/* ... */], local = [rad_out, /* ... */])]
 fn mag_and_rad_interrupt(mut ctx: mag_and_rad_interrupt::Context) {
@@ -80,9 +119,16 @@ fn mag_and_rad_interrupt(mut ctx: mag_and_rad_interrupt::Context) {
     // ...
 }
 ```
-Unlike the previous tasks, this has the `binds` argument passed to the `task` attribute. This essentially tells RTIC that `mag_and_rad_interrupt` is a hardware task (more on that below). Also, the `EXTI15_10` interrupt line isn't just for the radiation sensor; as you may have inferred from the name, the task is also triggered by the magnetometer's DRDY (data ready) pin to inform the STM32 that the magnetometer has new data to be read over SPI. To ensure this interrupt was indeed triggered by the radiation sensor, we check the pin's interrupt before recording a click. A similar process for the magnetometer is omitted.
 
-RTIC has two types of tasks: "hardware tasks" like `mag_and_rad_interrupt` are triggered by peripheral-bound IRQs (interrupts), while "software tasks" like `rad_task` and `watchdog` are spawned by pending an otherwise-unused "dispatcher" IRQ. We essentially donate some IRQ lines to RTIC and guarantee that we won't trigger those interrupts ourselves, so RTIC can use them to dispatch software tasks. This is done at the top of our `app` module:
+`binds = EXTI15_10` makes this a hardware task: the processor invokes it directly for that interrupt line.
+Several GPIOs share the same line, so the handler checks which pin is actually pending.
+In the omitted half, the magnetometer's data-ready pin is handled the same way and its sample wakes the ADCS task.
+
+This is an unfortunate RTIC limitation, but it has more to do with massive number of peripherals on the STM32.
+
+Software tasks such as `watchdog` and `rad_task` have no natural hardware interrupt.
+RTIC dispatches them using interrupt lines we deliberately leave otherwise unused:
+
 ```rs
 #[rtic::app(
     device = stm32h7xx_hal::stm32,
@@ -94,7 +140,8 @@ mod app {
 }
 ```
 
-To indicate the resources we use, we have a struct for each type of resource:
+The complete set of resources is declared centrally:
+
 ```rs
 #[shared]
 pub struct SharedResources {
@@ -112,7 +159,7 @@ pub struct LocalResources {
 }
 ```
 
-which we initialize in the `init` routine:
+and constructed once in `init`:
 
 ```rs
 #[init]
@@ -120,7 +167,7 @@ pub fn init(
     mut ctx: init::Context,
 ) -> (SharedResources, LocalResources) {
     // ...
-    
+
     // rad sensor
     let mut rad_out = gpiod.pd15.into_pull_down_input();
     rad_out.make_interrupt_source(&mut ctx.device.SYSCFG);
@@ -129,7 +176,7 @@ pub fn init(
     rad_out.clear_interrupt_pending_bit();
 
     let rad = Rad::new();
-    
+
     // ...
     let mut watchdog = IndependentWatchdog::new(ctx.device.IWDG);
     watchdog.start(10.secs());
@@ -153,15 +200,76 @@ pub fn init(
 }
 ```
 
-## Synchronization and preventing deadlocks
+## Synchronization without waiting
 
-Since RTIC targets single-core exclusively and has hard priorities, using a wait-based `Mutex` for resource management would result in hangs when priorities are different.
+A conventional mutex is a bad fit for a preemptive, single-core system.
+If a high-priority task interrupts a low-priority task holding a lock and then waits for that lock,
+the low-priority task can never resume to release it.
 
-RTIC mutexes, therefore, elevate a task's priority to the priority of the highest-prority task that shares the resource.
-This acts as an improved version of a critical section.
-Rather than completely disabling interrupts, it allows higher-priority tasks to still run.
+RTIC avoids the problem with priority ceilings.
+Each shared resource gets the priority of the highest-priority task that can access it.
+While a task locks that resource, RTIC temporarily raises the task to the ceiling, so no competing task can preempt it.
+Unrelated work above the ceiling can still run; interrupts do not need to be disabled all together.
 
-This still prevents priority inversion by ensuring critical sections cannot be preempted by any other task using the resource.
+This lets critical sections occur while high priority tasks still run.
 
-When a resource is shared exclusively by tasks of the same priority, it can be considered lockless because
-there will never be preemption of the resource.
+Likewise, due to the use of critical sections, there is no sleeping lock or wait to acquire a resource.
+The tradeoff is that lock closures must be short, and we never `.await` inside one.
+Rust's borrow checker and RTIC's generated contexts enforce the rest.
+
+## Embedded application
+
+The firmware is `no_std` and `no_alloc`.
+Buffers, packets, command queues, and torque profiles all have fixed capacities known at compile time.
+This is occasionally less convenient than a `Vec`, but allocation provides a host of problems, as well as extra code.
+
+The running system is a hierarchy of small jobs:
+
+- **Priority 9:** RAM ECC faults
+- **Priority 8:** incoming radio bytes
+- **Priority 7:** IMU and magnetometer data-ready interrupts
+- **Priority 6:** watchdog feeding and coarse sun sensor sampling
+- **Priority 5:** attitude estimation and control
+- **Priority 3:** commands, downlinks, heartbeats, and flash logging
+- **Priority 2:** sensor recovery and radiation statistics
+- **Priority 1:** the scheduled reset
+- **Priority 0:** idle, where the core sleeps with `wfi` until an interrupt arrives
+
+The tasks communicate through fixed-capacity async channels and signals.
+
+## Storage without a disk
+
+We use the STM32's second 1 MB flash bank as a tiny, purpose-built data store.
+Its eight sectors are divided between one captured image, a two-sector circular log, a reserved sector, and the current TLE.
+Each region is bounded by its own API, so image code cannot accidentally erase the program or the orbit data.
+
+The camera already produces JPEG data.
+During capture, firmware pulls it through a single 128 KiB buffer in AXI SRAM, writes it to flash in aligned chunks, and calculates a CRC as it goes.
+Metadata is written last.
+If power disappears halfway through a capture, the half-written bytes are never mistaken for a valid image.
+
+The ground station later requests various chunks of the image.
+
+Logs follow the same philosophy. `defmt` compresses each log frame, a fixed queue decouples logging from flash writes, and two sectors form a ring that overwrites the oldest data when full.
+Ground control reads the stream with cursors, so useful history survives resets without requiring anything resembling a general-purpose filesystem.
+
+Even if we wanted one, a general-purpose filesystem would not be possible on the STM32, because it is only possible to erase one (128 kb) sector at a time; no smaller section can be independently erased.
+
+## Designing for recovery and failure management
+
+The STM32 is not radiation-hardened, and software cannot fix this.
+
+The independent watchdog has a ten-second timeout and is fed once per second by a high-priority task.
+We also reset the processor deliberately once an hour, limiting how long corrupted peripheral or software state can accumulate.
+Additionally, failed IMU and magnetometer drivers are reinitialized by a recovery task rather than being abandoned after one bus error.
+
+RAM ECC gets the highest-priority interrupt in the system. A correctable single-bit fault is repaired by writing the corrected word back; an uncorrectable double-bit fault causes an immediate reset.
+
+Panics follow a similar handling structure: interrupts are disabled, the panic message is copied into backup SRAM, queued logs are flushed to flash if the flash controller is safe to use, and the chip resets.
+On the next boot, the panic record is recovered into the persistent log before normal operation resumes.
+
+## Conclusion
+
+Our OBC design became simpler each time we redesigned.
+
+That final system still performs almost equivalent functionality to the original and yet is vastly more efficient.
