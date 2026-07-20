@@ -38,7 +38,7 @@ Early in the project, our "flight software" was a monolithic Python file launche
 It was a poor spacecraft architecture.
 
 Linux brings in power draw, scheduling, unexpected tasks, and many other issues.
-Additionally, we had already seen the Pi shut down unexpectedly on the bench, so putting it beyond physical reach did not seem likely to improve matters.
+Additionally, we had already seen the Pi shut down unexpectedly on the bench, so putting it beyond physical reach would not improve matters.
 
 Our first major redesign came in February 2026, when we moved the main flight software to bare-metal Rust on a classic dual-core ESP32.
 An Embassy async executor ran comms, ADCS, and the rest of the spacecraft tasks.
@@ -71,8 +71,8 @@ It also yielded some nice quality of life improvements:
 A fast processor is not very useful if multitasking is inefficient.
 We use [RTIC](https://rtic.rs/), a Rust concurrency framework built around hardware interrupts.
 Tasks have fixed priorities which map directly onto interrupt priorities.
-When two tasks are ready, the higher-priority one always takes precidence; if it isn't ready yet, it will preempt the lower-priority task immediately upon readiness.
-On ARM Cortex-M, RTIC turns the [NVIC](https://developer.arm.com/documentation/100166/0001/Nested-Vectored-Interrupt-Controller), the chip's interrupt controller, into a compact priority-based scheduler.
+When two tasks are ready, the higher-priority one always takes precidence; tasks of the same priority are round-robin scheduled.
+On ARM Cortex-M, RTIC turns the [NVIC (Nested Vector Interrupt Controller)](https://developer.arm.com/documentation/100166/0001/Nested-Vectored-Interrupt-Controller), the chip's interrupt controller, into a compact priority-based scheduler.
 
 When higher priority interrupts occur, the NVIC pushes a stack frame to handle them, once completed, the execution returns back to the original context.
 
@@ -110,7 +110,7 @@ async fn rad_task(mut ctx: rad_task::Context) {
 ```
 
 The actual radiation events arrive asynchronously.
-A [rising edge interrupt](https://en.wikipedia.org/wiki/Interrupt#Edge-triggered) from the sensor triggers a GPIO interrupt and increments a counter; `rad_task` later uses that counter as part of its statistics:
+A [rising edge interrupt](https://en.wikipedia.org/wiki/Interrupt#Edge-triggered) from the sensor triggers a GPIO interrupt and increments a counter via a task; `rad_task` later uses that counter as part of its statistics:
 
 ```rs
 #[task(binds = EXTI15_10, priority = 7, shared = [/* ... */], local = [rad_out, /* ... */])]
