@@ -13,10 +13,7 @@ export default defineConfig({
       rehypePlugins: [rehypeKatex],
     }),
     shikiConfig: {
-      themes: {
-        light: "github-light",
-        dark: "github-dark",
-      },
+      theme: "github-dark",
     },
   },
   vite: {

@@ -27,20 +27,20 @@
 :root {
   --font: "Instrument Sans Variable", system-ui, Helvetica, Arial, sans-serif;
 
-  --primary: #111111;
-  --secondary: #4f4f4f;
-  --tertiary: #7a7a7a;
-  --white: #ffffff;
+  --primary: #e6e6e6;
+  --secondary: #f3f3f3;
+  --tertiary: #f1f1f1;
+  --white: var(--primary);
 
   --blue: #d92e31;
   --blue-hover: #cf3032;
   --blue-press: #d41519;
 
-  --bg-surface: #ffffff;
-  --bg-gradient-start: #ffffff;
-  --bg-gradient-end: #ffffff;
-  --intro-gradient-start: #e3e8ff;
-  --intro-gradient-end: #f4f7ff;
+  --bg-surface: #0f0f0f;
+  --bg-gradient-start: #151932;
+  --bg-gradient-end: #2d3c7f;
+  --intro-gradient-start: var(--bg-gradient-start);
+  --intro-gradient-end: var(--bg-gradient-end);
   --intro-gradient: linear-gradient(
     180deg,
     var(--intro-gradient-start) 0%,
@@ -48,7 +48,7 @@
   );
   --background: var(--bg-surface);
 
-  --elevated-color: #3450d1;
+  --elevated-color: #eaeaea;
   --elevated-3: color-mix(in srgb, var(--elevated-color) 3%, transparent);
   --elevated-5: color-mix(in srgb, var(--elevated-color) 5%, transparent);
   --elevated-7: color-mix(in srgb, var(--elevated-color) 7%, transparent);
@@ -60,26 +60,6 @@
   --glass-filter: blur(12px) saturate(110%);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --primary: #e6e6e6;
-    --secondary: #f3f3f3;
-    --tertiary: #f1f1f1;
-    --white: var(--primary);
-
-    --bg-surface: #0f0f0f;
-    --bg-gradient-start: #151932;
-    --bg-gradient-end: #2d3c7f;
-    --intro-gradient-start: var(--bg-gradient-start);
-    --intro-gradient-end: var(--bg-gradient-end);
-
-    --elevated-color: #eaeaea;
-    --glass-filter: blur(12px);
-
-    --tight-spacing: -0.5rem;
-  }
-}
-
 @layer base {
   * {
     box-sizing: border-box;
@@ -87,6 +67,7 @@
   }
 
   html {
+    color-scheme: dark;
     scroll-behavior: smooth;
     background: var(--background);
   }

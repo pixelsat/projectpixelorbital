@@ -1,7 +1,7 @@
 ---
 import SiteHeader from "./SiteHeader.astro";
 import Text from "./Text.astro";
-import {formatDate} from "../scripts/date.ts"
+import { formatDate } from "../scripts/date.ts";
 
 interface Props {
   authors: string;
@@ -22,7 +22,8 @@ const { authors, title, date } = Astro.props;
     <section class="flex flex-col gap-[14px]">
       <Text variant="display" class="max-w-none text-balance">{title}</Text>
       <Text tag="div" variant="caption" tone="tertiary">by {authors}</Text>
-      <Text tag="div" variant="caption" tone="tertiary">{formatDate(date)}</Text>
+      <Text tag="div" variant="caption" tone="tertiary">{formatDate(date)}</Text
+      >
     </section>
 
     <section class="w-full">
@@ -224,15 +225,5 @@ const { authors, title, date } = Astro.props;
 
   .article-prose .footnotes p {
     margin: 0.7rem 0;
-  }
-  @media (prefers-color-scheme: dark) {
-    .astro-code,
-    .astro-code span {
-      color: var(--shiki-dark) !important;
-      background-color: transparent !important;
-      font-style: var(--shiki-dark-font-style) !important;
-      font-weight: var(--shiki-dark-font-weight) !important;
-      text-decoration: var(--shiki-dark-text-decoration) !important;
-    }
   }
 </style>
