@@ -23,7 +23,7 @@ We instead looked for a commercial microcontroller with the right peripherals, e
 
 Ultimately, the OBC has two tasks: run our flight firmware and talk to everything around it.
 It needs enough computational power for orbit propagation and the ADCS logic,
-plus handling interrupts or periodically reading UART, I2C, SPI, ADCs, timers, and a healthy number of GPIO pins.
+plus handling interrupts (at a high frequency) and periodic tasks.
 Just as importantly, it needs a mature Rust hardware abstraction layer and a concurrency model we can reason about.
 
 A few less obvious requirements follow from the environment:
@@ -55,7 +55,7 @@ For example, handling esp1 (the camera ESP) failures with timeouts and choosing 
 
 We finally consolidated the satellite around an [STM32H753](https://www.st.com/en/microcontrollers-microprocessors/stm32h753zi.html), a 32-bit ARM Cortex-M7.
 The chip can run at up to 480 MHz; however our firmware uses a 300 MHz system clock and a 150 MHz HCLK to reduce heat generation and power consumption.
-It gives us 1 MB of SRAM, 2 MB of internal flash, far more GPIO pins than we need, a real-time clock, an independent watchdog, hardware memory error correction, and cryptographic acceleration.
+It gives us 1 MB of SRAM, 2 MB of internal flash, tons of GPIO pins, a RTC, an independent watchdog, and a hardware memory ECC module.
 
 That headroom let one MCU replace the Pi and both proposed ESP32s.
 
@@ -71,8 +71,12 @@ It also yielded some nice quality of life improvements:
 A fast processor is not very useful if multitasking is inefficient.
 We use [RTIC](https://rtic.rs/), a Rust concurrency framework built around hardware interrupts.
 Tasks have fixed priorities which map directly onto interrupt priorities.
-When two tasks are ready, the higher-priority one runs; if it becomes ready later, it preempts the lower-priority task immediately.
-On ARM Cortex-M, RTIC turns the [NVIC](https://developer.arm.com/documentation/100166/0001/Nested-Vectored-Interrupt-Controller), the chip's interrupt controller, into a compact real-time scheduler.
+When two tasks are ready, the higher-priority one always takes precidence; if it isn't ready yet, it will preempt the lower-priority task immediately upon readiness.
+On ARM Cortex-M, RTIC turns the [NVIC](https://developer.arm.com/documentation/100166/0001/Nested-Vectored-Interrupt-Controller), the chip's interrupt controller, into a compact priority-based scheduler.
+
+When higher priority interrupts occur, the NVIC pushes a stack frame to handle them, once completed, the execution returns back to the original context.
+
+Additionally, the NVIC handles pending interrupts.
 
 RTIC also supports async Rust. A task waiting for a timer, command, or sensor can suspend at an `.await` instead of wasting the CPU in a spin loop. Lower-priority work can then proceed, while tasks at the same priority cooperate at those suspension points. We get predictable preemption without carrying a full RTOS.
 
@@ -106,7 +110,7 @@ async fn rad_task(mut ctx: rad_task::Context) {
 ```
 
 The actual radiation events arrive asynchronously.
-A [rising edge interrupt](https://en.wikipedia.org/wiki/Interrupt#Edge-triggered) from the sensor triggers a GPIO interrupt and increments a counter; `rad_task` later folds that counter into its statistics:
+A [rising edge interrupt](https://en.wikipedia.org/wiki/Interrupt#Edge-triggered) from the sensor triggers a GPIO interrupt and increments a counter; `rad_task` later uses that counter as part of its statistics:
 
 ```rs
 #[task(binds = EXTI15_10, priority = 7, shared = [/* ... */], local = [rad_out, /* ... */])]
@@ -202,7 +206,7 @@ pub fn init(
 
 ## Synchronization without waiting
 
-A conventional mutex is a bad fit for a preemptive, single-core system.
+A conventional mutex is not viable for a preemptive, single-core system.
 If a high-priority task interrupts a low-priority task holding a lock and then waits for that lock,
 the low-priority task can never resume to release it.
 
@@ -244,7 +248,7 @@ Its eight sectors are divided between one captured image, a two-sector circular 
 Each region is bounded by its own API, so image code cannot accidentally erase the program or the orbit data.
 
 The camera already produces JPEG data.
-During capture, firmware pulls it through a single 128 KiB buffer in AXI SRAM, writes it to flash in aligned chunks, and calculates a CRC as it goes.
+During capture, firmware streams it to a 128 KiB buffer in AXI SRAM, and then writes it to flash in aligned chunks, and calculates a CRC as it goes.
 Metadata is written last.
 If power disappears halfway through a capture, the half-written bytes are never mistaken for a valid image.
 
@@ -266,7 +270,7 @@ Additionally, broken IMU and magnetometer drivers are reinitialized by a recover
 RAM ECC gets the highest-priority interrupt in the system.
 A correctable single-bit fault is repaired by writing the corrected word back; an uncorrectable double-bit fault causes an immediate reset.
 
-For panic handling, interrupts are disabled, the panic message is copied into backup SRAM, queued logs are flushed to flash if the flash controller is safe to use, and the chip resets.
+For panic handling, interrupts are disabled, the panic message is copied into backup SRAM, queued logs are flushed to flash if the flash controller is available for use, and the chip then finally resets.
 On the next boot, the panic record is recovered into the persistent log before normal operation resumes.
 
 ## Conclusion
