@@ -109,25 +109,29 @@ const snapshot = [
 ] as const;
 ---
 
-<div class="min-h-screen">
+<div class="relative isolate min-h-screen">
+  <!-- The Earth stays pinned above the page content, so sections emerge from behind it. -->
+  <div
+    aria-hidden="true"
+    class="pointer-events-none fixed inset-0 z-10 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent_0%,transparent_48%,black_64%)]"
+  >
+    <img
+      src={earthSpace.src}
+      alt=""
+      class="size-full object-cover object-center"
+      loading="eager"
+    />
+  </div>
+
   <div class="flex min-h-svh flex-col">
-    <SiteHeader homeHref="#top" home />
+    <div class="relative z-20">
+      <SiteHeader homeHref="#top" home />
+    </div>
 
     <section
       id="top"
-      class="relative isolate flex flex-1 overflow-hidden bg-black"
+      class="relative z-20 isolate flex flex-1 overflow-hidden"
     >
-      <img
-        src={earthSpace.src}
-        alt="Earth seen from space"
-        class="absolute inset-0 -z-20 size-full object-cover object-center"
-        loading="eager"
-      />
-      <div
-        class="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(0,0,0,0.28)_0%,rgba(0,0,0,0.16)_44%,rgba(0,0,0,0.78)_100%)]"
-      >
-      </div>
-
       <div
         class="mx-auto flex w-full max-w-[1040px] flex-1 flex-col justify-between gap-12 px-5 py-7 sm:py-10"
       >
@@ -206,7 +210,7 @@ const snapshot = [
   </div>
 
   <main
-    class="mx-auto flex w-[min(1040px,calc(100vw-40px))] flex-col gap-14 py-14 pb-16"
+    class="relative z-0 mx-auto flex w-[min(1040px,calc(100vw-40px))] flex-col gap-14 py-14 pb-[calc(40svh+4rem)]"
   >
     {
       blogPosts.length > 0 && (

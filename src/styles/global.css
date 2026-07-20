@@ -36,9 +36,9 @@
   --blue-hover: #cf3032;
   --blue-press: #d41519;
 
-  --bg-surface: #0f0f0f;
-  --bg-gradient-start: #151932;
-  --bg-gradient-end: #2d3c7f;
+  --bg-surface: #000;
+  --bg-gradient-start: #000;
+  --bg-gradient-end: #000;
   --intro-gradient-start: var(--bg-gradient-start);
   --intro-gradient-end: var(--bg-gradient-end);
   --intro-gradient: linear-gradient(
