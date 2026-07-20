@@ -238,24 +238,36 @@ const snapshot = [
   >
     {
       blogPosts.length > 0 && (
-        <section class="flex flex-col gap-[18px]" id="blog" data-scroll-reveal>
-          <div class="flex items-end justify-between gap-5">
-            <Text variant="title">From the blog</Text>
+        <section
+          class="grid items-center gap-5 sm:grid-cols-2 sm:gap-10"
+          id="blog"
+          data-scroll-reveal
+        >
+          <div class="flex flex-col items-start gap-3">
+            <Text variant="title">Read our latest blog post</Text>
+            <a
+              href="/blog"
+              class="group inline-flex items-center gap-1 rounded-[5px] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-primary"
+            >
+              <Text
+                tag="span"
+                variant="body"
+                tone="secondary"
+                class="transition-colors duration-200 group-hover:text-primary"
+              >
+                See all posts →
+              </Text>
+            </a>
           </div>
 
-          <div
-            aria-label="Recent blog posts"
-            class="grid auto-cols-[minmax(280px,340px)] grid-flow-col gap-4 overflow-x-auto pb-1.5 [scroll-snap-type:x_proximity]"
-          >
-            {blogPosts.slice(0, 3).map((post: BlogPost) => (
-              <CardLink
-                class="min-h-[150px] [scroll-snap-align:start]"
-                href={`/${post.slug}`}
-                title={post.title}
-                desc={post.authors + " on " + formatDate(post.date)}
-              />
-            ))}
-          </div>
+          {blogPosts[0] && (
+            <CardLink
+              class="min-h-[150px]"
+              href={`/${blogPosts[0].slug}`}
+              title={blogPosts[0].title}
+              desc={blogPosts[0].authors + " on " + formatDate(blogPosts[0].date)}
+            />
+          )}
         </section>
       )
     }
