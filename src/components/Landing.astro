@@ -15,6 +15,7 @@ import weston from "../assets/images/wy_ppo.jpeg";
 import ashwin from "../assets/images/an_ppo.png";
 import francesca from "../assets/images/fd_ppo.webp";
 import earthSpace from "../../Earth-space.jpg";
+import pixelSat from "../assets/images/pixelsattransparentrender.png";
 import { formatDate } from "../scripts/date.ts";
 
 interface BlogPost {
@@ -115,39 +116,53 @@ const snapshot = [
 
     <section
       id="top"
-      class="relative isolate flex flex-1 overflow-hidden bg-black"
+      class="hero-orbit relative isolate flex flex-1 overflow-hidden bg-black"
     >
       <img
         src={earthSpace.src}
         alt="Earth seen from space"
-        class="absolute inset-0 -z-20 size-full object-cover object-center"
+        class="hero-earth-image absolute inset-0 -z-20 size-full object-cover object-center"
         loading="eager"
       />
-      <div
-        class="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(0,0,0,0.28)_0%,rgba(0,0,0,0.16)_44%,rgba(0,0,0,0.78)_100%)]"
-      >
-      </div>
+      <div class="hero-earth-shade absolute inset-0 -z-10"></div>
+
+      <div class="hero-orbit-line" aria-hidden="true"></div>
+      <img
+        src={pixelSat.src}
+        alt=""
+        aria-hidden="true"
+        class="hero-satellite"
+      />
 
       <div
-        class="mx-auto flex w-full max-w-[1040px] flex-1 flex-col justify-between gap-12 px-5 py-7 sm:py-10"
+        class="relative z-[2] mx-auto flex w-full max-w-[1040px] flex-1 flex-col justify-between gap-12 px-5 py-7 sm:py-10"
       >
         <div class="flex max-w-[700px] flex-col items-start gap-5">
-          <Text variant="caption" tone="white" class=""> PixelSat I </Text>
-          <Text
-            variant="display"
-            tone="white"
-            class="max-w-[12ch] text-[clamp(3rem,6vw,5.5rem)] leading-[0.94] tracking-[-0.055em]"
-          >
-            A CubeSat built by high schoolers
-          </Text>
-          <Text variant="subheading" tone="white" class="max-w-[62ch]">
-            Project Pixel Orbital is a fully student-led team at Stanford Online
-            High School building PixelSat I, a 3U CubeSat targeting launch into
-            sun-synchronous low Earth orbit in early 2027, from scratch, on an
-            extremely limited budget.
-          </Text>
+          <div class="hero-rise" style="--rise-delay: 80ms">
+            <Text variant="caption" tone="white"> PixelSat I </Text>
+          </div>
+          <div class="hero-rise" style="--rise-delay: 150ms">
+            <Text
+              variant="display"
+              tone="white"
+              class="max-w-[12ch] text-[clamp(3rem,6vw,5.5rem)] leading-[0.94] tracking-[-0.055em]"
+            >
+              A CubeSat built by high schoolers
+            </Text>
+          </div>
+          <div class="hero-rise" style="--rise-delay: 220ms">
+            <Text variant="subheading" tone="white" class="max-w-[62ch]">
+              Project Pixel Orbital is a fully student-led team at Stanford
+              Online High School building PixelSat I, a 3U CubeSat targeting
+              launch into sun-synchronous low Earth orbit in early 2027, from
+              scratch, on an extremely limited budget.
+            </Text>
+          </div>
 
-          <div class="flex flex-wrap items-center gap-3 pt-1">
+          <div
+            class="hero-rise flex flex-wrap items-center gap-3 pt-1"
+            style="--rise-delay: 290ms"
+          >
             <OuterLink
               href="https://www.gofundme.com/f/support-project-pixel-orbital-student-team"
               button
@@ -179,8 +194,11 @@ const snapshot = [
 
         <div class="grid max-w-[720px] gap-2.5 sm:grid-cols-3">
           {
-            stats.map((stat) => (
-              <div class="rounded-[14px] bg-black/45 px-4 py-3.5 backdrop-blur-sm">
+            stats.map((stat, index) => (
+              <div
+                class="hero-rise rounded-[14px] bg-black/45 px-4 py-3.5 backdrop-blur-sm"
+                style={`--rise-delay: ${360 + index * 70}ms`}
+              >
                 <Text
                   tag="div"
                   variant="subheading"
@@ -202,6 +220,15 @@ const snapshot = [
           }
         </div>
       </div>
+
+      <div class="hero-earth-foreground" aria-hidden="true">
+        <img
+          src={earthSpace.src}
+          alt=""
+          class="absolute inset-0 size-full object-cover object-center"
+        />
+        <div class="hero-earth-shade absolute inset-0"></div>
+      </div>
     </section>
   </div>
 
@@ -210,7 +237,7 @@ const snapshot = [
   >
     {
       blogPosts.length > 0 && (
-        <section class="flex flex-col gap-[18px]" id="blog">
+        <section class="flex flex-col gap-[18px]" id="blog" data-scroll-reveal>
           <div class="flex items-end justify-between gap-5">
             <Text variant="title">From the blog</Text>
           </div>
@@ -232,7 +259,7 @@ const snapshot = [
       )
     }
 
-    <section class="flex flex-col gap-[18px]">
+    <section class="flex flex-col gap-[18px]" data-scroll-reveal>
       <div class="flex flex-col gap-2.5">
         <Text variant="title">In brief</Text>
       </div>
@@ -253,7 +280,7 @@ const snapshot = [
       </div>
     </section>
 
-    <section id="mission" class="flex flex-col gap-[18px]">
+    <section id="mission" class="flex flex-col gap-[18px]" data-scroll-reveal>
       <div class="flex flex-col gap-[14px]">
         <Text variant="title">Mission</Text>
       </div>
@@ -272,7 +299,7 @@ const snapshot = [
       </div>
     </section>
 
-    <section id="systems" class="flex flex-col gap-[18px]">
+    <section id="systems" class="flex flex-col gap-[18px]" data-scroll-reveal>
       <div class="flex flex-col gap-[14px]">
         <Text variant="title">Technical overview</Text>
       </div>
@@ -305,7 +332,7 @@ const snapshot = [
       </div>
     </section>
 
-    <section id="team" class="flex flex-col gap-[18px]">
+    <section id="team" class="flex flex-col gap-[18px]" data-scroll-reveal>
       <div class="flex items-end justify-between gap-5">
         <Text variant="title">Team</Text>
       </div>
@@ -339,6 +366,7 @@ const snapshot = [
 
     <section
       class="flex flex-col gap-[18px] rounded-[20px] bg-elevated-3 p-6 sm:p-8"
+      data-scroll-reveal
     >
       <Text variant="title">Support us</Text>
       <Text variant="subheading" tone="secondary" class="max-w-[72ch]">
@@ -361,3 +389,30 @@ const snapshot = [
     </section>
   </main>
 </div>
+
+<script>
+  const reducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
+
+  if (!reducedMotion) {
+    const revealItems = document.querySelectorAll<HTMLElement>(
+      "[data-scroll-reveal]",
+    );
+
+    document.documentElement.classList.add("motion-ready");
+
+    const revealObserver = new IntersectionObserver(
+      (entries, observer) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        }
+      },
+      { rootMargin: "0px 0px -10%", threshold: 0.08 },
+    );
+
+    revealItems.forEach((item) => revealObserver.observe(item));
+  }
+</script>
