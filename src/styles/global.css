@@ -148,20 +148,6 @@
   will-change: transform, opacity;
 }
 
-.hero-orbit-line {
-  position: absolute;
-  z-index: 1;
-  top: 1%;
-  right: -15%;
-  width: min(68vw, 960px);
-  height: 48%;
-  border-top: 1px solid rgb(255 255 255 / 24%);
-  border-radius: 50%;
-  opacity: 0;
-  transform: rotate(-12deg) scale(0.92);
-  animation: draw-orbit 900ms ease-out 950ms forwards;
-}
-
 @keyframes rise-from-earth {
   0% {
     opacity: 0;
@@ -205,13 +191,6 @@
   }
 }
 
-@keyframes draw-orbit {
-  to {
-    opacity: 1;
-    transform: rotate(-12deg) scale(1);
-  }
-}
-
 .motion-ready [data-scroll-reveal] {
   opacity: 0;
   transform: translate3d(0, 52px, 0);
@@ -232,13 +211,6 @@
     width: 205px;
     opacity: 0;
   }
-
-  .hero-orbit-line {
-    top: 2%;
-    right: -58%;
-    width: 125vw;
-    height: 34%;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -252,7 +224,6 @@
 
   .hero-rise,
   .hero-satellite,
-  .hero-orbit-line,
   .motion-ready [data-scroll-reveal] {
     animation: none;
     opacity: 1;
