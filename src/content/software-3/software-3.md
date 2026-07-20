@@ -88,7 +88,7 @@ async fn watchdog(ctx: watchdog::Context) {
 }
 ```
 
-The `local = [watchdog]` declaration matters.
+The `local = [watchdog]` declaration matters because
 RTIC gives that resource exclusively to this task, and the generated context makes it impossible for another task to borrow it.
 Resources needed by several tasks are declared `shared` and accessed through short critical sections.
 For example, this task periodically updates the accumulated radiation statistics:
