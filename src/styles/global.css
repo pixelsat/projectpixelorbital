@@ -27,20 +27,20 @@
 :root {
   --font: "Instrument Sans Variable", system-ui, Helvetica, Arial, sans-serif;
 
-  --primary: #111111;
-  --secondary: #4f4f4f;
-  --tertiary: #7a7a7a;
-  --white: #ffffff;
+  --primary: #e6e6e6;
+  --secondary: #f3f3f3;
+  --tertiary: #f1f1f1;
+  --white: var(--primary);
 
   --blue: #d92e31;
   --blue-hover: #cf3032;
   --blue-press: #d41519;
 
-  --bg-surface: #ffffff;
-  --bg-gradient-start: #ffffff;
-  --bg-gradient-end: #ffffff;
-  --intro-gradient-start: #e3e8ff;
-  --intro-gradient-end: #f4f7ff;
+  --bg-surface: #0f0f0f;
+  --bg-gradient-start: #151932;
+  --bg-gradient-end: #2d3c7f;
+  --intro-gradient-start: var(--bg-gradient-start);
+  --intro-gradient-end: var(--bg-gradient-end);
   --intro-gradient: linear-gradient(
     180deg,
     var(--intro-gradient-start) 0%,
@@ -48,7 +48,7 @@
   );
   --background: var(--bg-surface);
 
-  --elevated-color: #3450d1;
+  --elevated-color: #eaeaea;
   --elevated-3: color-mix(in srgb, var(--elevated-color) 3%, transparent);
   --elevated-5: color-mix(in srgb, var(--elevated-color) 5%, transparent);
   --elevated-7: color-mix(in srgb, var(--elevated-color) 7%, transparent);
@@ -60,26 +60,6 @@
   --glass-filter: blur(12px) saturate(110%);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --primary: #e6e6e6;
-    --secondary: #f3f3f3;
-    --tertiary: #f1f1f1;
-    --white: var(--primary);
-
-    --bg-surface: #0f0f0f;
-    --bg-gradient-start: #151932;
-    --bg-gradient-end: #2d3c7f;
-    --intro-gradient-start: var(--bg-gradient-start);
-    --intro-gradient-end: var(--bg-gradient-end);
-
-    --elevated-color: #eaeaea;
-    --glass-filter: blur(12px);
-
-    --tight-spacing: -0.5rem;
-  }
-}
-
 @layer base {
   * {
     box-sizing: border-box;
@@ -87,8 +67,22 @@
   }
 
   html {
+    color-scheme: dark;
     scroll-behavior: smooth;
     background: var(--background);
+  }
+
+  /* The landing page has two snap points only. Because the second point is a
+     main element taller than the viewport, browsers leave its inner scrolling
+     unconstrained after snapping past the hero. */
+  html.snap-hero-scroll {
+    scroll-snap-type: y mandatory;
+  }
+
+  html.snap-hero-scroll .hero-snap-point,
+  html.snap-hero-scroll .content-snap-point {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
   }
 
   body {
@@ -107,5 +101,150 @@
   ::selection {
     color: var(--primary);
     background-color: var(--elevated-15);
+  }
+}
+
+/* The duplicated foreground is clipped to the planet's horizon. Hero elements
+   begin below it, so their entrance reads as coming out from behind Earth. */
+.hero-earth-shade {
+  background: linear-gradient(
+    180deg,
+    rgb(0 0 0 / 28%) 0%,
+    rgb(0 0 0 / 16%) 44%,
+    rgb(0 0 0 / 78%) 100%
+  );
+}
+
+.hero-earth-foreground {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  pointer-events: none;
+  clip-path: polygon(
+    0 67%,
+    8% 65.8%,
+    16% 64.6%,
+    24% 63.4%,
+    32% 62.2%,
+    40% 61.4%,
+    50% 60.9%,
+    60% 61.2%,
+    70% 62%,
+    80% 63.3%,
+    90% 65%,
+    100% 67.2%,
+    100% 100%,
+    0 100%
+  );
+  animation: release-earth 650ms cubic-bezier(0.33, 1, 0.68, 1) 1.15s forwards;
+}
+
+.hero-rise {
+  opacity: 0;
+  transform: translate3d(0, min(46svh, 390px), 0);
+  animation: rise-from-earth 1.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: var(--rise-delay, 80ms);
+  will-change: transform, opacity;
+}
+
+.hero-satellite {
+  position: absolute;
+  z-index: 2;
+  top: 8%;
+  right: max(-5rem, calc((100vw - 1240px) / 2));
+  width: clamp(190px, 25vw, 360px);
+  filter: drop-shadow(0 24px 32px rgb(0 0 0 / 55%));
+  opacity: 0;
+  transform: translate3d(12vw, 68svh, 0) rotate(18deg) scale(0.72);
+  animation: satellite-from-earth 1.75s cubic-bezier(0.16, 1, 0.3, 1) 180ms
+    forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes rise-from-earth {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, min(46svh, 390px), 0);
+  }
+  14% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes satellite-from-earth {
+  0% {
+    opacity: 0;
+    transform: translate3d(12vw, 68svh, 0) rotate(18deg) scale(0.72);
+  }
+  22% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.88;
+    transform: translate3d(0, 0, 0) rotate(-5deg) scale(1);
+  }
+}
+
+@keyframes release-earth {
+  0% {
+    opacity: 1;
+    visibility: visible;
+  }
+  99% {
+    opacity: 0;
+    visibility: visible;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+.motion-ready [data-scroll-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 52px, 0);
+  transition:
+    opacity 700ms ease,
+    transform 850ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.motion-ready [data-scroll-reveal].is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+@media (max-width: 700px) {
+  .hero-satellite {
+    top: 3%;
+    right: -76px;
+    width: 205px;
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  html.snap-hero-scroll {
+    scroll-snap-type: none;
+  }
+
+  .hero-earth-foreground {
+    display: none;
+  }
+
+  .hero-rise,
+  .hero-satellite,
+  .motion-ready [data-scroll-reveal] {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }
