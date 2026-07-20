@@ -39,31 +39,11 @@ const blogPosts = await getCollection("blog");
     aria-label="Primary"
     class="flex flex-wrap items-center gap-5 md:justify-end"
   >
-    {
-      blogPosts.length > 0 && (
-        <a href="/#blog" class="py-2">
-          <Text variant="nav" tone="tertiary">
-            Blog
-          </Text>
-        </a>
-      )
-    }
-    <a href="/#mission" class="py-2">
-      <Text variant="nav" tone="tertiary">Mission</Text>
+    <a href="/" class="py-2">
+      <Text variant="nav" tone="tertiary">Home</Text>
     </a>
-    <a href="/#systems" class="py-2">
-      <Text variant="nav" tone="tertiary">Systems</Text>
+    <a href="/blog" class="py-2">
+      <Text variant="nav" tone="tertiary">Blog</Text>
     </a>
-    <a href="/#team" class="py-2">
-      <Text variant="nav" tone="tertiary">Team</Text>
-    </a>
-    <OuterLink
-      href="https://www.gofundme.com/f/support-project-pixel-orbital-student-team"
-      button
-      primary
-    >
-      Support the launch
-      <IconExternalLink />
-    </OuterLink>
   </nav>
 </header>

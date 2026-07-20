@@ -1,5 +1,7 @@
 ---
 import CardLink from "./CardLink.astro";
+import BrandInstagram from "./icons/BrandInstagram.astro";
+import BrandYoutube from "./icons/BrandYoutube.astro";
 import IconArrowRight from "./icons/IconArrowRight.astro";
 import IconExternalLink from "./icons/IconExternalLink.astro";
 import OuterLink from "./OuterLink.astro";
@@ -131,26 +133,27 @@ const snapshot = [
         </Text>
 
         <div class="flex flex-wrap items-center gap-3">
-          <a
-            href="#mission"
-            class="inline-flex min-h-[38px] items-center gap-[7px] rounded-full bg-blue px-4 py-[9px] text-[16px] font-medium text-white no-underline transition-[background-color,transform] duration-200 hover:bg-blue-hover active:scale-[0.97] active:bg-blue-press"
+          <OuterLink
+              href="https://www.gofundme.com/f/support-project-pixel-orbital-student-team"
+              button
+              primary
           >
-            See what we're building
-            <IconArrowRight />
-          </a>
+            Support us
+            <IconArrowRight/>
+          </OuterLink>
           <OuterLink
             href="https://www.instagram.com/projectpixelorbital/"
             button
+            aria-label="Project Pixel Orbital on Instagram"
           >
-            Instagram
-            <IconExternalLink />
+            <BrandInstagram />
           </OuterLink>
           <OuterLink
             href="https://www.youtube.com/@projectpixelorbital2026"
             button
+            aria-label="Project Pixel Orbital on YouTube"
           >
-            YouTube
-            <IconExternalLink />
+            <BrandYoutube />
           </OuterLink>
         </div>
 
@@ -195,7 +198,7 @@ const snapshot = [
             aria-label="Recent blog posts"
             class="grid auto-cols-[minmax(280px,340px)] grid-flow-col gap-4 overflow-x-auto pb-1.5 [scroll-snap-type:x_proximity]"
           >
-            {blogPosts.map((post: BlogPost) => (
+            {blogPosts.slice(0, 3).map((post: BlogPost) => (
               <CardLink
                 class="min-h-[150px] [scroll-snap-align:start]"
                 href={`/${post.slug}`}

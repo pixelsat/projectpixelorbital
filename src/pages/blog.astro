@@ -1,0 +1,53 @@
+---
+import { getCollection, type CollectionEntry } from "astro:content";
+import SiteHeader from "../components/SiteHeader.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Text from "../components/Text.astro";
+import { formatDate } from "../scripts/date.ts";
+
+const posts = (await getCollection("blog")).sort(
+  (a: CollectionEntry<"blog">, b: CollectionEntry<"blog">) =>
+    b.data.date.getTime() - a.data.date.getTime(),
+);
+---
+
+<BaseLayout title="Blog | Project Pixel Orbital">
+  <div class="min-h-screen">
+    <SiteHeader />
+
+    <main
+      class="mx-auto flex w-[min(1040px,calc(100vw-40px))] flex-col gap-8 py-8 pb-[72px] max-md:pb-14"
+    >
+      <section class="flex flex-col gap-[14px]">
+        <Text variant="display">Blog</Text>
+      </section>
+
+      <section aria-label="Blog posts" class="border-t border-elevated-10">
+        {
+          posts.map((post) => {
+            const slug = post.id.split("/").slice(1)[0];
+
+            return (
+              <article class="border-b border-elevated-10 py-5 first:pt-4">
+                <a
+                  href={`/${slug}`}
+                  class="group flex flex-col gap-2 no-underline focus-visible:rounded-[5px] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-primary"
+                >
+                  <Text
+                    variant="heading"
+                    class="transition-colors duration-200 group-hover:text-blue"
+                  >
+                    {post.data.title}
+                  </Text>
+                  <Text tag="div" variant="caption" tone="tertiary">
+                    {post.data.authors} · {formatDate(post.data.date)}
+                  </Text>
+                </a>
+              </article>
+            );
+          })
+        }
+      </section>
+    </main>
+  </div>
+</BaseLayout>
