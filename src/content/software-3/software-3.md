@@ -257,15 +257,16 @@ Even if we wanted one, a general-purpose filesystem would not be possible on the
 
 ## Designing for recovery and failure management
 
-The STM32 is not radiation-hardened, and software cannot fix this.
+The STM32 is not radiation-hardened, but it provided useful tools for fault tolerance.
 
 The independent watchdog has a ten-second timeout and is fed once per second by a high-priority task.
-We also reset the processor deliberately once an hour, limiting how long corrupted peripheral or software state can accumulate.
-Additionally, failed IMU and magnetometer drivers are reinitialized by a recovery task rather than being abandoned after one bus error.
+We also deliberately reset the processor once an hour, limiting how long a corrupted state can last.
+Additionally, broken IMU and magnetometer drivers are reinitialized by a recovery task rather than being left abandoned after a bus error.
 
-RAM ECC gets the highest-priority interrupt in the system. A correctable single-bit fault is repaired by writing the corrected word back; an uncorrectable double-bit fault causes an immediate reset.
+RAM ECC gets the highest-priority interrupt in the system.
+A correctable single-bit fault is repaired by writing the corrected word back; an uncorrectable double-bit fault causes an immediate reset.
 
-Panics follow a similar handling structure: interrupts are disabled, the panic message is copied into backup SRAM, queued logs are flushed to flash if the flash controller is safe to use, and the chip resets.
+For panic handling, interrupts are disabled, the panic message is copied into backup SRAM, queued logs are flushed to flash if the flash controller is safe to use, and the chip resets.
 On the next boot, the panic record is recovered into the persistent log before normal operation resumes.
 
 ## Conclusion
