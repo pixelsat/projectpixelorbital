@@ -74,26 +74,26 @@ const team = [
   {
     name: "Ashwin Naren",
     role: "Software BDFL/Lead · electrical · structural",
-    image: ashwin.src,
+    image: ashwin,
   },
   {
     name: "Vinayak Vikram",
     role: "Electrical lead · software · structural",
-    image: vinayak.src,
+    image: vinayak,
   },
-  { name: "Aadish Verma", role: "Comms lead · software", image: aadish.src },
-  { name: "Weston Yoo", role: "Team lead", image: weston.src },
+  { name: "Aadish Verma", role: "Comms lead · software", image: aadish },
+  { name: "Weston Yoo", role: "Team lead", image: weston },
   { name: "Daphne F", role: "Outreach Lead", initials: "DF" },
   { name: "Jahnavi Naren", role: "Software · structural", initials: "JN" },
   { name: "Caleb Laverty", role: "Outreach", initials: "CL" },
   {
     name: "Francesca Davies",
     role: "Outreach · funding",
-    image: francesca.src,
+    image: francesca,
   },
   { name: "Shiv Sareen", role: "Outreach · funding", initials: "SS" },
-  { name: "Victoria McLeod", role: "Structural", image: victoria.src },
-  { name: "Grace Zheng", role: "Structural · media", image: grace.src },
+  { name: "Victoria McLeod", role: "Structural", image: victoria },
+  { name: "Grace Zheng", role: "Structural · media", image: grace },
 ];
 
 const stats = [
@@ -132,11 +132,15 @@ const snapshot = [
       />
       <div class="hero-earth-shade absolute inset-0 -z-10"></div>
 
-      <img
-        src={pixelSat.src}
+      <Picture
+        src={pixelSat}
+        formats={["avif"]}
+        quality={85}
         alt=""
         aria-hidden="true"
         class="hero-satellite"
+        loading="eager"
+        fetchpriority="high"
       />
 
       <div
@@ -369,9 +373,13 @@ const snapshot = [
           team.map((member) => (
             <article class="flex flex-col gap-[14px]">
               {member.image ? (
-                <img
-                  class="aspect-square w-full rounded-[16px] bg-elevated-10 object-cover object-center"
+                <Picture
                   src={member.image}
+                  formats={["avif"]}
+                  widths={[320, 640]}
+                  sizes="(min-width: 768px) 331px, (min-width: 640px) calc((100vw - 64px) / 2), calc(100vw - 40px)"
+                  quality={85}
+                  class="aspect-square w-full rounded-[16px] bg-elevated-10 object-cover object-center"
                   alt={member.name}
                   loading="lazy"
                 />
