@@ -1,4 +1,5 @@
 ---
+import { Picture } from "astro:assets";
 import CardLink from "./CardLink.astro";
 import BrandInstagram from "./icons/BrandInstagram.astro";
 import BrandYoutube from "./icons/BrandYoutube.astro";
@@ -118,11 +119,16 @@ const snapshot = [
       id="top"
       class="hero-orbit relative isolate flex flex-1 overflow-hidden bg-black"
     >
-      <img
-        src={earthSpace.src}
+      <Picture
+        src={earthSpace}
+        formats={["avif"]}
+        widths={[480, 768, 1280, 1920, 2560, 2880, 3840]}
+        sizes="100vw"
+        quality={85}
         alt="Earth seen from space"
         class="hero-earth-image absolute inset-0 -z-20 size-full object-cover object-center"
         loading="eager"
+        fetchpriority="high"
       />
       <div class="hero-earth-shade absolute inset-0 -z-10"></div>
 
@@ -223,10 +229,16 @@ const snapshot = [
       </div>
 
       <div class="hero-earth-foreground" aria-hidden="true">
-        <img
-          src={earthSpace.src}
+        <Picture
+          src={earthSpace}
+          formats={["avif"]}
+          widths={[480, 768, 1280, 1920, 2560, 2880, 3840]}
+          sizes="100vw"
+          quality={85}
           alt=""
           class="absolute inset-0 size-full object-cover object-center"
+          loading="eager"
+          fetchpriority="high"
         />
         <div class="hero-earth-shade absolute inset-0"></div>
       </div>
@@ -265,7 +277,9 @@ const snapshot = [
               class="min-h-[150px]"
               href={`/${blogPosts[0].slug}`}
               title={blogPosts[0].title}
-              desc={blogPosts[0].authors + " on " + formatDate(blogPosts[0].date)}
+              desc={
+                blogPosts[0].authors + " on " + formatDate(blogPosts[0].date)
+              }
             />
           )}
         </section>
