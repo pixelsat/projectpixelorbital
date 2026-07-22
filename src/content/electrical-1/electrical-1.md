@@ -10,7 +10,10 @@ In this series, we will explore both what we built and also how we arrived there
 If you are new to our mission, we highly recommend checking out our software blog series.
 
 The electrical power system (EPS) of a satellite is akin to the cardiovascular system of a human.
-<!-- TODO: ashwinorz add stuff i suck at theatre -->
+
+It harvests energy from the panels and then distributes it to the battery and the various electrical components.
+
+<!-- Something something if the eps fails it would be like cutting of bloodflow to organs -->
 
 ## Constraints
 In some ways, we can view the overarching design of the EPS as a very broad optimization problem.
