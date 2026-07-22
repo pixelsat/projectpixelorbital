@@ -57,7 +57,6 @@ mpptorz
 With this all in mind, we were looking in the 6-8V range for a battery. We decided to go with a 3p2s LiPo battery (each cell being a 21700, a very common and reliable hobby battery), operating at a nominal voltage of 7.4V.
 
 ## MPPT
-Maximum Power Point Tracking extracts maximum possible power from solar panels.
 
 Solar panels generate electricity with a non-linear relationship between voltage and current, and how much power the panel produces depends on how stressed it is.
 If we consider a grpah of this voltage-to-current relationship, it would look somewhat like this:
@@ -102,3 +101,67 @@ The resistor divider connected to the VIN_REG pin sets this target voltage, and 
 to keep the panel operating at that setpoint.
 In addition, once the battery approaches its full charge voltage and the charge current drops below $1/10$th of the programmed maximum,
 the LT3652 automatically terminates the charging cycle and enters a low-current standby mode to prevent overcharging.
+
+## The 5V Rail
+
+At this point, we have solved around half of the power problem; how we charge the battery. Though the LT3652 is capable of efficiently extracting energy from our solar panels while safely charging the battery, it does not provide a stable voltage for the rest of the spacecraft. The remaining half of the problem is simply: how do we discharge?
+
+The battery voltage naturally varies over its discharge cycle, from approximately 8.4 V when fully charged to around 6 V near depletion. Unfortunately, our transceiver expects a regulated 5 V supply, and feeding it directly from the battery would end badly,
+considering that it dies at voltages above 5.5 V.
+
+Therefore, we need a buck converter, a switching regulator that efficiently converts a higher DC voltage into a lower one.
+Unlike a linear regulator, which simply burns the excess voltage as heat, a buck converter stores energy temporarily in an inductor before releasing it to the load.
+This allows it to achieve efficiencies well above 90% as well as handle much larger voltage differentials.
+
+### Switching regulators
+
+Although switching regulators often appear intimidating, they are fundamentally built from only a handful of components: a switch (mosfet), an inductor, and a capacitor.
+
+When the internal mosfet closes, current flows from the battery through the inductor into the output.
+Because an inductor resists rapid changes in current, the current ramps upward gradually while simultaneously storing energy in its magnetic field.
+<!-- TODO: ashwinorz eeorz narenorz write the r/c/l overview section ffs or i will geebye your gee gun -->
+
+When the mosfet opens, the inductor tries to keep the current flowing.
+Since current through an inductor cannot change instantaneously, the collapsing magnetic field generates whatever voltage is necessary to continue driving current into the load.
+The path provided by the diode allows this current to circulate until the next switching cycle begins.
+
+By rapidly alternating between these two states hundreds of thousands of times per second,
+the converter maintains a nearly constant output voltage despite the switching action itself being entirely digital.
+
+The amount of energy delivered each cycle is controlled by the duty cycle, which is simply the fraction of each switching period during which the mosfet is switched on. Ignoring losses,
+
+[
+V_{\text{out}} \approx D,V_{\text{in}},
+]
+
+where (D) is the duty cycle.
+
+As the battery voltage changes or the load current fluctuates, the controller continuously adjusts the duty cycle to maintain a stable 5 V output.
+
+### LT8610
+
+We use the LT8610 buck converter, a buck regulator capable of delivering up to 3.5 A of output current while operating at efficiencies approaching 95%.
+
+The surrounding circuitry primarily exists to configure the converter and ensure stable operation.
+
+The resistor divider connected to the FB pin determines the output voltage.
+The controller continuously compares the feedback voltage against its internal reference and adjusts the duty cycle accordingly.
+If the output voltage begins to droop (because we start transmitting, for example), the controller immediately increases the duty cycle,
+delivering more energy to the output until regulation is restored.
+Similarly, if the load suddenly decreases, the duty cycle is reduced to regulate the output.
+
+We use a whole lot of capacitors, each serving a distinct purpose.
+The input capacitors supply the large, rapidly changing switching currents locally, preventing those current spikes from propagating throughout the unregulated battery-connected bus.
+The output capacitors smooth the ripple produced by the switching action and provide energy during sudden load spikes before the controller has time to adjust the duty cycle.
+A small bootstrap capacitor provides the gate drive required for the high-side mosfet.
+Since the mosfet's source terminal rises nearly to the input voltage when it turns on, its gate must be driven to an even higher voltage in order to fully enhance the device.
+The bootstrap capacitor temporarily stores charge while the low-side switch is conducting, then uses that stored energy to drive the high-side gate above the supply rail during the next switching cycle.
+Finally, the compensation network shapes the frequency response of the feedback loop, ensuring that the controller responds quickly to changes in load or input voltage without overcorrecting.
+
+The inductor is arguably the most important external component in the entire converter.
+Its inductance determines the ripple current, transient response, and operating efficiency.
+Choosing one with too little inductance results in excessive current ripple and lower efficiency, wheras too much inductance
+slows the converter's response to quickly spiking loads and unnecessarily increases size, mass, and electromagnetic interference.
+
+With a stable and efficient 5 V rail now available, producing the final 3.3 V supply for the control electronics becomes dramatically simpler.
+Rather than using another buck converter, we simply use an LDO.
