@@ -18,7 +18,7 @@ It harvests energy from the panels and then distributes it to the battery and th
 <!-- Something something if the eps fails it would be like cutting of bloodflow to organs
 bro is on somethign^^ -->
 
-## Constraints
+## Buses
 In some ways, we can view the overarching design of the EPS as a very broad optimization problem.
 We began designing the system in earnest after finalizing our [STM32 microcontroller](/software-3) and settling on the [EByte E22-400T30D](/software-1) transceiver.
 This meant that at the very least we had to have two rails at 5V and 3.3V.
@@ -26,6 +26,12 @@ This meant that at the very least we had to have two rails at 5V and 3.3V.
 The other main constraint is that we had to prepare for our hand-wound magnetorquers to draw upwards of 2A of current randomly; as such, it made sense to have a third, unregulated rail that drove the torquers.
 The calculations are outlined in the [ADCS blog post](/software-2), but we are biased towards higher voltages on this rail.
 
+From this, we settled on a relatively simple architecture:
+```
+6-8V source --- buck to 5V  --- LDO to 3.3V
+     |              |               |
+ torquers       transceiver        main
+```
 <!--
 outline:
 
@@ -48,7 +54,7 @@ mpptorz
 
 ## Battery
 
-With this all in mind, we were looking in the 5-8V range for a battery. Though many excellent 5V batteries exist, we decided to go with a 3p2s LiPo battery (each cell being a 21700, a very common and reliable hobby battery), operating at a nominal voltage of 7.4V. The battery is connected
+With this all in mind, we were looking in the 6-8V range for a battery. We decided to go with a 3p2s LiPo battery (each cell being a 21700, a very common and reliable hobby battery), operating at a nominal voltage of 7.4V.
 
 ## MPPT
 Maximum Power Point Tracking extracts maximum possible power from solar panels.
