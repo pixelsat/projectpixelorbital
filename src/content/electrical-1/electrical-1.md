@@ -128,13 +128,7 @@ The path provided by the diode allows this current to circulate until the next s
 By rapidly alternating between these two states hundreds of thousands of times per second,
 the converter maintains a nearly constant output voltage despite the switching action itself being entirely digital.
 
-The amount of energy delivered each cycle is controlled by the duty cycle, which is simply the fraction of each switching period during which the mosfet is switched on. Ignoring losses,
-
-[
-V_{\text{out}} \approx D,V_{\text{in}},
-]
-
-where (D) is the duty cycle.
+The amount of energy delivered each cycle is controlled by the duty cycle, which is simply the fraction of each switching period during which the mosfet is switched on.
 
 As the battery voltage changes or the load current fluctuates, the controller continuously adjusts the duty cycle to maintain a stable 5 V output.
 
