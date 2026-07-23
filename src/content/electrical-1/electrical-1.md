@@ -97,7 +97,7 @@ Instead of explicitly searching for the peak of the power curve, it regulates th
 which we choose to coincide with the panel's maximum power point under nominal operating conditions.
 For our solar cells, the voltage at the maximum power point changes relatively little with irradiance (around 9.6V),
 making this a simple and highly effective approach.
-The resistor divider connected to the VIN_REG pin sets this target voltage, and the controller automatically adjusts the battery charging current
+The resistor divider connected to the VIN\_REG pin sets this target voltage, and the controller automatically adjusts the battery charging current
 to keep the panel operating at that setpoint.
 In addition, once the battery approaches its full charge voltage and the charge current drops below $1/10$th of the programmed maximum,
 the LT3652 automatically terminates the charging cycle and enters a low-current standby mode to prevent overcharging.
@@ -165,3 +165,5 @@ slows the converter's response to quickly spiking loads and unnecessarily increa
 
 With a stable and efficient 5 V rail now available, producing the final 3.3 V supply for the control electronics becomes dramatically simpler.
 Rather than using another buck converter, we simply use an LDO.
+
+## The 3.3V ER
