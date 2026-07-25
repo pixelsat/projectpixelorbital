@@ -54,26 +54,29 @@ const mission = [
 const systems = [
   {
     title: "ADCS",
+    link: "/software-2",
     body: "IMU, magnetometer, and sun sensor readings are merged and fused using an Extended Kalman Filter to estimate the spacecraft's attitude (orientation). Hand-wound magnetorquers are driven through a PID controller to set the satellite's angular velocity and orientation.",
   },
   {
     title: "Flight computer",
+    link: "/software-3",
     body: "A STM32-series processor running the RTIC framework handles all onboard operations on a single core. All code is no_std Rust.",
   },
   {
     title: "Communications",
+    link: "/software-1",
     body: "We use the 435 Megahertz ultra-high frequency band for communication, with the LoRa modulation scheme. Our transceiver is an E-Byte LoRa module which wraps a SemTech SX1262-based chip, connected to a tape measure antenna which is deployed via a burn wire into orbit.",
   },
   {
     title: "Power",
-    body: "Our battery pack is a 4P3S 21700 (21mm x 70mm) lithium ion battery pack powered by high-efficiency solar panels. The satellite runs on a 5V bus regulated by a custom power controller. A dedicated watchdog chip resets the STM32 flight computer in case of a heartbeat failure.",
+    body: "Our battery pack is a 7.4V lithium-ion battery pack powered by high-efficiency solar panels. The satellite runs on a 3.3V bus regulated by a custom power controller, with other (higher voltage) dedicated buses for the transceiver and the magnetorquers.",
   },
 ];
 
 const team = [
   {
     name: "Ashwin Naren",
-    role: "Software BDFL/Lead · electrical · structural",
+    role: "Software lead · electrical · structural",
     image: ashwin,
   },
   {
@@ -337,14 +340,23 @@ const snapshot = [
 
       <div class="grid gap-3 md:grid-cols-2">
         {
-          systems.map((system) => (
-            <article class="flex flex-col gap-2.5 rounded-[16px] bg-elevated-3 p-5">
-              <Text variant="heading">{system.title}</Text>
-              <Text variant="subheading" tone="secondary">
-                {system.body}
-              </Text>
-            </article>
-          ))
+            systems.map((system) => (
+                <a
+                href={system.link}
+                class="group flex flex-col gap-2.5 rounded-[16px] bg-elevated-3 p-5 transition-colors hover:bg-elevated-5 focus-visible:outline-2 focus-visible:outline-primary"
+                >
+                <Text
+                    variant="heading"
+                    class="group-hover:text-primary transition-colors"
+                >
+                    {system.title}
+                </Text>
+
+                <Text variant="subheading" tone="secondary">
+                    {system.body}
+                </Text>
+                </a>
+            ))
         }
       </div>
 
