@@ -54,7 +54,11 @@ mpptorz
 
 ## Battery
 
-With this all in mind, we were looking in the 6-8V range for a battery. We decided to go with a 3p2s LiPo battery (each cell being a 21700, a very common and reliable hobby battery), operating at a nominal voltage of 7.4V.
+With this all in mind, we were looking in the 6-8V range for a battery.
+We decided to go with a 3p2s lithium-ion battery (each cell being a 21700, a very common and reliable hobby battery),
+operating at a nominal voltage of 7.4V. At the moment, we are using a GlobTek battery that matches our specifications,
+but in the future we might design a battery pack around the Samsung INR21700-50E cell (six of them, to be exact).
+Keep an eye out for a blog post on this if we do!
 
 ## MPPT
 
@@ -157,7 +161,35 @@ Its inductance determines the ripple current, transient response, and operating 
 Choosing one with too little inductance results in excessive current ripple and lower efficiency, wheras too much inductance
 slows the converter's response to quickly spiking loads and unnecessarily increases size, mass, and electromagnetic interference.
 
-With a stable and efficient 5 V rail now available, producing the final 3.3 V supply for the control electronics becomes dramatically simpler.
-Rather than using another buck converter, we simply use an LDO.
+## The 3.3V Rail
 
-## The 3.3V ER
+With a stable and efficient 5 V rail now available, producing the final 3.3 V supply for the control electronics becomes dramatically simpler.
+Rather than using another buck converter, we simply use an LDO (Low Dropout Regulator).
+
+Unlike switching regulators, linear regulators contain no inductors, no switching MOSFETs, and no complex feedback compensation networks.
+Instead, they operate much like a variable resistor placed in series with the load.
+Our regulator continuously adjusts the resistance of an internal pass transistor such that the output remains fixed at 3.3 V
+regardless of changes in load current or input voltage.
+
+The downside of this is that any voltage drop across the LDO is simply released as heat, given by the equation $P=I_{\text{load}}\Delta V$.
+In our case, stepping down from 5V to 3.3V, we must constantly dissipate $1.7 \cdot I_{\text{load}}$.
+Thankfully, since our mains draw never exceeds a few hundred milliamps (and that at higher levels of operation),
+which is why we are comfortable using an LDO here.
+
+### Ripples and flux
+
+The main advantage of an LDO is the quality of its output. Because it contains no high-frequency switching elements,
+it introduces virtually no switching ripple of its own and provides excellent rejection of the residual noise
+produced by the upstream buck converter. While the LT8610 already produces a well-regulated 5 V rail,
+every switching regulator generates some output ripple as it rapidly switches current through its inductor.
+The LDO effectively acts as a final cleanup stage, getting rid of all the remaining noise before it reaches the control electronics.
+
+This is especially important for our analog peripherals such as the photodiodes. 
+The STM32's analog-to-digital converters, reference voltages, and sensor interfaces all benefit from a clean supply rail,
+reducing measurement noise and improving overall system stability.
+Even for purely digital logic, eliminating unnecessary supply ripple makes signals much easier to process
+and reduces the chance of random things happening under load.
+
+Thankfully, the circuitry surrounding the LDO is quite trivial.
+Other than the LDO itself, only an input capacitor and an output capacitor are required to ensure stable operation and provide local decoupling.
+After designing the MPPT circuit and the scaffolding for the buck converter, designing this was refreshingly easy.
