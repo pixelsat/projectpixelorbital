@@ -148,14 +148,6 @@ If the output voltage begins to droop (because we start transmitting, for exampl
 delivering more energy to the output until regulation is restored.
 Similarly, if the load suddenly decreases, the duty cycle is reduced to regulate the output.
 
-We use a whole lot of capacitors, each serving a distinct purpose.
-The input capacitors supply the large, rapidly changing switching currents locally, preventing those current spikes from propagating throughout the unregulated battery-connected bus.
-The output capacitors smooth the ripple produced by the switching action and provide energy during sudden load spikes before the controller has time to adjust the duty cycle.
-A small bootstrap capacitor provides the gate drive required for the high-side mosfet.
-Since the mosfet's source terminal rises nearly to the input voltage when it turns on, its gate must be driven to an even higher voltage in order to fully enhance the device.
-The bootstrap capacitor temporarily stores charge while the low-side switch is conducting, then uses that stored energy to drive the high-side gate above the supply rail during the next switching cycle.
-Finally, the compensation network shapes the frequency response of the feedback loop, ensuring that the controller responds quickly to changes in load or input voltage without overcorrecting.
-
 The inductor is arguably the most important external component in the entire converter.
 Its inductance determines the ripple current, transient response, and operating efficiency.
 Choosing one with too little inductance results in excessive current ripple and lower efficiency, wheras too much inductance
@@ -193,3 +185,55 @@ and reduces the chance of random things happening under load.
 Thankfully, the circuitry surrounding the LDO is quite trivial.
 Other than the LDO itself, only an input capacitor and an output capacitor are required to ensure stable operation and provide local decoupling.
 After designing the MPPT circuit and the scaffolding for the buck converter, designing this was refreshingly easy.
+
+## Interference and decoupling
+
+You might have noticed by now that we appear to be sticking capacitors in random places. This is not accidental.
+First and foremost, capacitors are essential in keeping high-speed switching regulators stable and preventing them from interfering
+with the rest of the satellite's electronics. The LT3652 and LT8610 switch several amperes of current hundreds of thousands of times per second,
+producing extremely sharp edges on the voltage/time and current/time graphs.
+Without careful filtering, all this switching noise would propagate throughout the power distribution circuitry and flow into nearby circuitry.
+
+One of the first things we designed is the collection of input and output capacitors surrounding each switching regulator.
+The input capacitors provide the large, rapidly changing switching currents locally, preventing the current spikes drawn during swithcing from propagating throughout the battery bus.
+Similarly, the output capacitors smooth the ripple produced by the switching action and provide energy during sudden load spikes before the controller has time to adjust its duty cycle.
+
+There are some more specialized capacitors. A small bootstrap capacitor provides the gate drive required for the high-side MOSFET.
+Since the mosfet's source terminal rises nearly to the input voltage when it turns on, its gate must briefly be driven to an even higher voltage in order to fully enhance the device.
+The bootstrap capacitor stores charge while the low-side switch is conducting, then uses that stored energy to drive the high-side gate during the following switching cycle.
+
+Finally, the compensation network determines and regulates the frequency response of the feedback loop. Rather than allowing the controller to aggressively chase every tiny voltage fluctuation,
+it makes sure the regulator responds quickly while remaining stable. Without proper compensation,
+the output voltage would oscillate instead of smoothly converging back to its desired value as the regulator tried to overcorrect.
+
+### Decoupling capacitors
+
+Throughout our PCB you might notice numerous 100 nF ceramic capacitors placed immediately adjacent to nearly every integrated circuit. These are the decoupling capacitors.
+
+Integrated circuits rarely draw perfectly constant current. Every clock cycle inside the STM, for example, causes a sharp edge in our current draw.
+If these currents had to travel all the way from the battery, the inductance of the power distribution network would create unwanted voltage fluctuations according to
+
+
+$$
+V = L \frac{\text{d}I}{\text{d}t}
+$$
+
+Instead, each ceramic capacitor acts as a tiny local battery, supplying these high-frequency current spikes directly to the IC sitting only a few millimeters away.
+After the transient passes, the capacitor recharges from the main power rail.
+
+This is why decoupling capacitors are placed physically adjacent to the power pins of each IC.
+Their effectiveness depends only on minimizing trace inductance than on the exact capacitance value.
+A perfectly sized capacitor located several centimeters away is often less useful than a smaller one placed immediately beside the device.
+
+### PCB layout
+
+When designing power electronics, especially with swithcing components, we have to keep PCB layout in mind at all times.
+Though the schematic is important, the circuit will not work unless we are vigilant about our trace length and layout.
+
+Every high-current switching path forms a loop, and every loop behaves like a small antenna.
+Larger loops radiate more electromagnetic interference while simultaneously being more susceptible to external noise.
+Consequently, high-current switching loops should be kept as physically small as possible,
+with input bypass capacitors located immediately adjacent to the switching regulator.
+
+Similarly, all high-current traces must be made sufficiently wide to minimize resistive losses and voltage drop,
+while a continuous ground plane provides a low-impedance return path for switching currents.
