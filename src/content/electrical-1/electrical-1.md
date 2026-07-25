@@ -63,11 +63,10 @@ Keep an eye out for a blog post on this if we do!
 ## MPPT
 
 Solar panels generate electricity with a non-linear relationship between voltage and current, and how much power the panel produces depends on how stressed it is.
-If we consider a grpah of this voltage-to-current relationship, it would look somewhat like this:
-<!-- TODO: insert graph -->
 
+Consider a grpah of this voltage-to-current relationship.
 Now consider the graph of power vs voltage. This can be obtained by multiplying our voltage-current graph by the voltage at each point to get something like the graph below:
-<!-- TODO: insert graph -->
+![P-V and I-V graphs](mpp.png)
 
 We can see that there is exactly one point where the panel delivers the greatest possible power, known as the Maximum Power Point (MPP).
 Operating to either side of this peak leaves usable energy on the table.
