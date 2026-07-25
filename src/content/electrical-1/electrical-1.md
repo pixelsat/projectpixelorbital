@@ -230,7 +230,7 @@ A perfectly sized capacitor located several centimeters away is often less usefu
 When designing power electronics, especially with swithcing components, we have to keep PCB layout in mind at all times.
 Though the schematic is important, the circuit will not work unless we are vigilant about our trace length and layout.
 
-Every high-current switching path forms a loop, and every loop behaves like a small antenna.
+Every high-current switching path forms a loop, and every loop behaves like a small antenna/electromagnet.
 Larger loops radiate more electromagnetic interference while simultaneously being more susceptible to external noise.
 Consequently, high-current switching loops should be kept as physically small as possible,
 with input bypass capacitors located immediately adjacent to the switching regulator.
