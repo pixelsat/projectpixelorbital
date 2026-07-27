@@ -116,13 +116,32 @@ Therefore, we need a buck converter, a switching regulator that efficiently conv
 Unlike a linear regulator, which simply burns the excess voltage as heat, a buck converter stores energy temporarily in an inductor before releasing it to the load.
 This allows it to achieve efficiencies well above 90% as well as handle much larger voltage differentials.
 
+### Resistors, Capacitor, and Inductors (RCL)
+
+Before we jump into the actual implementation, it's worth taking a second to review the basic components here.
+
+There are three passive components here: Resistors (R), Capacitor (C), and Inductors (L).
+
+A resistor just reduces the flow of current. The voltage is proportional to current: $V = IR$ (Ohm's law).
+Any absorbed power is dissipated as heat. 
+
+A capacitor is internally just two conductive plates.
+It holds charge proportional to the voltage.
+Changing the voltage of a capacitor is more difficult the bigger the capacitance.
+This means that capacitors act as voltage stabilizers, which protects against power dips or surges.
+
+An inductor is the mirror image of a capacitor.
+It is analogous to a capacitor, except that it holds a magnetic field instead.
+Just as a capacitor resists the change in voltage, an inductor resists the change in current
+
+Unlike a resistor, capacitors and inductors do not produce heat.
+
 ### Switching regulators
 
 Although switching regulators often appear intimidating, they are fundamentally built from only a handful of components: a switch (mosfet), an inductor, and a capacitor.
 
 When the internal mosfet closes, current flows from the battery through the inductor into the output.
 Because an inductor resists rapid changes in current, the current ramps upward gradually while simultaneously storing energy in its magnetic field.
-<!-- TODO: ashwinorz eeorz narenorz write the r/c/l overview section ffs or i will geebye your gee gun -->
 
 When the mosfet opens, the inductor tries to keep the current flowing.
 Since current through an inductor cannot change instantaneously, the collapsing magnetic field generates whatever voltage is necessary to continue driving current into the load.
