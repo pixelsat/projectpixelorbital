@@ -16,7 +16,7 @@ It harvests energy from the panels and then distributes it to the battery and th
 
 
 <!-- Something something if the eps fails it would be like cutting of bloodflow to organs
-bro is on somethign^^ -->
+bro is on something^^ -->
 
 ## Buses
 In some ways, we can view the overarching design of the EPS as a very broad optimization problem.
@@ -64,7 +64,7 @@ Keep an eye out for a blog post on this if we do!
 
 Solar panels generate electricity with a non-linear relationship between voltage and current, and how much power the panel produces depends on how stressed it is.
 
-Consider a grpah of this voltage-to-current relationship.
+Consider a graph of this voltage-to-current relationship.
 Now consider the graph of power vs voltage. This can be obtained by multiplying our voltage-current graph by the voltage at each point to get something like the graph below:
 ![P-V and I-V graphs](mpp.png)
 
@@ -107,7 +107,7 @@ the LT3652 automatically terminates the charging cycle and enters a low-current 
 
 ## The 5V Rail
 
-At this point, we have solved around half of the power problem; how we charge the battery. Though the LT3652 is capable of efficiently extracting energy from our solar panels while safely charging the battery, it does not provide a stable voltage for the rest of the spacecraft. The remaining half of the problem is simply: how do we discharge?
+At this point, we have solved roughly half of the power problem: how we charge the battery. Though the LT3652 is capable of efficiently extracting energy from our solar panels while safely charging the battery, it does not provide a stable voltage for the rest of the spacecraft. The remaining half of the problem is simply: how do we discharge?
 
 The battery voltage naturally varies over its discharge cycle, from approximately 8.4 V when fully charged to around 6 V near depletion. Unfortunately, our transceiver expects a regulated 5 V supply, and feeding it directly from the battery would end badly,
 considering that it dies at voltages above 5.5 V.
@@ -149,7 +149,7 @@ Similarly, if the load suddenly decreases, the duty cycle is reduced to regulate
 
 The inductor is arguably the most important external component in the entire converter.
 Its inductance determines the ripple current, transient response, and operating efficiency.
-Choosing one with too little inductance results in excessive current ripple and lower efficiency, wheras too much inductance
+Choosing one with too little inductance results in excessive current ripple and lower efficiency, whereas too much inductance
 slows the converter's response to quickly spiking loads and unnecessarily increases size, mass, and electromagnetic interference.
 
 ## The 3.3V Rail
@@ -164,7 +164,7 @@ regardless of changes in load current or input voltage.
 
 The downside of this is that any voltage drop across the LDO is simply released as heat, given by the equation $P=I_{\text{load}}\Delta V$.
 In our case, stepping down from 5V to 3.3V, we must constantly dissipate $1.7 \cdot I_{\text{load}}$.
-Thankfully, since our mains draw never exceeds a few hundred milliamps (and that at higher levels of operation),
+Thankfully, our mains draw never exceeds a few hundred milliamps (and that at higher levels of operation),
 which is why we are comfortable using an LDO here.
 
 ### Ripples and flux
@@ -194,7 +194,7 @@ producing extremely sharp edges on the voltage/time and current/time graphs.
 Without careful filtering, all this switching noise would propagate throughout the power distribution circuitry and flow into nearby circuitry.
 
 One of the first things we designed is the collection of input and output capacitors surrounding each switching regulator.
-The input capacitors provide the large, rapidly changing switching currents locally, preventing the current spikes drawn during swithcing from propagating throughout the battery bus.
+The input capacitors provide the large, rapidly changing switching currents locally, preventing the current spikes drawn during switching from propagating throughout the battery bus.
 Similarly, the output capacitors smooth the ripple produced by the switching action and provide energy during sudden load spikes before the controller has time to adjust its duty cycle.
 
 There are some more specialized capacitors. A small bootstrap capacitor provides the gate drive required for the high-side MOSFET.
@@ -221,12 +221,12 @@ Instead, each ceramic capacitor acts as a tiny local battery, supplying these hi
 After the transient passes, the capacitor recharges from the main power rail.
 
 This is why decoupling capacitors are placed physically adjacent to the power pins of each IC.
-Their effectiveness depends only on minimizing trace inductance than on the exact capacitance value.
+Their effectiveness depends more on minimizing trace inductance than on the exact capacitance value.
 A perfectly sized capacitor located several centimeters away is often less useful than a smaller one placed immediately beside the device.
 
 ### PCB layout
 
-When designing power electronics, especially with swithcing components, we have to keep PCB layout in mind at all times.
+When designing power electronics, especially with switching components, we have to keep PCB layout in mind at all times.
 Though the schematic is important, the circuit will not work unless we are vigilant about our trace length and layout.
 
 Every high-current switching path forms a loop, and every loop behaves like a small antenna/electromagnet.
