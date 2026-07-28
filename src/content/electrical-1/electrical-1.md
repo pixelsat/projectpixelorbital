@@ -29,25 +29,6 @@ From this, we settled on a relatively simple architecture:
      |              |               |
  torquers       transceiver        main
 ```
-<!--
-outline:
-
-constraints
-battery
-    - fuel monitoring, charging
-explanation of r, c, l
-    - brief physics dhristimaxxing session
-regulating for the transceiver
-    - lt8610 wiring
-    orz^
-thank god our ldo is trivial
-interference and decoupling
-    - the 2000uF capacitor is larger than my gee gun
-    - ashwinorz "servoorz" "mathorz" "csorz" "lcporz" "eeorz" "ui/uxorz" "osdevorz" "soydevorz" "trumpimpressionorz" "miriorz" "orz" "d0stalkingorz" narenorz and the capacitor saga /j
-mpptorz
-    - lt3652orz
-    - schottky diodes and why theyre cool
--->
 
 ## Battery
 
