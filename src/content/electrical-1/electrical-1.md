@@ -10,13 +10,10 @@ In this series, we will explore both what we built and also how we arrived there
 If you are new to our mission, we highly recommend checking out our software blog series.
 
 The electrical power system (EPS) of a satellite is akin to the cardiovascular system of a human.
+It harvests energy from the solar panels and distributes it throughout the spacecraft to power everything from the radio to the attitude control system.
+The EPS must regulate multiple voltage rails and deliver clean, stable power under wildly varying conditions.
 
-It harvests energy from the panels and then distributes it to the battery and the various electrical components.
-
-
-
-<!-- Something something if the eps fails it would be like cutting of bloodflow to organs
-bro is on something^^ -->
+In this post, we'll explore the key design decisions and components that make up PixelSat I's EPS: the battery that stores our energy, the maximum power point tracker that maximizes solar harvesting, and the carefully regulated power rails that feed the rest of the satellite.
 
 ## Buses
 In some ways, we can view the overarching design of the EPS as a very broad optimization problem.
