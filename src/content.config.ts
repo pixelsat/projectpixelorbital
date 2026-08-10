@@ -8,6 +8,7 @@ const blog = defineCollection({
     title: z.string(),
     authors: z.string(),
     date: z.coerce.date(),
+    redirect: z.string().url().optional(),
   }),
 });
 

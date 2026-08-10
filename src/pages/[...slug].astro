@@ -15,6 +15,11 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 const { title, authors, date } = post.data;
+
+if (post.data.redirect) {
+  return Astro.redirect(post.data.redirect, 301);
+}
+
 const { Content } = await render(post);
 ---
 

@@ -30,7 +30,7 @@ const posts = (await getCollection("blog")).sort(
             return (
               <article class="border-b border-elevated-10 py-5 first:pt-4">
                 <a
-                  href={`/${slug}`}
+                  href={post.data.redirect ?? `/${slug}`}
                   class="group flex flex-col gap-2 no-underline focus-visible:rounded-[5px] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-primary"
                 >
                   <Text
