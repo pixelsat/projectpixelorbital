@@ -226,7 +226,7 @@ This ensures that our detumble is rapid and that we are not wasting any power on
 
 #### Reference attitude tracking
 
-During nominal operations, PixelSat maintains a nadir-pointing attitude, keeping its antenna directed toward Earth.
+During nominal operations, PixelSat maintains a nadir-pointing attitude, keeping its UHF and 2.4 GHz S-band antennas directed toward Earth.
 This maximizes communication performance over the majority of each orbit while also providing a consistent reference frame for the rest of the spacecraft.
 
 Additionally, we can adjust this attitude as needed to take pictures.
@@ -242,7 +242,7 @@ When communicating with one of our ground stations, we can do even better than s
 Rather than pointing toward Earth's center, the controller computes the line-of-sight vector to the selected ground station from the spacecraft's current orbit estimate.
 The same feedback controller is then used, but with this continuously changing reference attitude.
 
-This allows the antenna's main lobe to remain aligned with the receiving station throughout the pass, improving the available link margin.
+This keeps the communications antennas aligned with the receiving station throughout the pass, improving the available link margin for comms operations.
 
 ### PID
 
