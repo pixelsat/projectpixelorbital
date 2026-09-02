@@ -40,7 +40,7 @@ const mission = [
   },
   {
     title: "Take an image of the Earth",
-    body: "We aim to 1) detumble (stop spinning after being released from the launch vehicle), 2) establish contact with the Project Pixel Orbital team on the ground with our LoRa UHF comms pipeline, 3) capture an image of the Earth using the onboard OV2640 camera, and 4) downlink the image.",
+    body: "We aim to 1) detumble (stop spinning after being released from the launch vehicle), 2) establish contact with the Project Pixel Orbital team on the ground with our dual-band UHF and S-band comms system, 3) capture an image of the Earth using the onboard OV2640 camera, and 4) downlink the image.",
   },
   {
     title: "Learn stuff",
@@ -66,12 +66,12 @@ const systems = [
   {
     title: "Communications",
     link: "/software-1",
-    body: "We use the 435 Megahertz ultra-high frequency band for communication, with the LoRa modulation scheme. Our transceiver is an E-Byte LoRa module which wraps a SemTech SX1262-based chip, connected to a tape measure antenna which is deployed in orbit via a burn wire.",
+    body: "Our dual-band communications system uses LoRa UHF at 435 MHz alongside S-band at 2.4 GHz. The UHF transceiver is an E-Byte LoRa module built around a Semtech SX1262 chip and connected to a tape-measure antenna that deploys in orbit via a burn wire.",
   },
   {
     title: "Power",
 link: "/electrical-1",
-    body: "Our battery pack is a 7.4V lithium-ion battery pack powered by high-efficiency solar panels. The satellite runs on a 3.3V bus regulated by a custom power controller, with other (higher voltage) dedicated buses for the transceiver and the magnetorquers.",
+    body: "Our battery pack is a 7.4V lithium-ion battery pack powered by high-efficiency solar panels. The satellite runs on a 3.3V bus regulated by a custom power controller, with other (higher voltage) dedicated buses for the communications system and the magnetorquers.",
   },
 ];
 
@@ -113,7 +113,7 @@ const snapshot = [
   ["Form factor", "3U CubeSat (100×100×300 mm)"],
   ["Orbit", "Sun-synchronous LEO @ 550km"],
   ["Structure", "Aluminum frame"],
-  ["Comms", "UHF LoRa on 435 MHz"],
+  ["Comms", "435 MHz UHF + 2.4 GHz S-band"],
   ["Goal", "Capture & downlink image of the Earth"],
 ] as const;
 ---
