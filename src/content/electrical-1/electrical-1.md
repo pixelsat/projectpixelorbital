@@ -17,7 +17,7 @@ In this post, we'll explore the key design decisions and components that make up
 
 ## Buses
 In some ways, we can view the overarching design of the EPS as a very broad optimization problem.
-We began designing the system in earnest after finalizing our [STM32 microcontroller](/software-3) and settling on the [EByte E22-400T30D](/software-1) transceiver.
+We began designing the system in earnest after finalizing our [STM32 microcontroller](/software-3) and settling on the [EByte E22-400T30D](/software-1) transceiver for our 435 MHz UHF link. The communications system also uses a E28-2G4M27SX S-band at 2.4 GHz.
 This meant that at the very least we had to have two rails at 5V and 3.3V.
 
 The other main constraint is that we had to prepare for our hand-wound magnetorquers to draw upwards of 2A of current randomly; as such, it made sense to have a third, unregulated rail that drove the torquers.
@@ -27,7 +27,7 @@ From this, we settled on a relatively simple architecture:
 ```
 6-8V source --- buck to 5V  --- LDO to 3.3V
      |              |               |
- torquers       transceiver        main
+ torquers         comms            main
 ```
 
 ## Battery
@@ -87,7 +87,7 @@ the LT3652 automatically terminates the charging cycle and enters a low-current 
 
 At this point, we have solved roughly half of the power problem: how we charge the battery. Though the LT3652 is capable of efficiently extracting energy from our solar panels while safely charging the battery, it does not provide a stable voltage for the rest of the spacecraft. The remaining half of the problem is simply: how do we discharge?
 
-The battery voltage naturally varies over its discharge cycle, from approximately 8.4 V when fully charged to around 6 V near depletion. Unfortunately, our transceiver expects a regulated 5 V supply, and feeding it directly from the battery would end badly,
+The battery voltage naturally varies over its discharge cycle, from approximately 8.4 V when fully charged to around 6 V near depletion. Unfortunately, our UHF transceiver expects a regulated 5 V supply, and feeding it directly from the battery would end badly,
 considering that it dies at voltages above 5.5 V.
 
 Therefore, we need a buck converter, a switching regulator that efficiently converts a higher DC voltage into a lower one.
