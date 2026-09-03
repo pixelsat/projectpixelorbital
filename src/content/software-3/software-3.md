@@ -44,12 +44,8 @@ Our first major redesign came in February 2026, when we moved the main flight so
 An Embassy async executor ran comms, ADCS, and the rest of the spacecraft tasks.
 We kept the Pi as a payload computer over UART, responsible only for image processing and data from a planned protein-crystallization experiment.
 
-Then the experiment was cut, and we found a camera that could encode JPEGs itself.
-In doing so we put the RPI out of a job.
-We briefly designed a dual-ESP32 system to replace the RPI, with one processor handling comms and ADCS while the other handled images and telemetry,
-but the boundary created more failure modes and complication than it removed.
-
-For example, handling esp1 (the camera ESP) failures with timeouts and choosing whe to reset it was an unneeded complication.
+Then the experiment was cut, and eventually the new experiment might even use its own computer,
+however the RPI was kept because of the large amount of flash it contained and its ability to support higher-res cameras.
 
 ## STM32
 
@@ -244,13 +240,10 @@ The tasks communicate through fixed-capacity async channels and signals.
 ## Storage without a disk
 
 We use the STM32's second 1 MB flash bank as a tiny, purpose-built data store.
-Its eight sectors are divided between one captured image, a two-sector circular log, a reserved sector, and the current TLE.
+Its eight sectors are divided between a two-sector circular log, a reserved sector for in-flight patching, and the current TLE.
 Each region is bounded by its own API, so image code cannot accidentally erase the program or the orbit data.
 
-The camera already produces JPEG data.
-During capture, firmware streams it to a 128 KiB buffer in AXI SRAM, and then writes it to flash in aligned chunks, and calculates a CRC as it goes.
-Metadata is written last.
-If power disappears halfway through a capture, the half-written bytes are never mistaken for a valid image.
+During image downlink, the RPI streams chunks (by request of the ground) through the STM32 (which acts like a passthrough) via UART.
 
 The ground station later requests various chunks of the image.
 
