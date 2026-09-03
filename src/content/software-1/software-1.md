@@ -13,7 +13,7 @@ Because we are a student team working under tight budget, power, and time constr
 
 A satellite can have great software, a capable payload, and a carefully designed avionics stack, but without a reliable radio link it is effectively inaccessible once it leaves the ground. The communications system determines how much data we can return, how confidently we can command the spacecraft, what sort of ground infrastructure we can rely on, and even which regulations we have to design around. In many ways, it sets the operational envelope for the entire mission.
 
-This post focuses on how we chose our radio stack and why we ultimately committed to a low-cost LoRa-based approach. We will walk through the constraints we started with, the modulation schemes we considered, the hardware options we evaluated, and the framing decisions that define the current system.
+This post focuses on how we chose our radio stack and developed a low-cost dual-band system using LoRa UHF at 435 MHz alongside S-band at 2.4 GHz. We will walk through the constraints we started with, the modulation schemes we considered, the hardware options we evaluated, and the framing decisions that define the current system.
 
 ## Constraints
 When choosing a transceiver, there were a few constraints we absolutely had to satisfy.
@@ -26,18 +26,19 @@ Thirdly, we needed something with a relatively low power draw. We needed a trans
 
 Lastly, the transceiver had to physically survive in a CubeSat: it needed to be small and able to handle radiation and temperature cycling.
 
-## UHF
+## UHF and S-band
 
 ![List of ITU bands with their frequencies and wavelengths](Higher_frequency_ITU_radio_bands.png)
 
-UHF is the ideal band for communications at this scale because of its low power requirements, ease of manufacturing (which implies lower cost), and decent bandwidth.
+UHF is an ideal foundation for communications at this scale because of its low power requirements, ease of manufacturing (which implies lower cost), and decent bandwidth.
 
-Compared to VHF, UHF is less affected by the ionosphere, has a smaller antenna footprint, and offers much more bandwidth.
-
-S-band and X-band do not have cheap, readily available COTS transceivers, and their power draw is also higher to compensate for signal loss.
+Compared to VHF, UHF is less affected by the ionosphere, has a smaller antenna footprint, and offers much more bandwidth. PixelSat I uses LoRa in the 435 MHz UHF band and complements it with an additional S-band link operating at 2.4 GHz.
 
 Our UHF antenna will be a deployable "tape-measure" antenna transmitting in the 435 MHz band.
 The antenna is generally omnidirectional, but pointing it towards the ground increases the link budget significantly.
+
+The S-Band patch antenna almost certainly needs to be pointing towards to ground to operate.
+However it is not mission critical and only provides much needed bandwidth for high-res images and streaming operations.
 
 ## LoRa vs GMSK/GFSK
 
@@ -63,11 +64,11 @@ Because LoRa uses chirp spread spectrum, it is generally more tolerant of Dopple
 
 ![Visualization of how LoRa's chirp spread spectrum is more resistent to Doppler shift than GMSK/GFSK](comms-diagram.svg)
 
-Due to Doppler shift and our design constraints, we eventually settled on a pure LoRa communications stack.
+Due to Doppler shift and our design constraints, we eventually settled on LoRa for the UHF side of our dual-band communications stack.
 
 ## Timeline
 
-We considered an inordinate number of transceivers throughout this project before settling on the EByte E22-400T30D LoRa module in May 2026.
+We considered an inordinate number of transceivers throughout this project before settling on the EByte E22-400T30D LoRa module for the UHF link in May 2026. Our current communications system also includes an S-band link at 2.4 GHz.
 
 ### GomSpace AX100
 The GomSpace AX100 is a UHF/VHF transceiver used in many CubeSat missions. It operates with GMSK/GFSK, supporting configurable data rates and forward error correction. We first considered it because of its extensive flight heritage and the prevalence of GMSK ground stations. However, after talking to GomSpace, we were unable to get a quote below $10k for a single transceiver, which pushed us to our next option.
@@ -82,11 +83,11 @@ The Semtech SX-series is a family of UHF transceivers that support both LoRa *an
 
 The only problem with this approach was the TCXO. A TCXO (temperature-compensated crystal oscillator) is a key component of most transceivers, providing a stable frequency reference. In space, temperature fluctuations can cause a standard crystal oscillator (like the one packaged with raw SX-series modules) to drift significantly, potentially jeopardizing the link. In the past, many satellites custom-designed their transceiver boards to integrate a TCXO, but we decided that this was impractical since it would just be an additional point of failure.
 
-Speaking of points of failure, this was also when we decided, after many discussions, to fully commit to a pure LoRa stack for two reasons. First, given our expected usage—at most one or two low-resolution JPEGs transmitted per day—there was no compelling reason to use GMSK. Second, constantly switching between LoRa for light tasks and GMSK for heavier tasks could prove problematic.
+Speaking of points of failure, this was also when we decided, after many discussions, to fully commit to LoRa for our UHF link for two reasons. First, given our expected usage—at most one or two low-resolution JPEGs transmitted per day—there was no compelling reason to use GMSK. Second, constantly switching between LoRa for light tasks and GMSK for heavier tasks could prove problematic. We later complemented this UHF link with our 2.4 GHz S-band link for additional bandwidth.
 
 ### EByte E22-400T30D
 
-The EByte E22-400T30D is a pure LoRa transceiver that wraps everything we want: an SX1262 transceiver module with a TCXO, nice I/O, and 3.3 V logic. Though we could not find exact flight heritage for the module, the success of previous thoroughly vetted SX-based modules in CubeSats, along with the advice of many experts, convinced us to choose it as the final transceiver for the satellite.
+The EByte E22-400T30D is a pure LoRa transceiver that wraps everything we want for UHF: an SX1262 transceiver module with a TCXO, nice I/O, and 3.3 V logic. Though we could not find exact flight heritage for the module, the success of previous thoroughly vetted SX-based modules in CubeSats, along with the advice of many experts, convinced us to choose it for the satellite's 435 MHz UHF link. A separate 2.4 GHz S-band link completes the dual-band system.
 
 #### `AT+UFREQ` pain
 The EByte module operates on 83 channels, with a base frequency of 410.125 MHz. On channel 25, we should theoretically get a frequency of 435.125 MHz, which is close to the amateur radio band we are permitted to use. However, to conform to regulations, we must transmit and receive at exactly 435 MHz. To do this, we need to use the `AT+UFREQ` command, but according to the manual, "Detailed documentation for instruction operations is available through EBYTE sales channels." We reached out to EByte but have not received a response, so we reverse-engineered our best interpretation from the manual for the EWM226-900H30S.
@@ -108,7 +109,7 @@ We still need to verify this with dedicated RF hardware.
 
 ## Ground Network
 
-UHF also has strong ground network support: the SatNOGS and TinyGS networks provide worldwide downlink connectivity for amateur satellites like ours.
+Our UHF and 2.4 GHz S-band links can draw on established ground infrastructure. The SatNOGS and TinyGS networks provide worldwide downlink connectivity for amateur satellites like ours, with network support varying by band.
 
 Due to regulations, these networks generally cannot provide uplink connectivity; however, specific operators might be able to provide it on a case-by-case basis.
 
@@ -180,11 +181,9 @@ pub struct Example {
 ## Closing thoughts
 
 Our current stack is a necessity given the tight requirements we operate under.
-This comms stack costs less than $100: one of, if not, the lowest cost of any cubesat comms system.
-For a relatively low bandwidth mission like this, this stack is of course optimal, however this does not scale:
-COTS chips don't work on S or X bands.
+The transceiver stack costs less than $100, making it one of the lowest-cost CubeSat radio links we know of.
 
-As of now, we have verified that the system works with two-way communication on earth,
+As of now, we have verified that the system works with two-way communication on Earth,
 but we have yet to extensively vibe test or thermal cycle the system.
 
 We also still need a ground station for uplink capabilities.
