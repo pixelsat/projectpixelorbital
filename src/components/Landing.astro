@@ -15,7 +15,7 @@ import weston from "../assets/images/wy_ppo.jpeg";
 import ashwin from "../assets/images/an_ppo.png";
 import francesca from "../assets/images/fd_ppo.webp";
 import james from "../assets/images/jl_ppo.png";
-import olivia from "../assets/images/ok_ppo.png"
+import olivia from "../assets/images/ok_ppo.png";
 import earthSpace from "../../Earth-space.jpg";
 import pixelSat from "../assets/images/pixelsattransparentrender.png";
 import { formatDate } from "../scripts/date.ts";
@@ -70,7 +70,7 @@ const systems = [
   },
   {
     title: "Power",
-link: "/electrical-1",
+    link: "/electrical-1",
     body: "Our battery pack is a 7.4V lithium-ion battery pack powered by high-efficiency solar panels. The satellite runs on a 3.3V bus regulated by a custom power controller, with other (higher voltage) dedicated buses for the communications system and the magnetorquers.",
   },
 ];
@@ -87,12 +87,20 @@ const team = [
     image: vinayak,
   },
   { name: "Aadish Verma", role: "Comms lead · software", image: aadish },
-  { name: "Weston Yoo", role: "Project Founder · Project Manager", image: weston },
+  {
+    name: "Weston Yoo",
+    role: "Project Founder · Project Manager",
+    image: weston,
+  },
   { name: "Daphne F", role: "Outreach lead", initials: "DF" },
   { name: "James Lu", role: "Software · structural", image: james },
   { name: "Vikrant Chintanaboina", role: "Thermal", initials: "VC" },
   { name: "Jahnavi Naren", role: "Software · structural", initials: "JN" },
-  { name: "Olivia Kaiser", role: "Electrical · structural · outreach", image: olivia },
+  {
+    name: "Olivia Kaiser",
+    role: "Electrical · structural · outreach",
+    image: olivia,
+  },
   { name: "Grace Zheng", role: "Structural · media", image: grace },
   {
     name: "Francesca Davies",
@@ -119,145 +127,176 @@ const snapshot = [
 ---
 
 <div class="min-h-screen">
-  <div class="hero-snap-point flex min-h-svh flex-col">
-    <SiteHeader homeHref="#top" home />
+  <!--
+    Pinned parallax hero. The wrapper is taller than the viewport; the inner
+    frame sticks to the top while the page scrolls through the extra height,
+    and the script below maps that scroll progress onto the Earth zoom, the
+    text exit, the satellite drift, and the final fade into the content.
+  -->
+  <div class="hero-pin" data-hero-wrap>
+    <div class="hero-pin-frame flex h-svh flex-col overflow-hidden bg-black">
+      <SiteHeader homeHref="#top" home />
 
-    <section
-      id="top"
-      class="hero-orbit relative isolate flex flex-1 overflow-hidden bg-black"
-    >
-      <Picture
-        src={earthSpace}
-        formats={["avif"]}
-        widths={[480, 768, 1280, 1920, 2560, 2880, 3840]}
-        sizes="100vw"
-        quality={85}
-        alt="Earth seen from space"
-        class="hero-earth-image absolute inset-0 -z-20 size-full object-cover object-center"
-        loading="eager"
-        fetchpriority="high"
-      />
-      <div class="hero-earth-shade absolute inset-0 -z-10"></div>
-
-      <Picture
-        src={pixelSat}
-        formats={["avif"]}
-        quality={85}
-        alt=""
-        aria-hidden="true"
-        class="hero-satellite"
-        loading="eager"
-        fetchpriority="high"
-      />
-
-      <div
-        class="relative z-[2] mx-auto flex w-full max-w-[1040px] flex-1 flex-col justify-between gap-12 px-5 py-7 sm:py-10"
+      <section
+        id="top"
+        class="hero-orbit relative isolate flex flex-1 overflow-hidden bg-black"
       >
-        <div class="flex max-w-[700px] flex-col items-start gap-5">
-          <div class="hero-rise" style="--rise-delay: 80ms">
-            <Text variant="caption" tone="white"> PixelSat I </Text>
-          </div>
-          <div class="hero-rise" style="--rise-delay: 150ms">
-            <Text
-              variant="display"
-              tone="white"
-              class="max-w-[12ch] text-[clamp(3rem,6vw,5.5rem)] leading-[0.94]"
-            >
-              A CubeSat built by high schoolers
-            </Text>
-          </div>
-          <div class="hero-rise" style="--rise-delay: 220ms">
-            <Text variant="subheading" tone="white" class="max-w-[62ch]">
-              Project Pixel Orbital is a fully student-led team at Stanford
-              Online High School building PixelSat I, a 3U CubeSat targeting
-              launch into sun-synchronous low Earth orbit in early 2027, from
-              scratch, on an extremely limited budget.
-            </Text>
-          </div>
-
-          <div
-            class="hero-rise flex flex-wrap items-center gap-3 pt-1"
-            style="--rise-delay: 290ms"
-          >
-            <OuterLink
-              href="https://www.gofundme.com/f/support-project-pixel-orbital-student-team"
-              button
-              primary
-            >
-              Donate to PixelSat I
-              <IconExternalLink />
-            </OuterLink>
-            <OuterLink
-              href="https://www.instagram.com/projectpixelorbital/"
-              button
-              transparent
-              class="text-white hover:bg-white/10 backdrop-blur-sm"
-              aria-label="Project Pixel Orbital on Instagram"
-            >
-              <BrandInstagram />
-            </OuterLink>
-            <OuterLink
-              href="https://www.youtube.com/@projectpixelorbital2026"
-              button
-              transparent
-              class="text-white hover:bg-white/10 backdrop-blur-sm"
-              aria-label="Project Pixel Orbital on YouTube"
-            >
-              <BrandYoutube />
-            </OuterLink>
-          </div>
-        </div>
-
-        <div
-          class="relative -top-6 grid max-w-[720px] gap-2.5 sm:-top-12 sm:grid-cols-3 lg:-top-16"
-        >
-          {
-            stats.map((stat, index) => (
-              <div
-                class="hero-rise rounded-[14px] bg-black/45 px-4 py-3.5 backdrop-blur-sm"
-                style={`--rise-delay: ${360 + index * 70}ms`}
-              >
-                <Text
-                  tag="div"
-                  variant="subheading"
-                  tone="white"
-                  class="text-[17px]"
-                >
-                  {stat.value}
-                </Text>
-                <Text
-                  tag="div"
-                  variant="caption"
-                  tone="white"
-                  class="mt-1 text-[14px] leading-[1.3]"
-                >
-                  {stat.label}
-                </Text>
-              </div>
-            ))
-          }
-        </div>
-      </div>
-
-      <div class="hero-earth-foreground" aria-hidden="true">
         <Picture
           src={earthSpace}
           formats={["avif"]}
           widths={[480, 768, 1280, 1920, 2560, 2880, 3840]}
           sizes="100vw"
           quality={85}
-          alt=""
-          class="absolute inset-0 size-full object-cover object-center"
+          alt="Earth seen from space"
+          class="hero-earth-image absolute inset-0 -z-20 size-full object-cover object-center"
           loading="eager"
           fetchpriority="high"
+          data-hero-earth
         />
-        <div class="hero-earth-shade absolute inset-0"></div>
-      </div>
-    </section>
+        <div class="hero-earth-shade absolute inset-0 -z-10"></div>
+
+        <div class="hero-satellite" data-hero-sat>
+          <Picture
+            src={pixelSat}
+            formats={["avif"]}
+            quality={85}
+            alt=""
+            aria-hidden="true"
+            class="hero-satellite-image w-full"
+            loading="eager"
+            fetchpriority="high"
+          />
+        </div>
+
+        <div
+          class="relative z-[2] mx-auto flex w-full max-w-[1040px] flex-1 flex-col justify-between gap-12 px-5 py-7 sm:py-10"
+        >
+          <div
+            class="hero-exit flex max-w-[700px] flex-col items-start gap-5"
+            data-hero-text
+          >
+            <div class="hero-fade" style="--fade-delay: 80ms">
+              <Text variant="caption" tone="white"> PixelSat I </Text>
+            </div>
+            <div class="hero-fade" style="--fade-delay: 150ms">
+              <Text
+                variant="display"
+                tone="white"
+                class="max-w-[12ch] text-[clamp(3rem,6vw,5.5rem)] leading-[0.94]"
+              >
+                A CubeSat built by high schoolers
+              </Text>
+            </div>
+            <div class="hero-fade" style="--fade-delay: 220ms">
+              <Text
+                variant="subheading"
+                tone="white"
+                class="max-w-[62ch] max-sm:text-[17px]"
+              >
+                Project Pixel Orbital is a fully student-led team at Stanford
+                Online High School building PixelSat I, a 3U CubeSat targeting
+                launch into sun-synchronous low Earth orbit in early 2027, from
+                scratch, on an extremely limited budget.
+              </Text>
+            </div>
+
+            <div
+              class="hero-fade flex flex-wrap items-center gap-3 pt-1"
+              style="--fade-delay: 290ms"
+            >
+              <OuterLink
+                href="https://www.gofundme.com/f/support-project-pixel-orbital-student-team"
+                button
+                primary
+              >
+                Donate to PixelSat I
+                <IconExternalLink />
+              </OuterLink>
+              <OuterLink
+                href="https://www.instagram.com/projectpixelorbital/"
+                button
+                transparent
+                class="text-white hover:bg-white/10 backdrop-blur-sm"
+                aria-label="Project Pixel Orbital on Instagram"
+              >
+                <BrandInstagram />
+              </OuterLink>
+              <OuterLink
+                href="https://www.youtube.com/@projectpixelorbital2026"
+                button
+                transparent
+                class="text-white hover:bg-white/10 backdrop-blur-sm"
+                aria-label="Project Pixel Orbital on YouTube"
+              >
+                <BrandYoutube />
+              </OuterLink>
+            </div>
+          </div>
+
+          <!--
+            The entrance animation and the scroll-driven exit live on separate
+            elements: a `forwards` animation would otherwise override the
+            inline opacity the script writes.
+          -->
+          <div
+            class="hero-exit relative -top-6 sm:-top-12 lg:-top-16"
+            data-hero-stats
+          >
+            <div
+              class="hero-fade grid max-w-[720px] grid-cols-3 gap-2 sm:gap-2.5"
+              style="--fade-delay: 380ms"
+            >
+              {
+                stats.map((stat) => (
+                  <div class="rounded-[14px] bg-black/45 px-3 py-2.5 backdrop-blur-sm sm:px-4 sm:py-3.5">
+                    <Text
+                      tag="div"
+                      variant="subheading"
+                      tone="white"
+                      class="text-[15px] sm:text-[17px]"
+                    >
+                      {stat.value}
+                    </Text>
+                    <Text
+                      tag="div"
+                      variant="caption"
+                      tone="white"
+                      class="mt-1 text-[12px] leading-[1.3] sm:text-[14px]"
+                    >
+                      {stat.label}
+                    </Text>
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="hero-scroll-cue absolute bottom-5 left-1/2 z-[4] -translate-x-1/2"
+          aria-hidden="true"
+          data-hero-cue
+        >
+          <span
+            class="hero-fade flex items-center gap-2 text-[13px] font-medium tracking-[0.14em] uppercase text-white/65"
+            style="--fade-delay: 900ms"
+          >
+            Scroll ↓
+          </span>
+        </div>
+
+        <div
+          class="absolute inset-0 z-[5] bg-background opacity-0 pointer-events-none"
+          aria-hidden="true"
+          data-hero-fade
+        >
+        </div>
+      </section>
+    </div>
   </div>
 
   <main
-    class="content-snap-point mx-auto flex w-[min(1040px,calc(100vw-40px))] flex-col gap-14 py-14 pb-16"
+    class="mx-auto flex w-[min(1040px,calc(100vw-40px))] flex-col gap-14 py-14 pb-16"
   >
     {
       blogPosts.length > 0 && (
@@ -344,23 +383,23 @@ const snapshot = [
 
       <div class="grid gap-3 md:grid-cols-2">
         {
-            systems.map((system) => (
-                <a
-                href={system.link}
-                class="group flex flex-col gap-2.5 rounded-[16px] bg-elevated-3 p-5 transition-colors hover:bg-elevated-5 focus-visible:outline-2 focus-visible:outline-primary"
-                >
-                <Text
-                    variant="heading"
-                    class="group-hover:text-primary transition-colors"
-                >
-                    {system.title}
-                </Text>
+          systems.map((system) => (
+            <a
+              href={system.link}
+              class="group flex flex-col gap-2.5 rounded-[16px] bg-elevated-3 p-5 transition-colors hover:bg-elevated-5 focus-visible:outline-2 focus-visible:outline-primary"
+            >
+              <Text
+                variant="heading"
+                class="group-hover:text-primary transition-colors"
+              >
+                {system.title}
+              </Text>
 
-                <Text variant="subheading" tone="secondary">
-                    {system.body}
-                </Text>
-                </a>
-            ))
+              <Text variant="subheading" tone="secondary">
+                {system.body}
+              </Text>
+            </a>
+          ))
         }
       </div>
 
@@ -448,11 +487,11 @@ const snapshot = [
   ).matches;
 
   if (!reducedMotion) {
+    document.documentElement.classList.add("motion-ready");
+
     const revealItems = document.querySelectorAll<HTMLElement>(
       "[data-scroll-reveal]",
     );
-
-    document.documentElement.classList.add("motion-ready");
 
     const revealObserver = new IntersectionObserver(
       (entries, observer) => {
@@ -466,5 +505,86 @@ const snapshot = [
     );
 
     revealItems.forEach((item) => revealObserver.observe(item));
+  }
+
+  // Pinned parallax hero. Progress `p` runs 0 → 1 while the hero is pinned
+  // and drives every layer; it is derived from the wrapper's position so it
+  // stays correct on resize and when the page loads mid-scroll.
+  const query = <T extends HTMLElement>(selector: string) =>
+    document.querySelector<T>(selector);
+
+  const wrap = query("[data-hero-wrap]");
+  const earth = query("[data-hero-earth]");
+  const sat = query("[data-hero-sat]");
+  const text = query("[data-hero-text]");
+  const stats = query("[data-hero-stats]");
+  const cue = query("[data-hero-cue]");
+  const fade = query("[data-hero-fade]");
+
+  if (wrap && !reducedMotion) {
+    // How far past the first viewport the hero stays pinned, in vh.
+    const PIN_LENGTH_VH = 150;
+    // Scales every parallax displacement; 1 matches the approved design.
+    const INTENSITY = 1;
+
+    wrap.style.height = `calc(100svh + ${PIN_LENGTH_VH}vh)`;
+
+    const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
+    const px = (value: number) => `${value.toFixed(1)}px`;
+
+    const update = () => {
+      const vh = window.innerHeight;
+      const total = Math.max(1, wrap.offsetHeight - vh);
+      const p = clamp01(-wrap.getBoundingClientRect().top / total);
+      const k = INTENSITY;
+      const easeOut = 1 - Math.pow(1 - p, 2);
+
+      if (earth) {
+        const scale =
+          1.45 -
+          0.45 * easeOut * Math.min(k, 1) -
+          0.45 * Math.max(0, k - 1) * easeOut * 0.3;
+        earth.style.transform = `scale(${scale.toFixed(4)})`;
+      }
+
+      if (text) {
+        text.style.opacity = String(1 - clamp01(p / 0.4));
+        text.style.transform = `translate3d(0, ${px(-140 * easeOut * k)}, 0)`;
+      }
+
+      if (stats) {
+        stats.style.opacity = String(1 - clamp01((p - 0.06) / 0.44));
+        stats.style.transform = `translate3d(0, ${px(-90 * easeOut * k)}, 0)`;
+      }
+
+      if (sat) {
+        const tx = -window.innerWidth * 0.09 * p * k;
+        const ty = -vh * 0.1 * p * k;
+        sat.style.transform = `translate3d(${px(tx)}, ${px(ty)}, 0) rotate(${(-9 * p).toFixed(2)}deg) scale(${(1 - 0.12 * p).toFixed(3)})`;
+        sat.style.opacity = String(1 - clamp01((p - 0.65) / 0.35));
+      }
+
+      if (fade) {
+        fade.style.opacity = String(clamp01((p - 0.85) / 0.15) * 0.9);
+      }
+
+      if (cue) {
+        cue.style.opacity = String(1 - clamp01(p / 0.12));
+      }
+    };
+
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        update();
+        ticking = false;
+      });
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    update();
   }
 </script>

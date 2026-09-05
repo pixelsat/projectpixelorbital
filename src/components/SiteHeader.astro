@@ -1,9 +1,6 @@
 ---
 import logo from "../assets/images/ppologodark.png";
-import OuterLink from "./OuterLink.astro";
-import IconExternalLink from "./icons/IconExternalLink.astro";
 import Text from "./Text.astro";
-import { getCollection } from "astro:content";
 
 interface Props {
   homeHref?: string;
@@ -11,7 +8,6 @@ interface Props {
 }
 
 const { homeHref = "/", home = false } = Astro.props;
-const blogPosts = await getCollection("blog");
 ---
 
 <header
@@ -61,6 +57,9 @@ const blogPosts = await getCollection("blog");
       </a>
       <a href="/blog" class="py-2">
         <Text variant="nav" tone="tertiary">Blog</Text>
+      </a>
+      <a href="/sponsors" class="py-2">
+        <Text variant="nav" tone="tertiary">Sponsors</Text>
       </a>
     </nav>
   </div>

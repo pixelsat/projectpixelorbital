@@ -72,19 +72,6 @@
     background: var(--background);
   }
 
-  /* The landing page has two snap points only. Because the second point is a
-     main element taller than the viewport, browsers leave its inner scrolling
-     unconstrained after snapping past the hero. */
-  html.snap-hero-scroll {
-    scroll-snap-type: y mandatory;
-  }
-
-  html.snap-hero-scroll .hero-snap-point,
-  html.snap-hero-scroll .content-snap-point {
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
-  }
-
   body {
     min-height: 100vh;
     margin: 0;
@@ -104,8 +91,23 @@
   }
 }
 
-/* The duplicated foreground is clipped to the planet's horizon. Hero elements
-   begin below it, so their entrance reads as coming out from behind Earth. */
+/* Pinned parallax hero. The wrapper's height is set by the landing script
+   (100svh + pin length); the frame sticks while the page scrolls through it. */
+.hero-pin {
+  height: 100svh;
+}
+
+.hero-pin-frame {
+  position: sticky;
+  top: 0;
+}
+
+.hero-earth-image {
+  transform: scale(1.45);
+  transform-origin: 50% 62%;
+  will-change: transform;
+}
+
 .hero-earth-shade {
   background: linear-gradient(
     180deg,
@@ -115,36 +117,15 @@
   );
 }
 
-.hero-earth-foreground {
-  position: absolute;
-  z-index: 3;
-  inset: 0;
-  pointer-events: none;
-  clip-path: polygon(
-    0 67%,
-    8% 65.8%,
-    16% 64.6%,
-    24% 63.4%,
-    32% 62.2%,
-    40% 61.4%,
-    50% 60.9%,
-    60% 61.2%,
-    70% 62%,
-    80% 63.3%,
-    90% 65%,
-    100% 67.2%,
-    100% 100%,
-    0 100%
-  );
-  animation: release-earth 650ms cubic-bezier(0.33, 1, 0.68, 1) 1.15s forwards;
+/* Layers the scroll script moves and fades out as the hero releases. */
+.hero-exit {
+  will-change: transform, opacity;
 }
 
-.hero-rise {
+.hero-fade {
   opacity: 0;
-  transform: translate3d(0, min(46svh, 390px), 0);
-  animation: rise-from-earth 1.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  animation-delay: var(--rise-delay, 80ms);
-  will-change: transform, opacity;
+  animation: hero-fade 900ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: var(--fade-delay, 80ms);
 }
 
 .hero-satellite {
@@ -153,54 +134,34 @@
   top: 8%;
   right: max(-5rem, calc((100vw - 1240px) / 2));
   width: clamp(190px, 25vw, 360px);
-  filter: drop-shadow(0 24px 32px rgb(0 0 0 / 55%));
-  opacity: 0;
-  transform: translate3d(12vw, 68svh, 0) rotate(18deg) scale(0.72);
-  animation: satellite-from-earth 1.75s cubic-bezier(0.16, 1, 0.3, 1) 180ms
-    forwards;
   will-change: transform, opacity;
 }
 
-@keyframes rise-from-earth {
-  0% {
+.hero-satellite-image {
+  filter: drop-shadow(0 24px 32px rgb(0 0 0 / 55%));
+  opacity: 0;
+  animation: satellite-in 1.4s cubic-bezier(0.16, 1, 0.3, 1) 250ms forwards;
+}
+
+@keyframes hero-fade {
+  from {
     opacity: 0;
-    transform: translate3d(0, min(46svh, 390px), 0);
+    transform: translate3d(0, 28px, 0);
   }
-  14% {
+  to {
     opacity: 1;
-  }
-  100% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
+    transform: none;
   }
 }
 
-@keyframes satellite-from-earth {
-  0% {
+@keyframes satellite-in {
+  from {
     opacity: 0;
-    transform: translate3d(12vw, 68svh, 0) rotate(18deg) scale(0.72);
+    transform: translate3d(6vw, 10vh, 0) rotate(8deg) scale(0.85);
   }
-  22% {
-    opacity: 1;
-  }
-  100% {
+  to {
     opacity: 0.88;
-    transform: translate3d(0, 0, 0) rotate(-5deg) scale(1);
-  }
-}
-
-@keyframes release-earth {
-  0% {
-    opacity: 1;
-    visibility: visible;
-  }
-  99% {
-    opacity: 0;
-    visibility: visible;
-  }
-  100% {
-    opacity: 0;
-    visibility: hidden;
+    transform: rotate(-5deg);
   }
 }
 
@@ -222,7 +183,6 @@
     top: 3%;
     right: -76px;
     width: 205px;
-    opacity: 0;
   }
 }
 
@@ -231,20 +191,25 @@
     scroll-behavior: auto;
   }
 
-  html.snap-hero-scroll {
-    scroll-snap-type: none;
+  .hero-earth-image {
+    transform: scale(1.08);
   }
 
-  .hero-earth-foreground {
+  .hero-scroll-cue {
     display: none;
   }
 
-  .hero-rise,
-  .hero-satellite,
+  .hero-fade,
+  .hero-satellite-image,
   .motion-ready [data-scroll-reveal] {
     animation: none;
     opacity: 1;
     transform: none;
     transition: none;
+  }
+
+  .hero-satellite-image {
+    opacity: 0.88;
+    transform: rotate(-5deg);
   }
 }

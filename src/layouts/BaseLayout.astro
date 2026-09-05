@@ -8,7 +8,6 @@ interface Props {
   description?: string;
   image?: string;
   url?: string;
-  snapHeroScroll?: boolean;
 }
 
 const {
@@ -16,7 +15,6 @@ const {
   description = "Student-led CubeSat mission launching by 2026.",
   image,
   url,
-  snapHeroScroll = false,
 } = Astro.props;
 
 const pageUrl = url ?? Astro.url.href;
@@ -24,10 +22,7 @@ const socialImage = new URL(image ?? logo.src, Astro.site ?? Astro.url).href;
 ---
 
 <!doctype html>
-<html
-  lang="en"
-  class:list={["scroll-smooth dark", snapHeroScroll && "snap-hero-scroll"]}
->
+<html lang="en" class="scroll-smooth dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />

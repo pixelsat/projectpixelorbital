@@ -16,6 +16,6 @@ const blogPosts = (await getCollection("blog"))
   }));
 ---
 
-<BaseLayout snapHeroScroll>
+<BaseLayout>
   <Landing blogPosts={blogPosts} />
 </BaseLayout>

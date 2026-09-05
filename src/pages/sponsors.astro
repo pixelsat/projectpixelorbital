@@ -1,0 +1,49 @@
+---
+import {getCollection, type CollectionEntry} from "astro:content";
+import SiteHeader from "../components/SiteHeader.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Text from "../components/Text.astro";
+import {formatDate} from "../scripts/date.ts";
+
+const DONORS = {
+    "Michael Haase": {"amount": 300},
+    "Janet Ivey-Duensing": {"amount": 235},
+    "Alison Henderson": {"amount": 150},
+    "Adriana D": {"amount": 100},
+    "R Lombardi": {"amount": 100},
+    "Mark Davies": {"amount": 100},
+    "Nicola Davies": {"amount": 100},
+    "Ajmal Alib": {"amount": 100},
+    "Rachel Tillman": {"amount": 25},
+    "Daniel Odio": {"amount": 50},
+    "Holly N": {"amount": 30},
+    "Valentino D": {"amount": 30},
+    "Gwyndolen H": {"amount": 30},
+    "Gia O": {"amount": 30},
+    "Kelsie J": {"amount": 30},
+    "terrell outlay": {"amount": 25},
+    "Rose Martin": {"amount": 20},
+    "Tyree Portis": {"amount": 10},
+    "Chad Sperry": {"amount": 10},
+    "Megan Temple": {"amount": 10},
+    "Bikash Agarwalla": {"amount": 100},
+    "Pawan Pawan": {"amount": 100},
+    "Sunil Kumar": {"amount": 100},
+    "Logan Krause": {"amount": 35},
+    "Grace Ahn": {"amount": 5}
+};
+---
+
+<BaseLayout title="Sponsors | Project Pixel Orbital">
+    <div class="min-h-screen">
+        <SiteHeader/>
+
+        <main
+                class="mx-auto flex w-[min(1040px,calc(100vw-40px))] flex-col gap-8 py-8 pb-[72px] max-md:pb-14"
+        >
+            <section class="flex flex-col gap-[14px]">
+                <Text variant="display">Sponsors</Text>
+            </section>
+        </main>
+    </div>
+</BaseLayout>
