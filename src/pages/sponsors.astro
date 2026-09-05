@@ -5,7 +5,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import Text from "../components/Text.astro";
 import {formatDate} from "../scripts/date.ts";
 
-const DONORS = {
+const SPONSORS: Record<string, Record<string, any>> = {
     "Michael Haase": {"amount": 300},
     "Janet Ivey-Duensing": {"amount": 235},
     "Alison Henderson": {"amount": 150},
@@ -44,6 +44,16 @@ const DONORS = {
             <section class="flex flex-col gap-[14px]">
                 <Text variant="display">Sponsors</Text>
             </section>
+            <div class="grid lg:grid-cols-5 md:grid-cols-3 grid-cols-2">
+                {
+                    Object.keys(SPONSORS).map((sponsor) => {
+
+                        return (
+                                <p>{sponsor}</p>
+                        );
+                    })
+                }
+            </div>
         </main>
     </div>
 </BaseLayout>
