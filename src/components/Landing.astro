@@ -133,7 +133,9 @@ const snapshot = [
     text exit, the satellite drift, and the final fade into the content.
   -->
   <div class="hero-pin" data-hero-wrap>
-    <div class="hero-pin-frame flex h-svh flex-col overflow-hidden bg-black">
+    <div
+      class="hero-pin-frame relative flex h-svh flex-col overflow-hidden bg-black"
+    >
       <SiteHeader homeHref="#top" home />
 
       <section
@@ -284,13 +286,18 @@ const snapshot = [
           </span>
         </div>
 
-        <div
-          class="absolute inset-0 z-[5] bg-background opacity-0 pointer-events-none"
-          aria-hidden="true"
-          data-hero-fade
-        >
-        </div>
       </section>
+
+      <!--
+        Covers the whole frame (header included, but painted under the nav)
+        so the hero resolves to exactly the page background with no seam.
+      -->
+      <div
+        class="absolute inset-0 z-[5] bg-background opacity-0 pointer-events-none"
+        aria-hidden="true"
+        data-hero-fade
+      >
+      </div>
     </div>
   </div>
 
@@ -522,7 +529,7 @@ const snapshot = [
 
   if (wrap && !reducedMotion) {
     // How far past the first viewport the hero stays pinned, in vh.
-    const PIN_LENGTH_VH = 150;
+    const PIN_LENGTH_VH = 110;
     // Scales every parallax displacement; 1 matches the approved design.
     const INTENSITY = 1;
 
@@ -546,25 +553,32 @@ const snapshot = [
         earth.style.transform = `scale(${scale.toFixed(4)})`;
       }
 
+      // Exit order: headline, then stats, then the satellite, then the Earth
+      // fade below. Each layer starts before the previous one has finished.
       if (text) {
-        text.style.opacity = String(1 - clamp01(p / 0.4));
+        text.style.opacity = String(1 - clamp01(p / 0.3));
         text.style.transform = `translate3d(0, ${px(-140 * easeOut * k)}, 0)`;
       }
 
       if (stats) {
-        stats.style.opacity = String(1 - clamp01((p - 0.06) / 0.44));
+        stats.style.opacity = String(1 - clamp01((p - 0.05) / 0.33));
         stats.style.transform = `translate3d(0, ${px(-90 * easeOut * k)}, 0)`;
       }
 
       if (sat) {
-        const tx = -window.innerWidth * 0.09 * p * k;
-        const ty = -vh * 0.1 * p * k;
-        sat.style.transform = `translate3d(${px(tx)}, ${px(ty)}, 0) rotate(${(-9 * p).toFixed(2)}deg) scale(${(1 - 0.12 * p).toFixed(3)})`;
-        sat.style.opacity = String(1 - clamp01((p - 0.65) / 0.35));
+        // Recedes up and to the right, away from the headline, shrinking as
+        // the camera pulls back from the Earth.
+        const drift = easeOut * k;
+        const tx = window.innerWidth * 0.08 * drift;
+        const ty = -vh * 0.3 * drift;
+        sat.style.transform = `translate3d(${px(tx)}, ${px(ty)}, 0) rotate(${(-6 * easeOut).toFixed(2)}deg) scale(${(1 - 0.3 * easeOut).toFixed(3)})`;
+        sat.style.opacity = String(1 - clamp01((p - 0.15) / 0.35));
       }
 
       if (fade) {
-        fade.style.opacity = String(clamp01((p - 0.85) / 0.15) * 0.9);
+        // Lands on the page background right as the pin releases, so there is
+        // no stretch of flat colour to scroll through.
+        fade.style.opacity = String(clamp01((p - 0.62) / 0.33));
       }
 
       if (cue) {

@@ -13,7 +13,7 @@ const { homeHref = "/", home = false } = Astro.props;
 <header
   class:list={[
     home
-      ? "w-full bg-black"
+      ? "relative z-10 w-full"
       : "mx-auto w-[min(1040px,calc(100vw-40px))] border-b border-elevated-10",
   ]}
 >
