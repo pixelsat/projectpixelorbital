@@ -9,6 +9,8 @@ Welcome to the third post in our series about the PixelSat I software stack.
 [Part 1](/software-1) covered communications, and [Part 2](/software-2) covered attitude determination and control.
 This post is about the microcontroller tying both together, and the software running on it.
 
+A blog post about our payload computer, the software running on it, and what it enables us to do is coming in the future.
+
 ## Onboard computer
 
 Every input and output eventually passes through the onboard computer (OBC).
