@@ -154,6 +154,20 @@
   }
 }
 
+.hero-scroll-chevron {
+  animation: chevron-bob 2.4s ease-in-out infinite;
+}
+
+@keyframes chevron-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(5px);
+  }
+}
+
 @keyframes satellite-in {
   from {
     opacity: 0;

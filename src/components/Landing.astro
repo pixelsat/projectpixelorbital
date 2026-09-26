@@ -274,12 +274,20 @@ const snapshot = [
           aria-hidden="true"
           data-hero-cue
         >
-          <span
-            class="hero-fade flex items-center gap-2 text-[13px] font-medium tracking-[0.14em] uppercase text-white/65"
-            style="--fade-delay: 900ms"
-          >
-            Scroll ↓
-          </span>
+          <div class="hero-fade" style="--fade-delay: 900ms">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="hero-scroll-chevron size-7 text-white/60"
+            >
+              <path d="M6 9l6 6l6 -6"></path>
+            </svg>
+          </div>
         </div>
 
         <div
