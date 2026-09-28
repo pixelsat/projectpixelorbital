@@ -118,53 +118,287 @@ const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 const smooth = (t: number) => t * t * (3 - 2 * t);
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
-function solarPanelTexture() {
-  const w = 256;
-  const h = 874; // matches the 82 × 280 mm panel
-  const canvas = document.createElement("canvas");
-  canvas.width = w;
-  canvas.height = h;
-  const ctx = canvas.getContext("2d")!;
-  ctx.fillStyle = "#15171c";
-  ctx.fillRect(0, 0, w, h);
+// Side panel PCB in mm. Texture maps are drawn in these units, top of the
+// panel at y = 0.
+const PANEL = { w: 82, h: 280, thickness: 1.6 };
+const PX_PER_MM = 8;
 
-  // 2 × 3 triple-junction cells with clipped corners and silver fingers.
-  const cw = 112;
-  const ch = 250;
-  const gx = (w - cw * 2) / 3;
-  const gy = (h - ch * 3) / 4;
-  for (let row = 0; row < 3; row++) {
-    for (let col = 0; col < 2; col++) {
-      const x = gx + col * (cw + gx);
-      const y = gy + row * (ch + gy);
-      const c = 12;
-      const grad = ctx.createLinearGradient(x, y, x + cw, y + ch);
-      grad.addColorStop(0, "#23285a");
-      grad.addColorStop(1, "#141838");
-      ctx.fillStyle = grad;
+// Anything drawn on the panel sets all three maps at once: albedo, a packed
+// surface map (R = coverglass, which drives clearcoat and iridescence;
+// G = roughness; B = metalness), and a height map turned into normals.
+interface Finish {
+  color: string;
+  coat: number;
+  rough: number;
+  metal: number;
+  height: number;
+}
+const SOLDERMASK: Finish = {
+  color: "#0c0d10",
+  coat: 0,
+  rough: 0.55,
+  metal: 0,
+  height: 0.2,
+};
+const SILVER: Finish = {
+  color: "#c4c7cf",
+  coat: 0,
+  rough: 0.3,
+  metal: 1,
+  height: 0.8,
+};
+const GOLD: Finish = {
+  color: "#c9a45a",
+  coat: 0,
+  rough: 0.3,
+  metal: 1,
+  height: 0.3,
+};
+
+function solarPanelMaps(anisotropy: number) {
+  const layer = () => {
+    const canvas = document.createElement("canvas");
+    canvas.width = PANEL.w * PX_PER_MM;
+    canvas.height = PANEL.h * PX_PER_MM;
+    const ctx = canvas.getContext("2d")!;
+    ctx.scale(PX_PER_MM, PX_PER_MM);
+    return ctx;
+  };
+  const albedo = layer();
+  const surface = layer();
+  const height = layer();
+  const byte = (v: number) => Math.round(v * 255);
+  const paint = (f: Finish, path: (ctx: CanvasRenderingContext2D) => void) => {
+    const layers: [CanvasRenderingContext2D, string][] = [
+      [albedo, f.color],
+      [surface, `rgb(${byte(f.coat)},${byte(f.rough)},${byte(f.metal)})`],
+      [height, `rgb(${byte(f.height)},0,0)`],
+    ];
+    for (const [ctx, style] of layers) {
+      ctx.fillStyle = style;
       ctx.beginPath();
+      path(ctx);
+      ctx.fill();
+    }
+  };
+  const rect =
+    (x: number, y: number, w: number, h: number) =>
+    (ctx: CanvasRenderingContext2D) =>
+      ctx.rect(x, y, w, h);
+  const circle =
+    (x: number, y: number, r: number) => (ctx: CanvasRenderingContext2D) =>
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+  // Cells are cut two to a round wafer, so the two corners on the wafer's
+  // edge are cropped.
+  const croppedCell =
+    (x: number, y: number, w: number, h: number, c: number) =>
+    (ctx: CanvasRenderingContext2D) => {
       ctx.moveTo(x + c, y);
-      ctx.lineTo(x + cw - c, y);
-      ctx.lineTo(x + cw, y + c);
-      ctx.lineTo(x + cw, y + ch - c);
-      ctx.lineTo(x + cw - c, y + ch);
-      ctx.lineTo(x + c, y + ch);
-      ctx.lineTo(x, y + ch - c);
+      ctx.lineTo(x + w - c, y);
+      ctx.lineTo(x + w, y + c);
+      ctx.lineTo(x + w, y + h);
+      ctx.lineTo(x, y + h);
       ctx.lineTo(x, y + c);
       ctx.closePath();
-      ctx.fill();
-      ctx.fillStyle = "rgba(200, 205, 220, 0.35)";
-      for (let fy = y + 10; fy < y + ch - 6; fy += 9) {
-        ctx.fillRect(x + 3, fy, cw - 6, 1);
-      }
-      ctx.fillStyle = "rgba(210, 214, 226, 0.8)";
-      ctx.fillRect(x + 4, y + 3, cw - 8, 3);
+    };
+  let seed = 7;
+  const random = () => {
+    seed = (seed * 16807) % 2147483647;
+    return seed / 2147483647;
+  };
+
+  paint(SOLDERMASK, rect(0, 0, PANEL.w, PANEL.h));
+
+  // A few traces under the soldermask, from the end pads to the sensors.
+  const trace = { ...SOLDERMASK, color: "#111216", height: 0.26 };
+  paint(trace, rect(40.6, 12, 0.8, 30));
+  paint(trace, rect(20, 41.2, 21.4, 0.8));
+  paint(trace, rect(55, 22, 0.6, 20));
+
+  // Mounting holes in the corners.
+  for (const x of [4.5, PANEL.w - 4.5]) {
+    for (const y of [4.5, PANEL.h - 4.5]) {
+      paint({ ...SILVER, rough: 0.4, height: 0.3 }, circle(x, y, 3));
+      paint(
+        { color: "#050506", coat: 0, rough: 1, metal: 0, height: 0 },
+        circle(x, y, 1.7),
+      );
     }
   }
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = 8;
-  return texture;
+
+  // Four 80 × 40 mm triple-junction cells in series, with welded silver
+  // interconnects across each gap.
+  const cell = { w: 80, h: 40, gap: 2.5, crop: 5 };
+  const cellX = (PANEL.w - cell.w) / 2;
+  const stack = 4 * cell.h + 3 * cell.gap;
+  const cellsTop = (PANEL.h - stack) / 2;
+  const tabs = [12, 38.5, 65];
+  // Tabs from the first cell's back to a pad on the board.
+  for (const tx of tabs) {
+    paint(GOLD, rect(cellX + tx - 1, cellsTop - 6, 7, 4.5));
+    paint(SILVER, rect(cellX + tx, cellsTop - 5, 5, 7));
+  }
+  for (let i = 0; i < 4; i++) {
+    const y = cellsTop + i * (cell.h + cell.gap);
+    const lightness = 12 + (random() - 0.5) * 1.6;
+    const hue = 231 + (random() - 0.5) * 6;
+    const glass = 0.35;
+    paint(
+      { color: "#161a2c", coat: 1, rough: 0.05, metal: 0, height: 0.62 },
+      croppedCell(
+        cellX - glass,
+        y - glass,
+        cell.w + glass * 2,
+        cell.h + glass * 2,
+        cell.crop + glass,
+      ),
+    );
+    paint(
+      {
+        color: `hsl(${hue} 52% ${lightness}%)`,
+        coat: 1,
+        rough: 0.1,
+        metal: 0,
+        height: 0.6,
+      },
+      croppedCell(cellX, y, cell.w, cell.h, cell.crop),
+    );
+    // Grid fingers are microns wide: nearly invisible in colour, they show
+    // up as a faint metallic sheen when they catch the light.
+    const finger = {
+      color: "rgba(150, 156, 180, 0.18)",
+      coat: 1,
+      rough: 0.25,
+      metal: 0.7,
+      height: 0.63,
+    };
+    for (let fx = cellX + 1.2; fx < cellX + cell.w - 1; fx += 1.4) {
+      const top = fx < cellX + cell.crop || fx > cellX + cell.w - cell.crop;
+      paint(finger, rect(fx, y + (top ? cell.crop : 0.8), 0.12, cell.h - 2.6));
+    }
+    // Busbar along the uncropped edge, and the bypass diode sitting in a
+    // cropped corner.
+    paint(
+      { ...SILVER, coat: 1, height: 0.66 },
+      rect(cellX + 1, y + cell.h - 2, cell.w - 2, 1.4),
+    );
+    paint(
+      { color: "#1b1b1f", coat: 0, rough: 0.35, metal: 0.3, height: 0.7 },
+      rect(cellX + 0.6, y + 0.6, 2.2, 2.2),
+    );
+    paint(SILVER, rect(cellX + 2.8, y + 1.3, 2, 0.8));
+    // Interconnects from this cell's busbar down to the next cell (or to the
+    // board after the last one). The next cell covers their far ends.
+    for (const tx of tabs) {
+      const end = i < 3 ? cell.gap + 2 : 5;
+      paint(SILVER, rect(cellX + tx, y + cell.h - 2, 5, end + 2));
+      // Stress-relief loop in the middle of the gap.
+      paint(
+        { ...SILVER, color: "#8f929a", height: 0.95 },
+        rect(cellX + tx, y + cell.h + cell.gap / 2 - 0.4, 5, 0.8),
+      );
+      if (i === 3) paint(GOLD, rect(cellX + tx - 1, y + cell.h + 1.5, 7, 4.5));
+    }
+  }
+
+  // BPW34 sun-sensor photodiode and a thermistor at the top end.
+  const pd = { x: PANEL.w / 2, y: 28 };
+  paint(GOLD, rect(pd.x - 4.2, pd.y - 1.4, 8.4, 2.8));
+  paint(
+    { color: "#16161a", coat: 1, rough: 0.08, metal: 0, height: 1 },
+    rect(pd.x - 2.7, pd.y - 2.15, 5.4, 4.3),
+  );
+  paint(
+    { color: "#2a2638", coat: 1, rough: 0.1, metal: 0.2, height: 1 },
+    rect(pd.x - 1.4, pd.y - 1.4, 2.8, 2.8),
+  );
+  paint(SILVER, rect(pd.x - 1.4, pd.y - 1.4, 0.5, 0.5));
+  paint(GOLD, rect(54.4, 20, 2.2, 1.2));
+  paint(
+    { color: "#1d1d1d", coat: 0, rough: 0.6, metal: 0, height: 0.6 },
+    rect(54.9, 20, 1.2, 1.2),
+  );
+
+  // Silkscreen and fiducials.
+  const silk = {
+    color: "#d9d9d2",
+    coat: 0,
+    rough: 0.7,
+    metal: 0,
+    height: 0.28,
+  };
+  for (const ctx of [albedo, surface, height]) {
+    ctx.font = "600 3px sans-serif";
+    ctx.textBaseline = "middle";
+  }
+  const text = (s: string, x: number, y: number, align: CanvasTextAlign) =>
+    paint(silk, (ctx) => {
+      ctx.textAlign = align;
+      ctx.fillText(s, x, y);
+    });
+  text("PIXELSAT-I", 10, 12, "left");
+  text("SP REV B", PANEL.w - 10, 12, "right");
+  text("SUN", pd.x, pd.y + 5, "center");
+  text("TJ 4S", 10, PANEL.h - 12, "left");
+  for (const [x, y] of [
+    [16, 28],
+    [PANEL.w - 16, PANEL.h - 22],
+  ]) {
+    paint(GOLD, circle(x, y, 0.5));
+  }
+
+  // Faint grain so large flat areas don't look like vector art.
+  const noisy = albedo.getImageData(
+    0,
+    0,
+    albedo.canvas.width,
+    albedo.canvas.height,
+  );
+  for (let i = 0; i < noisy.data.length; i += 4) {
+    const n = (random() - 0.5) * 3;
+    noisy.data[i] += n;
+    noisy.data[i + 1] += n;
+    noisy.data[i + 2] += n;
+  }
+  albedo.putImageData(noisy, 0, 0);
+
+  // Height to tangent-space normals. Canvas y points down the panel, while
+  // the texture's v points up (flipY), which flips the sign of dy.
+  const { width, height: rows } = height.canvas;
+  const h = height.getImageData(0, 0, width, rows).data;
+  const normals = new ImageData(width, rows);
+  const strength = 3 / 255;
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < width; x++) {
+      const at = (xx: number, yy: number) =>
+        h[
+          (Math.min(rows - 1, Math.max(0, yy)) * width +
+            Math.min(width - 1, Math.max(0, xx))) *
+            4
+        ];
+      const dx = (at(x + 1, y) - at(x - 1, y)) * strength;
+      const dy = (at(x, y + 1) - at(x, y - 1)) * strength;
+      const len = Math.hypot(dx, dy, 1);
+      const i = (y * width + x) * 4;
+      normals.data[i] = byte((-dx / len + 1) / 2);
+      normals.data[i + 1] = byte((dy / len + 1) / 2);
+      normals.data[i + 2] = byte((1 / len + 1) / 2);
+      normals.data[i + 3] = 255;
+    }
+  }
+  height.putImageData(normals, 0, 0);
+
+  const texture = (ctx: CanvasRenderingContext2D, srgb = false) => {
+    const t = new THREE.CanvasTexture(ctx.canvas);
+    if (srgb) t.colorSpace = THREE.SRGBColorSpace;
+    t.anisotropy = anisotropy;
+    return t;
+  };
+  return {
+    map: texture(albedo, true),
+    surface: texture(surface),
+    normalMap: texture(height),
+  };
 }
 
 // A black room ringed by thin light bands just below the horizon, which is
@@ -186,15 +420,46 @@ function studioEnvironment(pmrem: THREE.PMREMGenerator) {
       )
       .children.at(-1)!.position.y = y;
   };
-  band(-1.8, 0.3, 4);
+  // The panels see this band at a grazing angle, so it stretches along a
+  // whole cell; brighter and it washes the coverglass out to grey.
+  band(-1.8, 0.3, 1.2);
   band(-3.6, 0.3, 2.5);
   band(6, 4, 0.3);
   return pmrem.fromScene(room, 0.01).texture;
 }
 
 // The CAD has no side panels, so four solar panels are built here.
-function solarPanels() {
-  const map = solarPanelTexture();
+function solarPanels(anisotropy: number) {
+  const { map, surface, normalMap } = solarPanelMaps(anisotropy);
+  // The cells sit under smooth coverglass with an anti-reflective coating:
+  // they reflect little (specularIntensity) apart from sharp glints off the
+  // glass (clearcoat), with a blue-violet thin-film tint at glancing angles.
+  const front = new THREE.MeshPhysicalMaterial({
+    map,
+    normalMap,
+    roughnessMap: surface,
+    metalnessMap: surface,
+    clearcoatMap: surface,
+    iridescenceMap: surface,
+    roughness: 1,
+    metalness: 1,
+    clearcoat: 1,
+    clearcoatRoughness: 0.02,
+    specularIntensity: 0.35,
+    specularColor: 0xa4a8ff,
+    iridescence: 0.5,
+    iridescenceIOR: 1.8,
+    iridescenceThicknessRange: [0, 180],
+    envMapIntensity: 0.8,
+  });
+  const back = new THREE.MeshStandardMaterial({
+    color: 0x0f1013,
+    roughness: 0.6,
+  });
+  const edge = new THREE.MeshStandardMaterial({
+    color: 0x6b6245,
+    roughness: 0.8,
+  });
   const panels: { mesh: THREE.Mesh; normal: THREE.Vector3 }[] = [];
   const faces = [
     new THREE.Vector3(1, 0, 0),
@@ -203,19 +468,19 @@ function solarPanels() {
     new THREE.Vector3(0, 0, -1),
   ];
   for (const normal of faces) {
-    const material = new THREE.MeshPhysicalMaterial({
-      map,
-      metalness: 0,
-      roughness: 0.35,
-      clearcoat: 1,
-      clearcoatRoughness: 0.03,
-      envMapIntensity: 0.8,
-      transparent: true,
-    });
     const onX = normal.x !== 0;
+    // BoxGeometry groups run +x, -x, +y, -y, +z, -z.
+    const outer = onX ? (normal.x > 0 ? 0 : 1) : normal.z > 0 ? 4 : 5;
+    const materials = Array<THREE.Material>(6).fill(edge);
+    materials[outer] = front;
+    materials[outer ^ 1] = back;
     const mesh = new THREE.Mesh(
-      new THREE.BoxGeometry(onX ? 1.6 : 82, 280, onX ? 82 : 1.6),
-      material,
+      new THREE.BoxGeometry(
+        onX ? PANEL.thickness : PANEL.w,
+        PANEL.h,
+        onX ? PANEL.w : PANEL.thickness,
+      ),
+      materials,
     );
     mesh.position.copy(normal).multiplyScalar(50.4).setY(150);
     mesh.castShadow = mesh.receiveShadow = true;
@@ -240,6 +505,9 @@ export function mountSatellite(
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFShadowMap;
+  // GTAO renders the scene a second time; without this the shadow map would
+  // be redrawn for it too. frameAt flags the one update per frame.
+  renderer.shadowMap.autoUpdate = false;
   renderer.toneMapping = THREE.AgXToneMapping;
   renderer.toneMappingExposure = 1.1;
 
@@ -290,15 +558,24 @@ export function mountSatellite(
   // through a dithered depth material. GTAO ignores opacity, so partly faded
   // meshes are left out of its pass instead of leaving dark outlines behind.
   const faders: THREE.Mesh[] = [];
+  const materialsOf = (mesh: THREE.Mesh) =>
+    [mesh.material].flat() as THREE.Material[];
   const makeFadeable = (mesh: THREE.Mesh) => {
-    mesh.material = (mesh.material as THREE.Material).clone();
-    mesh.material.transparent = true;
+    const clones = new Map<THREE.Material, THREE.Material>();
+    const clone = (m: THREE.Material) => {
+      if (!clones.has(m)) clones.set(m, m.clone());
+      return clones.get(m)!;
+    };
+    mesh.material = Array.isArray(mesh.material)
+      ? mesh.material.map(clone)
+      : clone(mesh.material);
+    for (const m of materialsOf(mesh)) m.transparent = true;
     mesh.customDepthMaterial = new THREE.MeshDepthMaterial({ alphaHash: true });
     faders.push(mesh);
   };
   const setOpacity = (meshes: THREE.Mesh[], opacity: number) => {
     for (const mesh of meshes) {
-      (mesh.material as THREE.Material).opacity = opacity;
+      for (const m of materialsOf(mesh)) m.opacity = opacity;
       mesh.customDepthMaterial!.opacity = opacity;
       mesh.visible = opacity > 0.001;
     }
@@ -306,13 +583,14 @@ export function mountSatellite(
   const renderAO = ao.render.bind(ao);
   ao.render = (...args: Parameters<GTAOPass["render"]>) => {
     const hidden = faders.filter(
-      (m) => m.visible && (m.material as THREE.Material).opacity < 1,
+      (m) => m.visible && materialsOf(m)[0].opacity < 1,
     );
     for (const m of hidden) m.visible = false;
     renderAO(...args);
     for (const m of hidden) m.visible = true;
   };
 
+  let dirty = true;
   const sat = new THREE.Group();
   sat.position.y = -150;
   scene.add(sat);
@@ -322,9 +600,10 @@ export function mountSatellite(
   const restY = {} as Record<Part, number>;
   const frameMeshes: THREE.Mesh[] = [];
   const studio = studioEnvironment(pmrem);
-  const panels = solarPanels();
+  const panels = solarPanels(renderer.capabilities.getMaxAnisotropy());
   for (const { mesh } of panels) {
-    (mesh.material as THREE.MeshPhysicalMaterial).envMap = studio;
+    for (const m of materialsOf(mesh))
+      (m as THREE.MeshStandardMaterial).envMap = studio;
     makeFadeable(mesh);
     sat.add(mesh);
   }
@@ -350,6 +629,7 @@ export function mountSatellite(
         }
         sat.add(child);
       }
+      dirty = true;
       onReady();
     },
     (event) => event.total && onProgress(event.loaded / event.total),
@@ -379,6 +659,7 @@ export function mountSatellite(
     composer.setSize(width, height);
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
+    dirty = true;
   };
   new ResizeObserver(resize).observe(canvas);
   resize();
@@ -464,6 +745,7 @@ export function mountSatellite(
       height,
     );
 
+    renderer.shadowMap.needsUpdate = true;
     composer.render();
   };
 
@@ -487,16 +769,30 @@ export function mountSatellite(
   const target = () => {
     const segment =
       (story.offsetHeight - window.innerHeight) / (poses.length - 1);
+    // A zero-size viewport (e.g. a hidden iframe) would make this NaN.
+    if (!(segment > 0)) return 0;
     const scrolled = -story.getBoundingClientRect().top;
     return Math.min(poses.length - 1, Math.max(0, scrolled / segment));
   };
 
+  // Only draw when something changed: scroll is still easing, the hero is
+  // swaying, or the canvas or model changed (dirty).
   let s = target();
+  let drawn = NaN;
   const tick = (time: number) => {
     if (!running) return;
-    s += (target() - s) * (reducedMotion ? 1 : 0.12);
-    updateCopy(s);
-    frameAt(s, time);
+    const goal = target();
+    s =
+      reducedMotion || Math.abs(goal - s) < 1e-4
+        ? goal
+        : s + (goal - s) * 0.12;
+    const swaying = !reducedMotion && s < 1;
+    if (s !== drawn) updateCopy(s);
+    if (dirty || swaying || s !== drawn) {
+      frameAt(s, time);
+      drawn = s;
+      dirty = false;
+    }
     requestAnimationFrame(tick);
   };
 

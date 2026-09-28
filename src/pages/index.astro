@@ -17,5 +17,13 @@ const blogPosts = (await getCollection("blog"))
 ---
 
 <BaseLayout>
+  {/* Start the model download alongside the JS bundle instead of after it. */}
+  <link
+    slot="head"
+    rel="preload"
+    href="/models/pixelsat.glb"
+    as="fetch"
+    crossorigin="anonymous"
+  />
   <Landing blogPosts={blogPosts} />
 </BaseLayout>
