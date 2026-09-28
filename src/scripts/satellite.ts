@@ -124,8 +124,8 @@ const PANEL = { w: 82, h: 280, thickness: 1.6 };
 const PX_PER_MM = 8;
 
 // Anything drawn on the panel sets all three maps at once: albedo, a packed
-// surface map (R = coverglass, which drives clearcoat and iridescence;
-// G = roughness; B = metalness), and a height map turned into normals.
+// surface map (R = coverglass, which drives clearcoat; G = roughness;
+// B = metalness), and a height map turned into normals.
 interface Finish {
   color: string;
   coat: number;
@@ -263,14 +263,15 @@ function solarPanelMaps(anisotropy: number) {
       },
       croppedCell(cellX, y, cell.w, cell.h, cell.crop),
     );
-    // Grid fingers are microns wide: nearly invisible in colour, they show
-    // up as a faint metallic sheen when they catch the light.
+    // Grid fingers are microns wide and sit under the coverglass, so they
+    // only faintly tint the cell. Giving them height or metalness puts
+    // sub-pixel ridges in the normal map, which alias into corrugated stripes.
     const finger = {
-      color: "rgba(150, 156, 180, 0.18)",
+      color: "rgba(150, 156, 180, 0.12)",
       coat: 1,
-      rough: 0.25,
-      metal: 0.7,
-      height: 0.63,
+      rough: 0.1,
+      metal: 0,
+      height: 0.6,
     };
     for (let fx = cellX + 1.2; fx < cellX + cell.w - 1; fx += 1.4) {
       const top = fx < cellX + cell.crop || fx > cellX + cell.w - cell.crop;
@@ -420,11 +421,12 @@ function studioEnvironment(pmrem: THREE.PMREMGenerator) {
       )
       .children.at(-1)!.position.y = y;
   };
-  // The panels see this band at a grazing angle, so it stretches along a
-  // whole cell; brighter and it washes the coverglass out to grey.
-  band(-1.8, 0.3, 1.2);
-  band(-3.6, 0.3, 2.5);
-  band(6, 4, 0.3);
+  // The panels see these bands at a grazing angle, where the coverglass
+  // reflects most of what it sees, so they stretch along whole cells. Any
+  // wider or brighter and they wash the dark cells out to a pale grey.
+  band(-1.8, 0.2, 0.8);
+  band(-3.6, 0.2, 1.6);
+  band(6, 4, 0.12);
   return pmrem.fromScene(room, 0.01).texture;
 }
 
@@ -433,23 +435,18 @@ function solarPanels(anisotropy: number) {
   const { map, surface, normalMap } = solarPanelMaps(anisotropy);
   // The cells sit under smooth coverglass with an anti-reflective coating:
   // they reflect little (specularIntensity) apart from sharp glints off the
-  // glass (clearcoat), with a blue-violet thin-film tint at glancing angles.
+  // glass (clearcoat), so they stay a deep blue-black.
   const front = new THREE.MeshPhysicalMaterial({
     map,
     normalMap,
     roughnessMap: surface,
     metalnessMap: surface,
     clearcoatMap: surface,
-    iridescenceMap: surface,
     roughness: 1,
     metalness: 1,
     clearcoat: 1,
     clearcoatRoughness: 0.02,
-    specularIntensity: 0.35,
-    specularColor: 0xa4a8ff,
-    iridescence: 0.5,
-    iridescenceIOR: 1.8,
-    iridescenceThicknessRange: [0, 180],
+    specularIntensity: 0.25,
     envMapIntensity: 0.8,
   });
   const back = new THREE.MeshStandardMaterial({
@@ -487,6 +484,32 @@ function solarPanels(anisotropy: number) {
     panels.push({ mesh, normal });
   }
   return panels;
+}
+
+// The CAD export only distinguishes materials by colour, and gives every
+// KiCad part the same matte plastic. Plating is picked out by KiCad's
+// standard colours so pins and pads read as metal.
+// Header pins, and the solder pads, part terminations and the LoRa module's
+// shield can. Similar colours (a yellow part body, the FR4 board edge) are
+// left alone.
+const GOLD_PLATING =
+  /^Opaque\((212,176,56|212,173,56|219,188,126|165,132,0)\)$/;
+const TIN_PLATING = /^Opaque\((188,188,188|210,209,199|165,158,150)\)$/;
+const SOLDERMASK_GREEN = "Opaque(80,124,105)";
+
+function finishMaterial(m: THREE.MeshStandardMaterial) {
+  if (GOLD_PLATING.test(m.name) || TIN_PLATING.test(m.name)) {
+    m.metalness = 1;
+    m.roughness = 0.3;
+  } else if (m.name === SOLDERMASK_GREEN) {
+    m.roughness = 0.4;
+  } else if (m.name.startsWith("Aluminum")) {
+    // Bead-blasted rails: a darker, rougher metal picks up gradients from the
+    // environment instead of reflecting it as one flat grey.
+    m.color.setRGB(0.62, 0.63, 0.65);
+    m.metalness = 1;
+    m.roughness = 0.45;
+  }
 }
 
 export function mountSatellite(
@@ -613,6 +636,15 @@ export function mountSatellite(
   loader.load(
     "/models/pixelsat.glb",
     (gltf) => {
+      const finished = new Set<THREE.Material>();
+      gltf.scene.traverse((o) => {
+        if (!(o instanceof THREE.Mesh)) return;
+        for (const m of materialsOf(o)) {
+          if (finished.has(m)) continue;
+          finished.add(m);
+          finishMaterial(m as THREE.MeshStandardMaterial);
+        }
+      });
       for (const child of [...gltf.scene.children]) {
         child.traverse((o) => (o.castShadow = o.receiveShadow = true));
         if (child.name === "frame") {
@@ -783,9 +815,7 @@ export function mountSatellite(
     if (!running) return;
     const goal = target();
     s =
-      reducedMotion || Math.abs(goal - s) < 1e-4
-        ? goal
-        : s + (goal - s) * 0.12;
+      reducedMotion || Math.abs(goal - s) < 1e-4 ? goal : s + (goal - s) * 0.12;
     const swaying = !reducedMotion && s < 1;
     if (s !== drawn) updateCopy(s);
     if (dirty || swaying || s !== drawn) {
