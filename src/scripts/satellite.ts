@@ -28,7 +28,9 @@ interface Pose {
   roll: number; // camera roll in degrees
   panels: number; // 0 = attached, 1 = pulled off
   frame: number; // frame opacity
-  side: boolean; // text sits beside the model instead of above it
+  // Text sits beside the model instead of above it; "wide" only does so on
+  // wide screens.
+  side: boolean | "wide";
   lift: Partial<Record<Part, number>>; // mm along the long axis
 }
 
@@ -45,7 +47,7 @@ export const POSES: Record<string, Pose> = {
     roll: -62,
     panels: 0,
     frame: 1,
-    side: false,
+    side: "wide",
   },
   open: { ...base, focus: "all", az: 20, el: 16, dist: 720, frame: 1 },
   adcs: {
@@ -699,8 +701,8 @@ export function mountSatellite(
   };
 
   // Meshes that fade out (panels and frame). Their shadows fade with them
-  // through a dithered depth material. GTAO ignores opacity, so partly faded
-  // meshes are left out of its pass instead of leaving dark outlines behind.
+  // through a dithered depth material. GTAO ignores opacity, so while they're
+  // partly faded it runs with and without them, and the two are crossfaded.
   const faders: THREE.Mesh[] = [];
   const materialsOf = (mesh: THREE.Mesh) =>
     [mesh.material].flat() as THREE.Material[];
@@ -725,13 +727,26 @@ export function mountSatellite(
     }
   };
   const renderAO = ao.render.bind(ao);
-  ao.render = (...args: Parameters<GTAOPass["render"]>) => {
-    const hidden = faders.filter(
+  const withoutFaders = new THREE.WebGLRenderTarget(1, 1, {
+    type: THREE.HalfFloatType,
+    depthBuffer: false,
+  });
+  ao.render = (renderer, writeBuffer, ...rest) => {
+    renderAO(renderer, writeBuffer, ...rest);
+    const partial = faders.filter(
       (m) => m.visible && materialsOf(m)[0].opacity < 1,
     );
-    for (const m of hidden) m.visible = false;
-    renderAO(...args);
-    for (const m of hidden) m.visible = true;
+    if (!partial.length) return;
+    for (const m of partial) m.visible = false;
+    renderAO(renderer, withoutFaders, ...rest);
+    for (const m of partial) m.visible = true;
+    const opacity = Math.min(...partial.map((m) => materialsOf(m)[0].opacity));
+    accumulateMaterial.uniforms.tSample.value = withoutFaders.texture;
+    accumulateMaterial.uniforms.weight.value = 1 - opacity;
+    renderer.autoClear = false;
+    renderer.setRenderTarget(writeBuffer);
+    accumulate.render(renderer);
+    renderer.autoClear = true;
   };
 
   let dirty = true;
@@ -809,6 +824,10 @@ export function mountSatellite(
     composer.setSize(width, height);
     const ratio = renderer.getPixelRatio();
     accumulated.setSize(Math.floor(width * ratio), Math.floor(height * ratio));
+    withoutFaders.setSize(
+      Math.floor(width * ratio),
+      Math.floor(height * ratio),
+    );
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
     dirty = true;
@@ -898,7 +917,8 @@ export function mountSatellite(
 
     // Shift the projection so the model sits beside (or below) the copy.
     const wide = width >= 900;
-    const side = lerp(+a.side, +b.side, t);
+    const sideOf = (p: Pose) => +(p.side === true || (wide && !!p.side));
+    const side = lerp(sideOf(a), sideOf(b), t);
     const shiftX = wide ? side * 0.22 : 0;
     const shiftY = lerp(0.25, wide ? 0 : -0.2, side);
     // Sub-pixel jitter, in CSS pixels like the rest of the view offset.

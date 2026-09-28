@@ -93,6 +93,10 @@
 
 /* Scroll-driven satellite story. The script in src/scripts/satellite.ts sets
    each chapter's opacity and transform. */
+html:has([data-story]) {
+  scroll-snap-type: y mandatory;
+}
+
 .story-canvas {
   opacity: 0;
   transition: opacity 1.2s ease-out;
@@ -138,6 +142,21 @@
     justify-content: center;
     padding: 0;
     background: none;
+  }
+
+  .story-hero {
+    position: absolute;
+    inset: 0 auto 0 max(20px, calc((100vw - 1040px) / 2));
+    display: flex;
+    width: min(520px, 44vw);
+    flex-direction: column;
+    justify-content: center;
+    padding: 0;
+    text-align: left;
+  }
+
+  .story-hero .story-display {
+    font-size: clamp(2.6rem, 5vw, 4.5rem);
   }
 }
 

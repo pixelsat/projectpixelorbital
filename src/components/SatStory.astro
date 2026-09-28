@@ -82,16 +82,18 @@ const segments = chapters.length + 1;
 
     <div class="story-chapter inset-0" data-chapter="hero" id="top">
       <SiteHeader homeHref="#top" home />
-      <div class="story-center">
+      <div class="story-center story-hero">
         <p class="story-eyebrow">PixelSat I</p>
         <h1 class="story-display">A CubeSat built by high schoolers</h1>
-        <p class="story-lede mx-auto max-w-[62ch]">
+        <p class="story-lede mx-auto max-w-[62ch] min-[900px]:mx-0">
           Project Pixel Orbital is a fully student-led team at Stanford Online
           High School building PixelSat I, a 3U CubeSat targeting launch into
           sun-synchronous low Earth orbit in early 2027, from scratch, on an
           extremely limited budget.
         </p>
-        <div class="mt-6 flex items-center justify-center gap-3">
+        <div
+          class="mt-6 flex items-center justify-center gap-3 min-[900px]:justify-start"
+        >
           <OuterLink href={donate} button primary>
             Donate to PixelSat I
             <IconExternalLink />
@@ -163,6 +165,15 @@ const segments = chapters.length + 1;
       </div>
     </div>
   </div>
+
+  {
+    Array.from({ length: segments + 1 }, (_, k) => (
+      <div
+        class="absolute h-px w-full snap-start"
+        style={`top: ${k * 120}svh`}
+      />
+    ))
+  }
 </section>
 
 <script>
