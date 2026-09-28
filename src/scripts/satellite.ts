@@ -1,11 +1,11 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
-import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 import { GTAOPass } from "three/examples/jsm/postprocessing/GTAOPass.js";
 import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
+import { FullScreenQuad } from "three/examples/jsm/postprocessing/Pass.js";
 
 // Node names baked into public/models/pixelsat.glb. The model is Y-up, in
 // millimetres, with the long axis running from y = 0 (bottom) to y = 300.
@@ -117,6 +117,14 @@ export const POSES: Record<string, Pose> = {
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 const smooth = (t: number) => t * t * (3 - 2 * t);
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+// Low-discrepancy sequence in [0, 1): successive samples fill the gaps left
+// by earlier ones.
+const halton = (i: number, base: number) => {
+  let r = 0;
+  for (let f = 1 / base; i > 0; i = Math.floor(i / base), f /= base)
+    r += f * (i % base);
+  return r;
+};
 
 // Side panel PCB in mm. Texture maps are drawn in these units, top of the
 // panel at y = 0.
@@ -402,31 +410,83 @@ function solarPanelMaps(anisotropy: number) {
   };
 }
 
-// A black room ringed by thin light bands just below the horizon, which is
-// where the side panels reflect from the hero shots. Flat panels reflect
-// nearly one direction, so thin bands read as crisp streaks that slide along
-// them as the camera moves, instead of an evenly lit sheen.
+// A black photo studio, laid out around a camera on +z looking at the
+// origin; frameAt turns it with the camera so every shot is lit the same way.
+// The shapes matter more than the amounts of light: metal and glass show
+// little but reflections of them.
 function studioEnvironment(pmrem: THREE.PMREMGenerator) {
   const room = new THREE.Scene();
-  const band = (y: number, height: number, brightness: number) => {
-    room
-      .add(
-        new THREE.Mesh(
-          new THREE.CylinderGeometry(10, 10, height, 64, 1, true),
-          new THREE.MeshBasicMaterial({
-            color: new THREE.Color().setScalar(brightness),
-            side: THREE.BackSide,
-          }),
-        ),
-      )
-      .children.at(-1)!.position.y = y;
+  const emitter = (brightness: number) =>
+    new THREE.MeshBasicMaterial({
+      color: new THREE.Color().setScalar(brightness),
+      side: THREE.DoubleSide,
+    });
+
+  // Faint fill that brightens towards the ceiling, so upward faces read as
+  // lit. The camera looks slightly down, so vertical faces (the frame rails,
+  // the side panels) reflect the floor on the camera's side: a broad glow
+  // there gives the rough rails a soft sheen, while the coverglass, which
+  // reflects only a few percent head-on, barely picks it up.
+  const dome = new THREE.SphereGeometry(20, 64, 32);
+  const shade = dome.attributes.position.array.map((_, i, p) => {
+    const up = p[i - (i % 3) + 1] / 20;
+    const front = p[i - (i % 3) + 2] / 20;
+    const floor = Math.exp(-(((up + 0.3) / 0.3) ** 2));
+    return (
+      0.015 +
+      0.08 * Math.max(0, up) ** 1.2 +
+      0.25 * floor * (0.25 + 0.75 * Math.max(0, front))
+    );
+  });
+  dome.setAttribute("color", new THREE.BufferAttribute(shade, 3));
+  room.add(
+    new THREE.Mesh(
+      dome,
+      new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide }),
+    ),
+  );
+
+  // Softboxes, all above the horizon: a big one overhead; a tall strip at the
+  // key light's side (upper left, in front) that runs down the frame rails;
+  // a cooler strip behind for rim highlights; and a wide sweep behind the
+  // model that horizontal boards reflect as a gloss across their tops.
+  const softbox = (
+    [x, y, z]: number[],
+    w: number,
+    h: number,
+    brightness: number,
+  ) => {
+    const box = new THREE.Mesh(
+      new THREE.PlaneGeometry(w, h),
+      emitter(brightness),
+    );
+    box.position.set(x, y, z);
+    box.lookAt(0, 0, 0);
+    room.add(box);
+    return box;
   };
-  // The panels see these bands at a grazing angle, where the coverglass
-  // reflects most of what it sees, so they stretch along whole cells. Any
-  // wider or brighter and they wash the dark cells out to a pale grey.
-  band(-1.8, 0.2, 0.8);
-  band(-3.6, 0.2, 1.6);
-  band(6, 4, 0.12);
+  softbox([0, 10, 0], 10, 10, 1.2);
+  softbox([-7, 5, 7], 3, 8, 3);
+  softbox([8, 5, -6], 2, 8, 1.5).material.color.setRGB(1.2, 1.4, 1.8);
+  softbox([0, 5.5, -10], 14, 5, 0.6);
+
+  // Thin bands just below the horizon, which is where the side panels
+  // reflect from the hero shots. Flat panels reflect nearly one direction,
+  // so thin bands read as crisp streaks that slide along them as the camera
+  // moves. They see them at a grazing angle, where the coverglass reflects
+  // most of what it sees; any wider or brighter and they wash the dark cells
+  // out to a pale grey.
+  for (const [y, brightness] of [
+    [-1.8, 0.65],
+    [-3.6, 1.3],
+  ]) {
+    const band = new THREE.Mesh(
+      new THREE.CylinderGeometry(10, 10, 0.2, 64, 1, true),
+      emitter(brightness),
+    );
+    band.position.y = y;
+    room.add(band);
+  }
   return pmrem.fromScene(room, 0.01).texture;
 }
 
@@ -447,7 +507,6 @@ function solarPanels(anisotropy: number) {
     clearcoat: 1,
     clearcoatRoughness: 0.02,
     specularIntensity: 0.25,
-    envMapIntensity: 0.8,
   });
   const back = new THREE.MeshStandardMaterial({
     color: 0x0f1013,
@@ -536,8 +595,7 @@ export function mountSatellite(
 
   const scene = new THREE.Scene();
   const pmrem = new THREE.PMREMGenerator(renderer);
-  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-  scene.environmentIntensity = 0.45;
+  scene.environment = studioEnvironment(pmrem);
 
   // The key light follows the camera (see frameAt) so every shot is lit
   // from the upper left, and casts the only shadows.
@@ -557,6 +615,12 @@ export function mountSatellite(
 
   const camera = new THREE.PerspectiveCamera(28, 1, 5, 5000);
 
+  // The composer draws one linear HDR sample of the scene with AO. Once the
+  // view stops moving, samples keep coming with the camera, key light and AO
+  // noise jittered, and are averaged into `accumulated`: this smooths edges
+  // and thin parts well beyond MSAA, turns the key light's single shadow into
+  // a soft area-light one, and dissolves AO noise. Tone mapping happens once,
+  // on the average.
   const composer = new EffectComposer(
     renderer,
     new THREE.WebGLRenderTarget(1, 1, {
@@ -564,6 +628,7 @@ export function mountSatellite(
       samples: 4,
     }),
   );
+  composer.renderToScreen = false;
   composer.addPass(new RenderPass(scene, camera));
   // Units are millimetres, so the AO radius is a few mm of contact shading.
   const ao = new GTAOPass(scene, camera);
@@ -575,7 +640,63 @@ export function mountSatellite(
     samples: 16,
   });
   composer.addPass(ao);
-  composer.addPass(new OutputPass());
+
+  const accumulated = new THREE.WebGLRenderTarget(1, 1, {
+    type: THREE.HalfFloatType,
+    depthBuffer: false,
+  });
+  // Blends a sample in with weight w: a running average when w = 1 / n.
+  const accumulateMaterial = new THREE.ShaderMaterial({
+    uniforms: { tSample: { value: null }, weight: { value: 1 } },
+    vertexShader: /* glsl */ `
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = vec4(position.xy, 0.0, 1.0);
+        }`,
+    fragmentShader: /* glsl */ `
+        uniform sampler2D tSample;
+        uniform float weight;
+        varying vec2 vUv;
+        void main() {
+          gl_FragColor = vec4(texture2D(tSample, vUv).rgb, weight);
+        }`,
+    transparent: true,
+    depthTest: false,
+    depthWrite: false,
+  });
+  const accumulate = new FullScreenQuad(accumulateMaterial);
+  const output = new OutputPass();
+  output.renderToScreen = true;
+
+  // GTAO and its denoiser pick sample directions from small tiled noise
+  // textures. Rolling them to a new offset per sample decorrelates the noise
+  // so averaging removes it.
+  const noises = [ao.gtaoNoiseTexture, ao.pdNoiseTexture].map((texture) => ({
+    texture,
+    original: (texture.image.data as Uint8Array).slice(),
+  }));
+  let rolled = 0;
+  const rollNoise = (k: number) => {
+    if (k === rolled) return;
+    rolled = k;
+    for (const { texture, original } of noises) {
+      const n = texture.image.width;
+      const dx = (k * 7) % n;
+      const dy = (k * 3 + Math.floor(k / n)) % n;
+      const data = texture.image.data as Uint8Array;
+      for (let y = 0; y < n; y++)
+        for (let x = 0; x < n; x++)
+          data.set(
+            original.subarray(
+              (((y + dy) % n) * n + ((x + dx) % n)) * 4,
+              (((y + dy) % n) * n + ((x + dx) % n)) * 4 + 4,
+            ),
+            (y * n + x) * 4,
+          );
+      texture.needsUpdate = true;
+    }
+  };
 
   // Meshes that fade out (panels and frame). Their shadows fade with them
   // through a dithered depth material. GTAO ignores opacity, so partly faded
@@ -622,11 +743,8 @@ export function mountSatellite(
   const restBoxes = {} as Record<Part, THREE.Box3>;
   const restY = {} as Record<Part, number>;
   const frameMeshes: THREE.Mesh[] = [];
-  const studio = studioEnvironment(pmrem);
   const panels = solarPanels(renderer.capabilities.getMaxAnisotropy());
   for (const { mesh } of panels) {
-    for (const m of materialsOf(mesh))
-      (m as THREE.MeshStandardMaterial).envMap = studio;
     makeFadeable(mesh);
     sat.add(mesh);
   }
@@ -689,6 +807,8 @@ export function mountSatellite(
     renderer.setSize(width, height, false);
     composer.setPixelRatio(renderer.getPixelRatio());
     composer.setSize(width, height);
+    const ratio = renderer.getPixelRatio();
+    accumulated.setSize(Math.floor(width * ratio), Math.floor(height * ratio));
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
     dirty = true;
@@ -700,9 +820,12 @@ export function mountSatellite(
   const focusB = new THREE.Vector3();
   const offset = new THREE.Vector3();
   const lightDir = new THREE.Vector3();
+  const disc = new THREE.Vector3();
   let running = false;
 
-  const frameAt = (s: number, time: number) => {
+  // Draws sample k of the view at s (k = 0 is unjittered) and blends it into
+  // the running average with the given weight.
+  const frameAt = (s: number, time: number, k: number, weight: number) => {
     const i = Math.min(poses.length - 2, Math.floor(s));
     // Hold each pose for the first third of its segment, then move.
     const t = smooth(clamp01((s - i - 0.3) / 0.7));
@@ -739,6 +862,7 @@ export function mountSatellite(
       ? 0
       : Math.sin(time / 2400) * 6 * (1 - t) * +(i === 0);
     const az = THREE.MathUtils.degToRad(lerp(a.az, b.az, t) + sway);
+    scene.environmentRotation.y = az;
     const el = THREE.MathUtils.degToRad(lerp(a.el, b.el, t));
     const dist = lerp(a.dist, b.dist, t) * fit;
     offset.set(
@@ -749,7 +873,16 @@ export function mountSatellite(
     camera.position.copy(focus).addScaledVector(offset, dist);
     camera.lookAt(focus);
 
-    lightDir.set(-0.6, 1, 0.7).applyQuaternion(camera.quaternion).normalize();
+    // Jittering the key light's direction across a small disc, sample by
+    // sample, averages its hard shadow into a soft area-light one.
+    const spread = k ? 0.07 * Math.sqrt(halton(k, 5)) : 0;
+    const turn = 2 * Math.PI * halton(k, 7);
+    lightDir
+      .set(-0.6, 1, 0.7)
+      .normalize()
+      .add(disc.set(Math.cos(turn), Math.sin(turn), 0).multiplyScalar(spread))
+      .applyQuaternion(camera.quaternion)
+      .normalize();
     key.position.copy(focus).addScaledVector(lightDir, 800);
     key.target.position.copy(focus);
     const extent = dist * 0.4;
@@ -768,17 +901,30 @@ export function mountSatellite(
     const side = lerp(+a.side, +b.side, t);
     const shiftX = wide ? side * 0.22 : 0;
     const shiftY = lerp(0.25, wide ? 0 : -0.2, side);
+    // Sub-pixel jitter, in CSS pixels like the rest of the view offset.
+    const pixel = 1 / renderer.getPixelRatio();
+    const jitterX = k ? (halton(k, 2) - 0.5) * pixel : 0;
+    const jitterY = k ? (halton(k, 3) - 0.5) * pixel : 0;
     camera.setViewOffset(
       width,
       height,
-      -shiftX * width,
-      -shiftY * height,
+      -shiftX * width + jitterX,
+      -shiftY * height + jitterY,
       width,
       height,
     );
 
+    rollNoise(k);
     renderer.shadowMap.needsUpdate = true;
     composer.render();
+    accumulateMaterial.uniforms.tSample.value = composer.readBuffer.texture;
+    accumulateMaterial.uniforms.weight.value = weight;
+    // Blend onto the running average rather than clearing it first.
+    renderer.autoClear = false;
+    renderer.setRenderTarget(accumulated);
+    accumulate.render(renderer);
+    renderer.autoClear = true;
+    output.render(renderer, null!, accumulated, 0, false);
   };
 
   // Chapter k is fully shown at s = k; its copy fades around that point.
@@ -807,10 +953,14 @@ export function mountSatellite(
     return Math.min(poses.length - 1, Math.max(0, scrolled / segment));
   };
 
-  // Only draw when something changed: scroll is still easing, the hero is
-  // swaying, or the canvas or model changed (dirty).
+  // Only draw when something changed (scroll is still easing, or the canvas
+  // or model changed), and then for SAMPLES frames more to refine the still
+  // view. The hero's slow sway moves the camera only a fraction of a pixel
+  // per frame, so it keeps a short moving average of the last few samples.
+  const SAMPLES = 32;
   let s = target();
   let drawn = NaN;
+  let k = 0;
   const tick = (time: number) => {
     if (!running) return;
     const goal = target();
@@ -818,10 +968,13 @@ export function mountSatellite(
       reducedMotion || Math.abs(goal - s) < 1e-4 ? goal : s + (goal - s) * 0.12;
     const swaying = !reducedMotion && s < 1;
     if (s !== drawn) updateCopy(s);
-    if (dirty || swaying || s !== drawn) {
-      frameAt(s, time);
+    if (dirty || s !== drawn) k = 0;
+    if (k < SAMPLES || swaying) {
+      const weight = Math.max(1 / (k + 1), swaying ? 0.2 : 0);
+      frameAt(s, time, k % SAMPLES, weight);
       drawn = s;
       dirty = false;
+      k++;
     }
     requestAnimationFrame(tick);
   };
