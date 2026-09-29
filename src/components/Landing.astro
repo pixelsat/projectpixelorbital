@@ -17,8 +17,6 @@ interface Props {
   blogPosts?: BlogPost[];
 }
 
-const { blogPosts = [] } = Astro.props as Props;
-
 const mission = [
   {
     title: "Do it",
@@ -37,81 +35,14 @@ const mission = [
     body: "We want to prove to students around the world that it's possible to build a CubeSat from scratch with no prior experience on a meager budget as a high school team, and hopefully get others to follow suit!",
   },
 ];
-
-const snapshot = [
-  ["Form factor", "3U CubeSat (100×100×300 mm)"],
-  ["Orbit", "Sun-synchronous LEO @ 550km"],
-  ["Structure", "Aluminum frame"],
-  ["Comms", "435 MHz UHF + 2.4 GHz S-band"],
-  ["Goal", "Capture & downlink image of the Earth"],
-] as const;
 ---
 
 <div class="min-h-screen">
   <SatStory />
 
-  <main
+  <!-- <main
     class="mx-auto flex w-[min(1040px,calc(100vw-40px))] snap-start flex-col gap-14 py-14 pb-16"
   >
-    {
-      blogPosts.length > 0 && (
-        <section
-          class="grid items-center gap-5 sm:grid-cols-2 sm:gap-10"
-          id="blog"
-          data-scroll-reveal
-        >
-          <div class="flex flex-col items-start gap-3">
-            <Text variant="title">Read our latest blog post</Text>
-            <a
-              href="/blog"
-              class="group inline-flex items-center gap-1 rounded-[5px] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-primary"
-            >
-              <Text
-                tag="span"
-                variant="body"
-                tone="secondary"
-                class="transition-colors duration-200 group-hover:text-primary"
-              >
-                See all posts →
-              </Text>
-            </a>
-          </div>
-
-          {blogPosts[0] && (
-            <CardLink
-              class="min-h-[150px]"
-              href={`/${blogPosts[0].slug}`}
-              title={blogPosts[0].title}
-              desc={
-                blogPosts[0].authors + " on " + formatDate(blogPosts[0].date)
-              }
-            />
-          )}
-        </section>
-      )
-    }
-
-    <section class="flex flex-col gap-[18px]" data-scroll-reveal>
-      <div class="flex flex-col gap-2.5">
-        <Text variant="title">In brief</Text>
-      </div>
-
-      <div class="grid gap-3 md:grid-cols-3">
-        {
-          snapshot.map(([label, value]) => (
-            <div class="flex flex-col gap-2 rounded-[14px] bg-elevated-3 px-4 py-4">
-              <Text tag="div" variant="caption" tone="tertiary">
-                {label}
-              </Text>
-              <Text tag="div" variant="body">
-                {value}
-              </Text>
-            </div>
-          ))
-        }
-      </div>
-    </section>
-
     <section id="mission" class="flex flex-col gap-[18px]" data-scroll-reveal>
       <div class="flex flex-col gap-[14px]">
         <Text variant="title">Mission</Text>
@@ -130,31 +61,10 @@ const snapshot = [
         }
       </div>
     </section>
-
-    <section
-      class="flex flex-col gap-[18px] rounded-[20px] bg-elevated-3 p-6 sm:p-8"
-      data-scroll-reveal
-    >
-      <Text variant="title">Support us</Text>
-      <Text variant="subheading" tone="secondary" class="max-w-[72ch]">
-        Launch costs are covered, but we're seeking funding for the actual
-        hardware of the satellite. Our $10,000 budget is already measly compared
-        to the millions available to many university teams, so every dollar
-        helps.
-      </Text>
-
-      <div class="flex flex-wrap items-center gap-3">
-        <OuterLink
-          href="https://www.gofundme.com/f/support-project-pixel-orbital-student-team"
-          button
-          primary
-        >
-          Donate on GoFundMe
-          <IconExternalLink />
-        </OuterLink>
-      </div>
-    </section>
-  </main>
+  </main> -->
+  <footer class="mx-auto flex w-[min(1040px,calc(100vw-40px))] snap-start flex-col gap-14 py-14 pb-16">
+      <Text tone="tertiary">© 2026 Project Pixel Orbital. All rights reserved.</Text>
+  </footer>
 </div>
 
 <script>
