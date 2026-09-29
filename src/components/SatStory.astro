@@ -140,20 +140,7 @@ const segments = chapters.length + 1;
     }
 
     <div class="story-chapter story-center" data-chapter="together">
-      <p class="story-eyebrow">PixelSat I</p>
-      <div class="mx-auto mt-4 grid max-w-[640px] grid-cols-3 gap-6">
-        {
-          stats.map((stat) => (
-            <div>
-              <div class="text-[clamp(1.2rem,3vw,2rem)] font-medium whitespace-nowrap text-white">
-                {stat.value}
-              </div>
-              <div class="mt-1 text-[13px] text-white/55">{stat.label}</div>
-            </div>
-          ))
-        }
-      </div>
-      <div class="mt-7 flex flex-wrap justify-center gap-3">
+      <div class="flex flex-wrap justify-center gap-3">
         <OuterLink href={donate} button primary>
           Help fund the hardware
           <IconExternalLink />

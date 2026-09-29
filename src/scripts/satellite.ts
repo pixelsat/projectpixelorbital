@@ -157,13 +157,6 @@ const SILVER: Finish = {
   metal: 1,
   height: 0.8,
 };
-const GOLD: Finish = {
-  color: "#c9a45a",
-  coat: 0,
-  rough: 0.3,
-  metal: 1,
-  height: 0.3,
-};
 
 function solarPanelMaps(anisotropy: number) {
   const layer = () => {
@@ -195,9 +188,6 @@ function solarPanelMaps(anisotropy: number) {
     (x: number, y: number, w: number, h: number) =>
     (ctx: CanvasRenderingContext2D) =>
       ctx.rect(x, y, w, h);
-  const circle =
-    (x: number, y: number, r: number) => (ctx: CanvasRenderingContext2D) =>
-      ctx.arc(x, y, r, 0, Math.PI * 2);
   // Cells are cut two to a round wafer, so the two corners on the wafer's
   // edge are cropped.
   const croppedCell =
@@ -219,44 +209,20 @@ function solarPanelMaps(anisotropy: number) {
 
   paint(SOLDERMASK, rect(0, 0, PANEL.w, PANEL.h));
 
-  // A few traces under the soldermask, from the end pads to the sensors.
-  const trace = { ...SOLDERMASK, color: "#111216", height: 0.26 };
-  paint(trace, rect(40.6, 12, 0.8, 30));
-  paint(trace, rect(20, 41.2, 21.4, 0.8));
-  paint(trace, rect(55, 22, 0.6, 20));
-
-  // Mounting holes in the corners.
-  for (const x of [4.5, PANEL.w - 4.5]) {
-    for (const y of [4.5, PANEL.h - 4.5]) {
-      paint({ ...SILVER, rough: 0.4, height: 0.3 }, circle(x, y, 3));
-      paint(
-        { color: "#050506", coat: 0, rough: 1, metal: 0, height: 0 },
-        circle(x, y, 1.7),
-      );
-    }
-  }
-
-  // Four 80 × 40 mm triple-junction cells in series, with welded silver
-  // interconnects across each gap.
-  const cell = { w: 80, h: 40, gap: 2.5, crop: 5 };
-  const cellX = (PANEL.w - cell.w) / 2;
-  const stack = 4 * cell.h + 3 * cell.gap;
-  const cellsTop = (PANEL.h - stack) / 2;
+  // Four triple-junction cells in series filling the panel end to end, with
+  // welded silver interconnects across each gap.
+  const gap = 2.5;
+  const cell = { w: PANEL.w, h: (PANEL.h - 3 * gap) / 4, crop: 5 };
   const tabs = [12, 38.5, 65];
-  // Tabs from the first cell's back to a pad on the board.
-  for (const tx of tabs) {
-    paint(GOLD, rect(cellX + tx - 1, cellsTop - 6, 7, 4.5));
-    paint(SILVER, rect(cellX + tx, cellsTop - 5, 5, 7));
-  }
   for (let i = 0; i < 4; i++) {
-    const y = cellsTop + i * (cell.h + cell.gap);
+    const y = i * (cell.h + gap);
     const lightness = 12 + (random() - 0.5) * 1.6;
     const hue = 231 + (random() - 0.5) * 6;
     const glass = 0.35;
     paint(
       { color: "#161a2c", coat: 1, rough: 0.05, metal: 0, height: 0.62 },
       croppedCell(
-        cellX - glass,
+        -glass,
         y - glass,
         cell.w + glass * 2,
         cell.h + glass * 2,
@@ -271,7 +237,7 @@ function solarPanelMaps(anisotropy: number) {
         metal: 0,
         height: 0.6,
       },
-      croppedCell(cellX, y, cell.w, cell.h, cell.crop),
+      croppedCell(0, y, cell.w, cell.h, cell.crop),
     );
     // Grid fingers are microns wide and sit under the coverglass, so they
     // only faintly tint the cell. Giving them height or metalness puts
@@ -283,79 +249,32 @@ function solarPanelMaps(anisotropy: number) {
       metal: 0,
       height: 0.6,
     };
-    for (let fx = cellX + 1.2; fx < cellX + cell.w - 1; fx += 1.4) {
-      const top = fx < cellX + cell.crop || fx > cellX + cell.w - cell.crop;
+    for (let fx = 1.2; fx < cell.w - 1; fx += 1.4) {
+      const top = fx < cell.crop || fx > cell.w - cell.crop;
       paint(finger, rect(fx, y + (top ? cell.crop : 0.8), 0.12, cell.h - 2.6));
     }
     // Busbar along the uncropped edge, and the bypass diode sitting in a
     // cropped corner.
     paint(
       { ...SILVER, coat: 1, height: 0.66 },
-      rect(cellX + 1, y + cell.h - 2, cell.w - 2, 1.4),
+      rect(1, y + cell.h - 2, cell.w - 2, 1.4),
     );
     paint(
       { color: "#1b1b1f", coat: 0, rough: 0.35, metal: 0.3, height: 0.7 },
-      rect(cellX + 0.6, y + 0.6, 2.2, 2.2),
+      rect(0.6, y + 0.6, 2.2, 2.2),
     );
-    paint(SILVER, rect(cellX + 2.8, y + 1.3, 2, 0.8));
-    // Interconnects from this cell's busbar down to the next cell (or to the
-    // board after the last one). The next cell covers their far ends.
+    paint(SILVER, rect(2.8, y + 1.3, 2, 0.8));
+    if (i === 3) continue;
+    // Interconnects from this cell's busbar down to the next cell, which
+    // covers their far ends.
     for (const tx of tabs) {
-      const end = i < 3 ? cell.gap + 2 : 5;
-      paint(SILVER, rect(cellX + tx, y + cell.h - 2, 5, end + 2));
+      paint(SILVER, rect(tx, y + cell.h - 2, 5, gap + 4));
       // Stress-relief loop in the middle of the gap.
       paint(
         { ...SILVER, color: "#8f929a", height: 0.95 },
-        rect(cellX + tx, y + cell.h + cell.gap / 2 - 0.4, 5, 0.8),
+        rect(tx, y + cell.h + gap / 2 - 0.4, 5, 0.8),
       );
-      if (i === 3) paint(GOLD, rect(cellX + tx - 1, y + cell.h + 1.5, 7, 4.5));
     }
-  }
-
-  // BPW34 sun-sensor photodiode and a thermistor at the top end.
-  const pd = { x: PANEL.w / 2, y: 28 };
-  paint(GOLD, rect(pd.x - 4.2, pd.y - 1.4, 8.4, 2.8));
-  paint(
-    { color: "#16161a", coat: 1, rough: 0.08, metal: 0, height: 1 },
-    rect(pd.x - 2.7, pd.y - 2.15, 5.4, 4.3),
-  );
-  paint(
-    { color: "#2a2638", coat: 1, rough: 0.1, metal: 0.2, height: 1 },
-    rect(pd.x - 1.4, pd.y - 1.4, 2.8, 2.8),
-  );
-  paint(SILVER, rect(pd.x - 1.4, pd.y - 1.4, 0.5, 0.5));
-  paint(GOLD, rect(54.4, 20, 2.2, 1.2));
-  paint(
-    { color: "#1d1d1d", coat: 0, rough: 0.6, metal: 0, height: 0.6 },
-    rect(54.9, 20, 1.2, 1.2),
-  );
-
-  // Silkscreen and fiducials.
-  const silk = {
-    color: "#d9d9d2",
-    coat: 0,
-    rough: 0.7,
-    metal: 0,
-    height: 0.28,
-  };
-  for (const ctx of [albedo, surface, height]) {
-    ctx.font = "600 3px sans-serif";
-    ctx.textBaseline = "middle";
-  }
-  const text = (s: string, x: number, y: number, align: CanvasTextAlign) =>
-    paint(silk, (ctx) => {
-      ctx.textAlign = align;
-      ctx.fillText(s, x, y);
-    });
-  text("PIXELSAT-I", 10, 12, "left");
-  text("SP REV B", PANEL.w - 10, 12, "right");
-  text("SUN", pd.x, pd.y + 5, "center");
-  text("TJ 4S", 10, PANEL.h - 12, "left");
-  for (const [x, y] of [
-    [16, 28],
-    [PANEL.w - 16, PANEL.h - 22],
-  ]) {
-    paint(GOLD, circle(x, y, 0.5));
   }
 
   // Faint grain so large flat areas don't look like vector art.
@@ -920,7 +839,9 @@ export function mountSatellite(
     const sideOf = (p: Pose) => +(p.side === true || (wide && !!p.side));
     const side = lerp(sideOf(a), sideOf(b), t);
     const shiftX = wide ? side * 0.22 : 0;
-    const shiftY = lerp(0.25, wide ? 0 : -0.2, side);
+    // The closing chapter is just two buttons, so the model can sit higher.
+    const drop = (p: Pose) => (p.side === false ? 0.1 : 0.25);
+    const shiftY = lerp(lerp(drop(a), drop(b), t), wide ? 0 : -0.2, side);
     // Sub-pixel jitter, in CSS pixels like the rest of the view offset.
     const pixel = 1 / renderer.getPixelRatio();
     const jitterX = k ? (halton(k, 2) - 0.5) * pixel : 0;
