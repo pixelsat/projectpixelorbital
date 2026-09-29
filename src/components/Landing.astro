@@ -1,21 +1,9 @@
 ---
-import { Picture } from "astro:assets";
 import CardLink from "./CardLink.astro";
 import IconExternalLink from "./icons/IconExternalLink.astro";
 import OuterLink from "./OuterLink.astro";
 import SatStory from "./SatStory.astro";
 import Text from "./Text.astro";
-
-import aadish from "../assets/images/aav_ppo.jpg";
-import alexandra from "../assets/images/alv.png";
-import grace from "../assets/images/gz_ppo.png";
-import vinayak from "../assets/images/vv_ppo.png";
-import weston from "../assets/images/wy_ppo.jpeg";
-import ashwin from "../assets/images/an_ppo.png";
-import james from "../assets/images/jl_ppo.png";
-import olivia from "../assets/images/ok_ppo.png";
-import sid from "../assets/images/sh_ppo.webp";
-import charlotte from "../assets/images/ch.jpg";
 import { formatDate } from "../scripts/date.ts";
 
 interface BlogPost {
@@ -48,39 +36,6 @@ const mission = [
     title: "Inspire other kids",
     body: "We want to prove to students around the world that it's possible to build a CubeSat from scratch with no prior experience on a meager budget as a high school team, and hopefully get others to follow suit!",
   },
-];
-
-const team = [
-  {
-    name: "Ashwin Naren",
-    role: "Team lead",
-    initials: "AN",
-  },
-  {
-    name: "Vinayak Vikram",
-    role: "Electrical lead · structural lead · software",
-    image: vinayak,
-  },
-  { name: "Aadish Verma", role: "Software lead · comms · legal", image: aadish },
-  {
-    name: "Weston Yoo",
-    role: "Project Founder · Project Manager",
-    image: weston,
-  },
-  { name: "Daphne F", role: "Outreach lead · legal", initials: "DF" },
-  { name: "Alexandra Veremey", role: "Comms", image: alexandra },
-  { name: "Siddhartha Hiremath", role: "Software", image: sid },
-  { name: "James Lu", role: "Outreach", image: james },
-  { name: "Charlotte Haase", role: "Outreach", image: charlotte },
-  { name: "Vikrant Chintanaboina", role: "Thermal", initials: "VC" },
-  { name: "Jahnavi Naren", role: "Software · structural", initials: "JN" },
-  {
-    name: "Olivia Kaiser",
-    role: "Outreach",
-    image: olivia,
-  },
-  { name: "Grace Zheng", role: "Structural · media", image: grace },
-  { name: "Caleb Laverty", role: "Outreach", initials: "CL" },
 ];
 
 const snapshot = [
@@ -170,43 +125,6 @@ const snapshot = [
               <Text variant="subheading" tone="secondary" class="mt-2">
                 {item.body}
               </Text>
-            </article>
-          ))
-        }
-      </div>
-    </section>
-
-    <section id="team" class="flex flex-col gap-[18px]" data-scroll-reveal>
-      <div class="flex items-end justify-between gap-5">
-        <Text variant="title">Team</Text>
-      </div>
-
-      <div class="grid gap-x-6 gap-y-8 sm:grid-cols-2 md:grid-cols-3">
-        {
-          team.map((member) => (
-            <article class="flex flex-col gap-[14px]">
-              {member.image ? (
-                <Picture
-                  src={member.image}
-                  formats={["avif"]}
-                  widths={[320, 640]}
-                  sizes="(min-width: 768px) 331px, (min-width: 640px) calc((100vw - 64px) / 2), calc(100vw - 40px)"
-                  quality={85}
-                  class="aspect-square w-full rounded-[16px] bg-elevated-10 object-cover object-center"
-                  alt={member.name}
-                  loading="lazy"
-                />
-              ) : (
-                <div class="grid aspect-square w-full place-items-center rounded-[16px] bg-elevated-5 text-[42px] font-medium text-primary">
-                  {member.initials}
-                </div>
-              )}
-              <div>
-                <Text variant="subheading">{member.name}</Text>
-                <Text variant="body" tone="secondary">
-                  {member.role}
-                </Text>
-              </div>
             </article>
           ))
         }
