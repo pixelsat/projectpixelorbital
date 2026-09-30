@@ -56,15 +56,9 @@ const stats = [
   { value: "$10k", label: "hardware budget" },
   { value: "0", label: "adult supervision" },
 ];
-
-const segments = chapters.length + 1;
 ---
 
-<section
-  class="story relative bg-black"
-  style={`height: calc(${segments * 120}svh + 100svh)`}
-  data-story
->
+<section class="story relative bg-black" data-story>
   <div class="sticky top-0 h-svh overflow-hidden">
     <canvas class="story-canvas absolute inset-0 size-full" data-story-canvas
     ></canvas>
@@ -79,8 +73,14 @@ const segments = chapters.length + 1;
       >
       </div>
     </div>
+  </div>
 
-    <div class="story-chapter inset-0" data-chapter="hero" id="top">
+  {
+    /* The copy scrolls natively over the sticky canvas. Each chapter's top
+      edge marks where its pose is fully shown (see src/scripts/satellite.ts). */
+  }
+  <div class="relative z-10 -mt-[100svh]">
+    <div class="story-chapter" data-chapter="hero" id="top">
       <SiteHeader homeHref="#top" home />
       <div class="story-center story-hero">
         <p class="story-eyebrow">PixelSat I</p>
@@ -123,18 +123,20 @@ const segments = chapters.length + 1;
     {
       chapters.map((chapter) => (
         <div class="story-chapter story-side" data-chapter={chapter.id}>
-          {chapter.eyebrow && <p class="story-eyebrow">{chapter.eyebrow}</p>}
-          <h2 class="story-title">{chapter.title}</h2>
-          {chapter.body && <p class="story-body">{chapter.body}</p>}
-          {chapter.links.length > 0 && (
-            <div class="mt-5 flex flex-col gap-2">
-              {chapter.links.map((link) => (
-                <a class="story-link" href={link.href}>
-                  {link.label} ›
-                </a>
-              ))}
-            </div>
-          )}
+          <div class="story-copy">
+            {chapter.eyebrow && <p class="story-eyebrow">{chapter.eyebrow}</p>}
+            <h2 class="story-title">{chapter.title}</h2>
+            {chapter.body && <p class="story-body">{chapter.body}</p>}
+            {chapter.links.length > 0 && (
+              <div class="mt-5 flex flex-col gap-2">
+                {chapter.links.map((link) => (
+                  <a class="story-link" href={link.href}>
+                    {link.label} ›
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       ))
     }
@@ -152,15 +154,6 @@ const segments = chapters.length + 1;
       </div>
     </div>
   </div>
-
-  {
-    Array.from({ length: segments + 1 }, (_, k) => (
-      <div
-        class="absolute h-px w-full snap-start"
-        style={`top: ${k * 120}svh`}
-      />
-    ))
-  }
 </section>
 
 <script>

@@ -91,12 +91,9 @@
   }
 }
 
-/* Scroll-driven satellite story. The script in src/scripts/satellite.ts sets
-   each chapter's opacity and transform. */
-html:has([data-story]) {
-  scroll-snap-type: y mandatory;
-}
-
+/* Scroll-driven satellite story. Chapters scroll natively over a sticky
+   canvas; src/scripts/satellite.ts poses the model and fades each chapter's
+   opacity from the scroll position. */
 .story-canvas {
   opacity: 0;
   transition: opacity 1.2s ease-out;
@@ -106,16 +103,17 @@ html:has([data-story]) {
   opacity: 1;
 }
 
+/* Each chapter is a viewport tall plus a gap, so the pose holds while its
+   copy is on screen. */
 .story-chapter {
-  position: absolute;
-  z-index: 10;
-  will-change: opacity, transform;
+  position: relative;
+  min-height: 100svh;
+  margin-bottom: 20svh;
+  will-change: opacity;
 }
 
-/* Hidden until the script takes over, so they don't pile up while loading. */
-.story-chapter:not([data-chapter="hero"]) {
-  visibility: hidden;
-  opacity: 0;
+.story-chapter:last-child {
+  margin-bottom: 0;
 }
 
 .story-center {
@@ -123,23 +121,25 @@ html:has([data-story]) {
   text-align: center;
 }
 
-.story-chapter.story-center {
-  inset: 0 0 auto;
+.story-side {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
 }
 
-.story-side {
-  inset: auto 0 0;
+.story-copy {
   padding: 18svh 20px 7svh;
   background: linear-gradient(transparent, rgb(0 0 0 / 85%) 30%);
 }
 
 @media (min-width: 900px) {
   .story-side {
-    inset: 0 auto 0 max(20px, calc((100vw - 1040px) / 2));
-    display: flex;
     width: min(440px, 38vw);
-    flex-direction: column;
+    margin-left: max(20px, calc((100vw - 1040px) / 2));
     justify-content: center;
+  }
+
+  .story-copy {
     padding: 0;
     background: none;
   }

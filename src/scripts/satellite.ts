@@ -868,7 +868,9 @@ export function mountSatellite(
     output.render(renderer, null!, accumulated, 0, false);
   };
 
-  // Chapter k is fully shown at s = k; its copy fades around that point.
+  // Chapter k is fully shown at s = k. Its copy scrolls natively and only
+  // its opacity is set here, from the raw scroll position so it stays in
+  // step with the page.
   const updateCopy = (s: number) => {
     chapters.forEach((el, k) => {
       const d = s - k;
@@ -878,39 +880,68 @@ export function mountSatellite(
           ? 1
           : last && d > 0
             ? 1
-            : 1 - smooth(clamp01((Math.abs(d) - 0.12) / 0.2));
+            : 1 - smooth(clamp01((Math.abs(d) - 0.08) / 0.3));
       el.style.opacity = opacity.toFixed(3);
-      el.style.transform = `translate3d(0, ${(-d * 60).toFixed(1)}px, 0)`;
-      el.style.visibility = opacity < 0.01 ? "hidden" : "visible";
     });
   };
 
+  // Scroll offsets, from the top of the story, at which each chapter's top
+  // reaches the top of the viewport. Measured rather than derived from CSS so
+  // chapters that grow past a screen tall stay in step with their poses.
+  let tops: number[] = [];
+  const measure = () => {
+    const top = story.getBoundingClientRect().top;
+    tops = chapters.map((el) => el.getBoundingClientRect().top - top);
+  };
+  new ResizeObserver(measure).observe(story);
+  measure();
+
   const target = () => {
-    const segment =
-      (story.offsetHeight - window.innerHeight) / (poses.length - 1);
-    // A zero-size viewport (e.g. a hidden iframe) would make this NaN.
-    if (!(segment > 0)) return 0;
     const scrolled = -story.getBoundingClientRect().top;
-    return Math.min(poses.length - 1, Math.max(0, scrolled / segment));
+    const last = tops.length - 1;
+    for (let i = 0; i < last; i++) {
+      if (scrolled < tops[i + 1])
+        return i + Math.max(0, scrolled - tops[i]) / (tops[i + 1] - tops[i]);
+    }
+    return Math.max(0, last);
   };
 
   // Only draw when something changed (scroll is still easing, or the canvas
   // or model changed), and then for SAMPLES frames more to refine the still
   // view. The hero's slow sway moves the camera only a fraction of a pixel
   // per frame, so it keeps a short moving average of the last few samples.
+  //
+  // While the view moves, each frame is a cheap preview without GTAO. Once it
+  // stops, full-quality samples are averaged on top of the last preview
+  // rather than replacing it, so AO and soft shadows fade in over a few
+  // frames instead of popping; the preview ends up weighted 1 / SAMPLES.
   const SAMPLES = 32;
+  // Time constant of the camera's easing towards the scroll position, in ms.
+  // Short enough to track the natively scrolling copy; long enough to smooth
+  // out mouse-wheel steps.
+  const EASE = 50;
   let s = target();
+  let copyAt = NaN;
   let drawn = NaN;
   let k = 0;
+  let last = NaN;
   const tick = (time: number) => {
     if (!running) return;
+    // Clamp the step so a frame after a stall (or a background tab) doesn't
+    // jump.
+    const dt = Math.min(100, time - last) || 16;
+    last = time;
     const goal = target();
+    if (goal !== copyAt) updateCopy((copyAt = goal));
     s =
-      reducedMotion || Math.abs(goal - s) < 1e-4 ? goal : s + (goal - s) * 0.12;
+      reducedMotion || Math.abs(goal - s) < 1e-4
+        ? goal
+        : s + (goal - s) * (1 - Math.exp(-dt / EASE));
+    const moving = s !== drawn;
     const swaying = !reducedMotion && s < 1;
-    if (s !== drawn) updateCopy(s);
-    if (dirty || s !== drawn) k = 0;
+    if (moving || dirty) k = 0;
     if (k < SAMPLES || swaying) {
+      ao.enabled = !moving;
       const weight = Math.max(1 / (k + 1), swaying ? 0.2 : 0);
       frameAt(s, time, k % SAMPLES, weight);
       drawn = s;
@@ -923,7 +954,10 @@ export function mountSatellite(
   new IntersectionObserver(([entry]) => {
     const wasRunning = running;
     running = entry.isIntersecting;
-    if (running && !wasRunning) requestAnimationFrame(tick);
+    if (running && !wasRunning) {
+      last = NaN;
+      requestAnimationFrame(tick);
+    }
   }).observe(story);
 
   updateCopy(s);
