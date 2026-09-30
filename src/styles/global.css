@@ -36,7 +36,7 @@
   --blue-hover: #cf3032;
   --blue-press: #d41519;
 
-  --bg-surface: #0f0f0f;
+  --bg-surface: #000;
   --bg-gradient-start: #151932;
   --bg-gradient-end: #2d3c7f;
   --intro-gradient-start: var(--bg-gradient-start);
@@ -91,92 +91,114 @@
   }
 }
 
-/* Pinned parallax hero. The wrapper's height is set by the landing script
-   (100svh + pin length); the frame sticks while the page scrolls through it. */
-.hero-pin {
-  height: 100svh;
+/* Scroll-driven satellite story. The script in src/scripts/satellite.ts sets
+   each chapter's opacity and transform. */
+html:has([data-story]) {
+  scroll-snap-type: y mandatory;
 }
 
-.hero-pin-frame {
-  position: sticky;
-  top: 0;
-}
-
-.hero-earth-image {
-  transform: scale(1.45);
-  transform-origin: 50% 62%;
-  will-change: transform;
-}
-
-.hero-earth-shade {
-  background: linear-gradient(
-    180deg,
-    rgb(0 0 0 / 28%) 0%,
-    rgb(0 0 0 / 16%) 44%,
-    rgb(0 0 0 / 78%) 100%
-  );
-}
-
-/* Layers the scroll script moves and fades out as the hero releases. */
-.hero-exit {
-  will-change: transform, opacity;
-}
-
-.hero-fade {
+.story-canvas {
   opacity: 0;
-  animation: hero-fade 900ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  animation-delay: var(--fade-delay, 80ms);
+  transition: opacity 1.2s ease-out;
 }
 
-.hero-satellite {
+.story-canvas.is-ready {
+  opacity: 1;
+}
+
+.story-chapter {
   position: absolute;
-  z-index: 2;
-  top: 8%;
-  right: max(-5rem, calc((100vw - 1240px) / 2));
-  width: clamp(190px, 25vw, 360px);
-  will-change: transform, opacity;
+  z-index: 10;
+  will-change: opacity, transform;
 }
 
-.hero-satellite-image {
-  filter: drop-shadow(0 24px 32px rgb(0 0 0 / 55%));
+/* Hidden until the script takes over, so they don't pile up while loading. */
+.story-chapter:not([data-chapter="hero"]) {
+  visibility: hidden;
   opacity: 0;
-  animation: satellite-in 1.4s cubic-bezier(0.16, 1, 0.3, 1) 250ms forwards;
 }
 
-@keyframes hero-fade {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 28px, 0);
+.story-center {
+  padding: 9svh 20px 0;
+  text-align: center;
+}
+
+.story-chapter.story-center {
+  inset: 0 0 auto;
+}
+
+.story-side {
+  inset: auto 0 0;
+  padding: 18svh 20px 7svh;
+  background: linear-gradient(transparent, rgb(0 0 0 / 85%) 30%);
+}
+
+@media (min-width: 900px) {
+  .story-side {
+    inset: 0 auto 0 max(20px, calc((100vw - 1040px) / 2));
+    display: flex;
+    width: min(440px, 38vw);
+    flex-direction: column;
+    justify-content: center;
+    padding: 0;
+    background: none;
   }
-  to {
-    opacity: 1;
-    transform: none;
+
+  .story-hero {
+    position: absolute;
+    inset: 0 auto 0 max(20px, calc((100vw - 1040px) / 2));
+    display: flex;
+    width: min(520px, 44vw);
+    flex-direction: column;
+    justify-content: center;
+    padding: 0;
+    text-align: left;
+  }
+
+  .story-hero .story-display {
+    font-size: clamp(2.6rem, 5vw, 4.5rem);
   }
 }
 
-.hero-scroll-chevron {
-  animation: chevron-bob 2.4s ease-in-out infinite;
+.story-eyebrow {
+  margin-bottom: 10px;
+  color: #ff6b6d;
+  font-size: 17px;
+  font-weight: 500;
 }
 
-@keyframes chevron-bob {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(5px);
-  }
+.story-display {
+  color: #fff;
+  font-size: clamp(2.6rem, 6.5vw, 5.25rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.04;
 }
 
-@keyframes satellite-in {
-  from {
-    opacity: 0;
-    transform: translate3d(6vw, 10vh, 0) rotate(8deg) scale(0.85);
-  }
-  to {
-    opacity: 0.88;
-    transform: rotate(-5deg);
-  }
+.story-title {
+  color: #fff;
+  font-size: clamp(2.1rem, 4vw, 3.4rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+}
+
+.story-lede,
+.story-body {
+  margin-top: 18px;
+  color: rgb(255 255 255 / 68%);
+  font-size: clamp(17px, 1.5vw, 20px);
+  line-height: 1.5;
+}
+
+.story-link {
+  width: fit-content;
+  color: #ff6b6d;
+  font-size: 18px;
+}
+
+.story-link:hover {
+  text-decoration: underline;
 }
 
 .motion-ready [data-scroll-reveal] {
@@ -192,38 +214,15 @@
   transform: translate3d(0, 0, 0);
 }
 
-@media (max-width: 700px) {
-  .hero-satellite {
-    top: 3%;
-    right: -76px;
-    width: 205px;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
 
-  .hero-earth-image {
-    transform: scale(1.08);
-  }
-
-  .hero-scroll-cue {
-    display: none;
-  }
-
-  .hero-fade,
-  .hero-satellite-image,
   .motion-ready [data-scroll-reveal] {
     animation: none;
     opacity: 1;
     transform: none;
     transition: none;
-  }
-
-  .hero-satellite-image {
-    opacity: 0.88;
-    transform: rotate(-5deg);
   }
 }
