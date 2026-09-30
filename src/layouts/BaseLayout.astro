@@ -34,6 +34,7 @@ const socialImage = new URL(image ?? logo.src, Astro.site ?? Astro.url).href;
       href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap"
       rel="stylesheet"
     />
+    <slot name="head" />
     <meta name="description" content={description} />
     <link rel="canonical" href={pageUrl} />
     <meta property="og:site_name" content="Project Pixel Orbital" />

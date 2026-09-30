@@ -1,0 +1,164 @@
+---
+import { getCollection } from "astro:content";
+import BrandInstagram from "./icons/BrandInstagram.astro";
+import BrandYoutube from "./icons/BrandYoutube.astro";
+import IconExternalLink from "./icons/IconExternalLink.astro";
+import OuterLink from "./OuterLink.astro";
+import SiteHeader from "./SiteHeader.astro";
+
+const donate =
+  "https://www.gofundme.com/f/support-project-pixel-orbital-student-team";
+
+const posts = new Map(
+  (await getCollection("blog")).map((post) => [
+    post.id.split("/")[0],
+    post.data.title.trim(),
+  ]),
+);
+const post = (slug: string) => ({ href: `/${slug}`, label: posts.get(slug) });
+
+// Each chapter's `id` picks its camera pose in scripts/frames/satellite.ts;
+// run `pnpm render-frames` after changing chapters or poses.
+const chapters = [
+  {
+    id: "open",
+    eyebrow: "Form factor",
+    title: "3U CubeSat (100×100×300 mm)",
+    links: [],
+  },
+  {
+    id: "adcs",
+    title: "ADCS",
+    body: "IMU, magnetometer, and sun sensor readings are merged and fused using an Extended Kalman Filter to estimate the spacecraft's attitude (orientation). Hand-wound magnetorquers are driven through a PID controller to set the satellite's angular velocity and orientation.",
+    links: [post("software-2"), post("adcs-snn")],
+  },
+  {
+    id: "power",
+    title: "Power",
+    body: "Our battery pack is a 7.4V lithium-ion battery pack powered by high-efficiency solar panels. The satellite runs on a 3.3V bus regulated by a custom power controller, with other (higher voltage) dedicated buses for the communications system and the magnetorquers.",
+    links: [post("electrical-1")],
+  },
+  {
+    id: "obc",
+    title: "Flight computer",
+    body: "A STM32-series processor running the RTIC framework handles all onboard operations on a single core. All code is no_std Rust. We have a Raspberry Pi Zero coprocessor for camera operations, science experiments, and doom.",
+    links: [post("software-3")],
+  },
+  {
+    id: "comms",
+    title: "Communications",
+    body: "Our dual-band communications system uses LoRa UHF at 435 MHz alongside S-band at 2.4 GHz. The UHF transceiver is an E-Byte LoRa module built around a Semtech SX1262 chip and connected to a tape-measure antenna that deploys in orbit via a burn wire, and we are using novel patch antenna technologies for the S-band antenna.",
+    links: [post("software-1")],
+  },
+];
+
+const stats = [
+  { value: "May 2027", label: "current launch target" },
+  { value: "$10k", label: "hardware budget" },
+  { value: "0", label: "adult supervision" },
+];
+
+const segments = chapters.length + 1;
+---
+
+<section
+  class="story relative bg-black"
+  style={`height: calc(${segments * 120}svh + 100svh)`}
+  data-story
+>
+  <div class="sticky top-0 h-svh overflow-hidden">
+    <canvas class="story-canvas absolute inset-0 size-full" data-story-canvas
+    ></canvas>
+
+    <div class="story-chapter inset-0" data-chapter="hero" id="top">
+      <SiteHeader homeHref="#top" home />
+      <div class="story-center story-hero">
+        <p class="story-eyebrow">PixelSat I</p>
+        <h1 class="story-display">A CubeSat built by high schoolers</h1>
+        <p class="story-lede mx-auto max-w-[62ch] min-[900px]:mx-0">
+          Project Pixel Orbital is a fully student-led team at Stanford Online
+          High School building PixelSat I, a 3U CubeSat targeting launch into
+          sun-synchronous low Earth orbit in early 2027, from scratch, on an
+          extremely limited budget.
+        </p>
+        <div
+          class="mt-6 flex items-center justify-center gap-3 min-[900px]:justify-start"
+        >
+          <OuterLink href={donate} button primary>
+            Donate to PixelSat I
+            <IconExternalLink />
+          </OuterLink>
+          <OuterLink
+            href="https://www.instagram.com/projectpixelorbital/"
+            button
+            transparent
+            class="text-white hover:bg-white/10"
+            aria-label="Project Pixel Orbital on Instagram"
+          >
+            <BrandInstagram />
+          </OuterLink>
+          <OuterLink
+            href="https://www.youtube.com/@projectpixelorbital2026"
+            button
+            transparent
+            class="text-white hover:bg-white/10"
+            aria-label="Project Pixel Orbital on YouTube"
+          >
+            <BrandYoutube />
+          </OuterLink>
+        </div>
+      </div>
+    </div>
+
+    {
+      chapters.map((chapter) => (
+        <div class="story-chapter story-side" data-chapter={chapter.id}>
+          {chapter.eyebrow && <p class="story-eyebrow">{chapter.eyebrow}</p>}
+          <h2 class="story-title">{chapter.title}</h2>
+          {chapter.body && <p class="story-body">{chapter.body}</p>}
+          {chapter.links.length > 0 && (
+            <div class="mt-5 flex flex-col gap-2">
+              {chapter.links.map((link) => (
+                <a class="story-link" href={link.href}>
+                  {link.label} ›
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
+      ))
+    }
+
+    <div class="story-chapter story-center" data-chapter="together">
+      <div class="flex flex-wrap justify-center gap-3">
+        <OuterLink href={donate} button primary>
+          Help fund the hardware
+          <IconExternalLink />
+        </OuterLink>
+        <OuterLink href="https://www.instagram.com/projectpixelorbital/" button>
+          Follow the build
+          <IconExternalLink />
+        </OuterLink>
+      </div>
+    </div>
+  </div>
+
+  {
+    Array.from({ length: segments + 1 }, (_, k) => (
+      <div
+        class="absolute h-px w-full snap-start"
+        style={`top: ${k * 120}svh`}
+      />
+    ))
+  }
+</section>
+
+<script>
+  import { mountStory } from "../scripts/story.ts";
+
+  const story = document.querySelector<HTMLElement>("[data-story]")!;
+  const canvas = story.querySelector<HTMLCanvasElement>("[data-story-canvas]")!;
+  const chapters = [...story.querySelectorAll<HTMLElement>("[data-chapter]")];
+
+  mountStory(canvas, chapters, story, () => canvas.classList.add("is-ready"));
+</script>

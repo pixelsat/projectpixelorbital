@@ -1,0 +1,16 @@
+{
+  "sets": {
+    "wide": {
+      "width": 1920,
+      "height": 1080,
+      "wide": true
+    },
+    "narrow": {
+      "width": 780,
+      "height": 1688,
+      "wide": false
+    }
+  },
+  "framesPerMove": 24,
+  "ext": "webp"
+}
