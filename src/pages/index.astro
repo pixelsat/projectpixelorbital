@@ -17,13 +17,20 @@ const blogPosts = (await getCollection("blog"))
 ---
 
 <BaseLayout>
-  {/* Start the model download alongside the JS bundle instead of after it. */}
+  {/* Start the first story frame downloading before the script runs. */}
   <link
     slot="head"
     rel="preload"
-    href="/models/pixelsat.glb"
-    as="fetch"
-    crossorigin="anonymous"
+    href="/frames/wide/0000.webp"
+    as="image"
+    media="(min-width: 900px)"
+  />
+  <link
+    slot="head"
+    rel="preload"
+    href="/frames/narrow/0000.webp"
+    as="image"
+    media="(max-width: 899.98px)"
   />
   <Landing blogPosts={blogPosts} />
 </BaseLayout>

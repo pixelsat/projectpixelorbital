@@ -17,7 +17,8 @@ const posts = new Map(
 );
 const post = (slug: string) => ({ href: `/${slug}`, label: posts.get(slug) });
 
-// Each chapter's `id` picks its camera pose in src/scripts/satellite.ts.
+// Each chapter's `id` picks its camera pose in scripts/frames/satellite.ts;
+// run `pnpm render-frames` after changing chapters or poses.
 const chapters = [
   {
     id: "open",
@@ -68,17 +69,6 @@ const segments = chapters.length + 1;
   <div class="sticky top-0 h-svh overflow-hidden">
     <canvas class="story-canvas absolute inset-0 size-full" data-story-canvas
     ></canvas>
-
-    <div
-      class="absolute bottom-10 left-1/2 z-10 h-0.5 w-32 -translate-x-1/2 overflow-hidden rounded-full bg-white/15 transition-opacity duration-700"
-      data-story-loading
-    >
-      <div
-        class="h-full w-0 bg-white/60 transition-[width] duration-300"
-        data-story-percent
-      >
-      </div>
-    </div>
 
     <div class="story-chapter inset-0" data-chapter="hero" id="top">
       <SiteHeader homeHref="#top" home />
@@ -164,22 +154,11 @@ const segments = chapters.length + 1;
 </section>
 
 <script>
-  import { mountSatellite } from "../scripts/satellite.ts";
+  import { mountStory } from "../scripts/story.ts";
 
   const story = document.querySelector<HTMLElement>("[data-story]")!;
   const canvas = story.querySelector<HTMLCanvasElement>("[data-story-canvas]")!;
-  const loading = story.querySelector<HTMLElement>("[data-story-loading]")!;
-  const percent = story.querySelector<HTMLElement>("[data-story-percent]")!;
   const chapters = [...story.querySelectorAll<HTMLElement>("[data-chapter]")];
 
-  mountSatellite(
-    canvas,
-    chapters,
-    story,
-    (fraction) => (percent.style.width = `${fraction * 100}%`),
-    () => {
-      loading.style.opacity = "0";
-      canvas.classList.add("is-ready");
-    },
-  );
+  mountStory(canvas, chapters, story, () => canvas.classList.add("is-ready"));
 </script>

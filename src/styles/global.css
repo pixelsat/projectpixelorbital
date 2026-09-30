@@ -91,7 +91,7 @@
   }
 }
 
-/* Scroll-driven satellite story. The script in src/scripts/satellite.ts sets
+/* Scroll-driven satellite story. The script in src/scripts/story.ts sets
    each chapter's opacity and transform. */
 html:has([data-story]) {
   scroll-snap-type: y mandatory;

@@ -117,7 +117,6 @@ export const POSES: Record<string, Pose> = {
 };
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
-const smooth = (t: number) => t * t * (3 - 2 * t);
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 // Low-discrepancy sequence in [0, 1): successive samples fill the gaps left
 // by earlier ones.
@@ -163,7 +162,7 @@ function solarPanelMaps(anisotropy: number) {
     const canvas = document.createElement("canvas");
     canvas.width = PANEL.w * PX_PER_MM;
     canvas.height = PANEL.h * PX_PER_MM;
-    const ctx = canvas.getContext("2d")!;
+    const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
     ctx.scale(PX_PER_MM, PX_PER_MM);
     return ctx;
   };
@@ -299,16 +298,15 @@ function solarPanelMaps(anisotropy: number) {
   const normals = new ImageData(width, rows);
   const strength = 3 / 255;
   for (let y = 0; y < rows; y++) {
+    const up = Math.max(0, y - 1) * width;
+    const row = y * width;
+    const down = Math.min(rows - 1, y + 1) * width;
     for (let x = 0; x < width; x++) {
-      const at = (xx: number, yy: number) =>
-        h[
-          (Math.min(rows - 1, Math.max(0, yy)) * width +
-            Math.min(width - 1, Math.max(0, xx))) *
-            4
-        ];
-      const dx = (at(x + 1, y) - at(x - 1, y)) * strength;
-      const dy = (at(x, y + 1) - at(x, y - 1)) * strength;
-      const len = Math.hypot(dx, dy, 1);
+      const left = Math.max(0, x - 1);
+      const right = Math.min(width - 1, x + 1);
+      const dx = (h[(row + right) * 4] - h[(row + left) * 4]) * strength;
+      const dy = (h[(down + x) * 4] - h[(up + x) * 4]) * strength;
+      const len = Math.sqrt(dx * dx + dy * dy + 1);
       const i = (y * width + x) * 4;
       normals.data[i] = byte((-dx / len + 1) / 2);
       normals.data[i + 1] = byte((dy / len + 1) / 2);
@@ -492,20 +490,22 @@ function finishMaterial(m: THREE.MeshStandardMaterial) {
   }
 }
 
-export function mountSatellite(
+// Renders the story offline into canvas, which must not be resized. Returns a
+// function that draws the view at pose point p (pose i is shown at p = i),
+// averaging the given number of jittered samples.
+export async function createRenderer(
   canvas: HTMLCanvasElement,
-  chapters: HTMLElement[],
-  story: HTMLElement,
-  onProgress: (fraction: number) => void,
-  onReady: () => void,
+  width: number,
+  height: number,
+  wide: boolean,
 ) {
-  const reducedMotion = window.matchMedia(
-    "(prefers-reduced-motion: reduce)",
-  ).matches;
-  const poses = chapters.map((el) => POSES[el.dataset.chapter!]);
+  const poses = Object.values(POSES);
 
-  const renderer = new THREE.WebGLRenderer({ canvas });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  const renderer = new THREE.WebGLRenderer({
+    canvas,
+    preserveDrawingBuffer: true,
+  });
+  renderer.setSize(width, height, false);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFShadowMap;
   // GTAO renders the scene a second time; without this the shadow map would
@@ -534,25 +534,25 @@ export function mountSatellite(
   scene.add(rim);
   scene.add(new THREE.HemisphereLight(0xe8eeff, 0x1a1a1a, 0.5));
 
-  const camera = new THREE.PerspectiveCamera(28, 1, 5, 5000);
+  const camera = new THREE.PerspectiveCamera(28, width / height, 5, 5000);
 
-  // The composer draws one linear HDR sample of the scene with AO. Once the
-  // view stops moving, samples keep coming with the camera, key light and AO
-  // noise jittered, and are averaged into `accumulated`: this smooths edges
-  // and thin parts well beyond MSAA, turns the key light's single shadow into
-  // a soft area-light one, and dissolves AO noise. Tone mapping happens once,
-  // on the average.
+  // The composer draws one linear HDR sample of the scene with AO. Samples
+  // with the camera, key light and AO noise jittered are averaged into
+  // `accumulated`: this smooths edges and thin parts well beyond MSAA, turns
+  // the key light's single shadow into a soft area-light one, and dissolves
+  // AO noise. Tone mapping happens once, on the average.
   const composer = new EffectComposer(
     renderer,
-    new THREE.WebGLRenderTarget(1, 1, {
+    new THREE.WebGLRenderTarget(width, height, {
       type: THREE.HalfFloatType,
       samples: 4,
     }),
   );
   composer.renderToScreen = false;
+  composer.setSize(width, height);
   composer.addPass(new RenderPass(scene, camera));
   // Units are millimetres, so the AO radius is a few mm of contact shading.
-  const ao = new GTAOPass(scene, camera);
+  const ao = new GTAOPass(scene, camera, width, height);
   ao.updateGtaoMaterial({
     radius: 60,
     distanceExponent: 1,
@@ -562,7 +562,7 @@ export function mountSatellite(
   });
   composer.addPass(ao);
 
-  const accumulated = new THREE.WebGLRenderTarget(1, 1, {
+  const accumulated = new THREE.WebGLRenderTarget(width, height, {
     type: THREE.HalfFloatType,
     depthBuffer: false,
   });
@@ -646,7 +646,7 @@ export function mountSatellite(
     }
   };
   const renderAO = ao.render.bind(ao);
-  const withoutFaders = new THREE.WebGLRenderTarget(1, 1, {
+  const withoutFaders = new THREE.WebGLRenderTarget(width, height, {
     type: THREE.HalfFloatType,
     depthBuffer: false,
   });
@@ -668,7 +668,6 @@ export function mountSatellite(
     renderer.autoClear = true;
   };
 
-  let dirty = true;
   const sat = new THREE.Group();
   sat.position.y = -150;
   scene.add(sat);
@@ -685,43 +684,35 @@ export function mountSatellite(
 
   const loader = new GLTFLoader();
   loader.setMeshoptDecoder(MeshoptDecoder);
-  loader.load(
-    "/models/pixelsat.glb",
-    (gltf) => {
-      const finished = new Set<THREE.Material>();
-      gltf.scene.traverse((o) => {
+  const gltf = await loader.loadAsync("/models/pixelsat.glb");
+  const finished = new Set<THREE.Material>();
+  gltf.scene.traverse((o) => {
+    if (!(o instanceof THREE.Mesh)) return;
+    for (const m of materialsOf(o)) {
+      if (finished.has(m)) continue;
+      finished.add(m);
+      finishMaterial(m as THREE.MeshStandardMaterial);
+    }
+  });
+  for (const child of [...gltf.scene.children]) {
+    child.traverse((o) => (o.castShadow = o.receiveShadow = true));
+    if (child.name === "frame") {
+      child.traverse((o) => {
         if (!(o instanceof THREE.Mesh)) return;
-        for (const m of materialsOf(o)) {
-          if (finished.has(m)) continue;
-          finished.add(m);
-          finishMaterial(m as THREE.MeshStandardMaterial);
-        }
+        makeFadeable(o);
+        frameMeshes.push(o);
       });
-      for (const child of [...gltf.scene.children]) {
-        child.traverse((o) => (o.castShadow = o.receiveShadow = true));
-        if (child.name === "frame") {
-          child.traverse((o) => {
-            if (!(o instanceof THREE.Mesh)) return;
-            makeFadeable(o);
-            frameMeshes.push(o);
-          });
-        } else {
-          nodes[child.name as Part] = child;
-          restBoxes[child.name as Part] = new THREE.Box3().setFromObject(child);
-          // Quantized meshes carry their offset in the node transform.
-          restY[child.name as Part] = child.position.y;
-        }
-        sat.add(child);
-      }
-      dirty = true;
-      onReady();
-    },
-    (event) => event.total && onProgress(event.loaded / event.total),
-  );
+    } else {
+      nodes[child.name as Part] = child;
+      restBoxes[child.name as Part] = new THREE.Box3().setFromObject(child);
+      // Quantized meshes carry their offset in the node transform.
+      restY[child.name as Part] = child.position.y;
+    }
+    sat.add(child);
+  }
 
   const centerOf = (focus: Pose["focus"], lift: Pose["lift"]) => {
-    if (focus === "all" || !restBoxes[focus[0]])
-      return new THREE.Vector3(0, 150, 0);
+    if (focus === "all") return new THREE.Vector3(0, 150, 0);
     const box = new THREE.Box3();
     for (const part of focus) {
       box.union(
@@ -733,48 +724,23 @@ export function mountSatellite(
     return box.getCenter(new THREE.Vector3());
   };
 
-  let width = 0;
-  let height = 0;
-  const resize = () => {
-    width = canvas.clientWidth;
-    height = canvas.clientHeight;
-    renderer.setSize(width, height, false);
-    composer.setPixelRatio(renderer.getPixelRatio());
-    composer.setSize(width, height);
-    const ratio = renderer.getPixelRatio();
-    accumulated.setSize(Math.floor(width * ratio), Math.floor(height * ratio));
-    withoutFaders.setSize(
-      Math.floor(width * ratio),
-      Math.floor(height * ratio),
-    );
-    camera.aspect = width / height;
-    camera.updateProjectionMatrix();
-    dirty = true;
-  };
-  new ResizeObserver(resize).observe(canvas);
-  resize();
-
   const focusA = new THREE.Vector3();
   const focusB = new THREE.Vector3();
   const offset = new THREE.Vector3();
   const lightDir = new THREE.Vector3();
   const disc = new THREE.Vector3();
-  let running = false;
 
-  // Draws sample k of the view at s (k = 0 is unjittered) and blends it into
+  // Draws sample k of the view at p (k = 0 is unjittered) and blends it into
   // the running average with the given weight.
-  const frameAt = (s: number, time: number, k: number, weight: number) => {
-    const i = Math.min(poses.length - 2, Math.floor(s));
-    // Hold each pose for the first third of its segment, then move.
-    const t = smooth(clamp01((s - i - 0.3) / 0.7));
+  const frameAt = (p: number, k: number, weight: number) => {
+    const i = Math.min(poses.length - 2, Math.floor(p));
+    const t = p - i;
     const a = poses[i];
     const b = poses[i + 1];
 
     for (const part of PARTS) {
-      const node = nodes[part];
-      if (node)
-        node.position.y =
-          restY[part] + lerp(a.lift[part] ?? 0, b.lift[part] ?? 0, t);
+      nodes[part].position.y =
+        restY[part] + lerp(a.lift[part] ?? 0, b.lift[part] ?? 0, t);
     }
 
     const panelsOff = lerp(a.panels, b.panels, t);
@@ -796,10 +762,7 @@ export function mountSatellite(
 
     // Portrait screens can't fit the model as wide, so back off.
     const fit = Math.max(1, 1.25 / camera.aspect) ** 0.8;
-    const sway = reducedMotion
-      ? 0
-      : Math.sin(time / 2400) * 6 * (1 - t) * +(i === 0);
-    const az = THREE.MathUtils.degToRad(lerp(a.az, b.az, t) + sway);
+    const az = THREE.MathUtils.degToRad(lerp(a.az, b.az, t));
     scene.environmentRotation.y = az;
     const el = THREE.MathUtils.degToRad(lerp(a.el, b.el, t));
     const dist = lerp(a.dist, b.dist, t) * fit;
@@ -835,17 +798,14 @@ export function mountSatellite(
     camera.rotateZ(THREE.MathUtils.degToRad(lerp(a.roll, b.roll, t)));
 
     // Shift the projection so the model sits beside (or below) the copy.
-    const wide = width >= 900;
     const sideOf = (p: Pose) => +(p.side === true || (wide && !!p.side));
     const side = lerp(sideOf(a), sideOf(b), t);
     const shiftX = wide ? side * 0.22 : 0;
     // The closing chapter is just two buttons, so the model can sit higher.
     const drop = (p: Pose) => (p.side === false ? 0.1 : 0.25);
     const shiftY = lerp(lerp(drop(a), drop(b), t), wide ? 0 : -0.2, side);
-    // Sub-pixel jitter, in CSS pixels like the rest of the view offset.
-    const pixel = 1 / renderer.getPixelRatio();
-    const jitterX = k ? (halton(k, 2) - 0.5) * pixel : 0;
-    const jitterY = k ? (halton(k, 3) - 0.5) * pixel : 0;
+    const jitterX = k ? halton(k, 2) - 0.5 : 0;
+    const jitterY = k ? halton(k, 3) - 0.5 : 0;
     camera.setViewOffset(
       width,
       height,
@@ -865,66 +825,10 @@ export function mountSatellite(
     renderer.setRenderTarget(accumulated);
     accumulate.render(renderer);
     renderer.autoClear = true;
+  };
+
+  return (p: number, samples: number) => {
+    for (let k = 0; k < samples; k++) frameAt(p, k, 1 / (k + 1));
     output.render(renderer, null!, accumulated, 0, false);
   };
-
-  // Chapter k is fully shown at s = k; its copy fades around that point.
-  const updateCopy = (s: number) => {
-    chapters.forEach((el, k) => {
-      const d = s - k;
-      const last = k === chapters.length - 1;
-      const opacity =
-        k === 0 && d < 0
-          ? 1
-          : last && d > 0
-            ? 1
-            : 1 - smooth(clamp01((Math.abs(d) - 0.12) / 0.2));
-      el.style.opacity = opacity.toFixed(3);
-      el.style.transform = `translate3d(0, ${(-d * 60).toFixed(1)}px, 0)`;
-      el.style.visibility = opacity < 0.01 ? "hidden" : "visible";
-    });
-  };
-
-  const target = () => {
-    const segment =
-      (story.offsetHeight - window.innerHeight) / (poses.length - 1);
-    // A zero-size viewport (e.g. a hidden iframe) would make this NaN.
-    if (!(segment > 0)) return 0;
-    const scrolled = -story.getBoundingClientRect().top;
-    return Math.min(poses.length - 1, Math.max(0, scrolled / segment));
-  };
-
-  // Only draw when something changed (scroll is still easing, or the canvas
-  // or model changed), and then for SAMPLES frames more to refine the still
-  // view. The hero's slow sway moves the camera only a fraction of a pixel
-  // per frame, so it keeps a short moving average of the last few samples.
-  const SAMPLES = 32;
-  let s = target();
-  let drawn = NaN;
-  let k = 0;
-  const tick = (time: number) => {
-    if (!running) return;
-    const goal = target();
-    s =
-      reducedMotion || Math.abs(goal - s) < 1e-4 ? goal : s + (goal - s) * 0.12;
-    const swaying = !reducedMotion && s < 1;
-    if (s !== drawn) updateCopy(s);
-    if (dirty || s !== drawn) k = 0;
-    if (k < SAMPLES || swaying) {
-      const weight = Math.max(1 / (k + 1), swaying ? 0.2 : 0);
-      frameAt(s, time, k % SAMPLES, weight);
-      drawn = s;
-      dirty = false;
-      k++;
-    }
-    requestAnimationFrame(tick);
-  };
-
-  new IntersectionObserver(([entry]) => {
-    const wasRunning = running;
-    running = entry.isIntersecting;
-    if (running && !wasRunning) requestAnimationFrame(tick);
-  }).observe(story);
-
-  updateCopy(s);
 }
