@@ -7,118 +7,19 @@ import { GTAOPass } from "three/examples/jsm/postprocessing/GTAOPass.js";
 import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
 import { FullScreenQuad } from "three/examples/jsm/postprocessing/Pass.js";
 
-// Node names baked into public/models/pixelsat.glb. The model is Y-up, in
-// millimetres, with the long axis running from y = 0 (bottom) to y = 300.
-const PARTS = [
-  "torquers",
-  "battery",
-  "power",
-  "mppt",
-  "obc",
-  "comms",
-  "antenna",
-] as const;
-type Part = (typeof PARTS)[number];
+import {
+  PARTS,
+  POSE_LIST,
+  clamp01,
+  lerp,
+  type Part,
+  type Pose,
+} from "../../src/scripts/story.ts";
 
-interface Pose {
-  focus: Part[] | "all";
-  az: number; // degrees around the long axis
-  el: number; // degrees above the horizon
-  dist: number; // mm from the focus point
-  roll: number; // camera roll in degrees
-  panels: number; // 0 = attached, 1 = pulled off
-  frame: number; // frame opacity
-  // Text sits beside the model instead of above it; "wide" only does so on
-  // wide screens.
-  side: boolean | "wide";
-  lift: Partial<Record<Part, number>>; // mm along the long axis
-}
+// Renders the satellite story offline, for render-frames.mjs. The page plays
+// the resulting frames back (src/scripts/story-player.ts) instead of running
+// any of this.
 
-const base = { roll: 0, panels: 1, frame: 0, side: true, lift: {} };
-
-// One pose per [data-chapter], in page order.
-export const POSES: Record<string, Pose> = {
-  hero: {
-    ...base,
-    focus: "all",
-    az: 38,
-    el: 14,
-    dist: 1000,
-    roll: -62,
-    panels: 0,
-    frame: 1,
-    side: "wide",
-  },
-  open: { ...base, focus: "all", az: 20, el: 16, dist: 720, frame: 1 },
-  adcs: {
-    ...base,
-    focus: ["torquers"],
-    az: 40,
-    el: 30,
-    dist: 430,
-    lift: { torquers: 40 },
-  },
-  power: {
-    ...base,
-    focus: ["battery", "power", "mppt"],
-    az: 60,
-    el: 26,
-    dist: 520,
-    lift: {
-      torquers: 150,
-      battery: 60,
-      power: 25,
-      obc: -30,
-      comms: -50,
-      antenna: -70,
-    },
-  },
-  obc: {
-    ...base,
-    focus: ["obc"],
-    az: 25,
-    el: 42,
-    dist: 400,
-    lift: {
-      torquers: 220,
-      battery: 150,
-      power: 110,
-      mppt: 85,
-      comms: -40,
-      antenna: -60,
-    },
-  },
-  comms: {
-    ...base,
-    focus: ["comms", "antenna"],
-    az: 5,
-    el: 34,
-    dist: 420,
-    lift: {
-      torquers: 260,
-      battery: 190,
-      power: 150,
-      mppt: 125,
-      obc: 60,
-      antenna: -35,
-    },
-  },
-  together: {
-    ...base,
-    focus: "all",
-    az: 215,
-    el: 16,
-    dist: 1000,
-    roll: -62,
-    panels: 0,
-    frame: 1,
-    side: false,
-  },
-};
-
-const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
-const smooth = (t: number) => t * t * (3 - 2 * t);
-const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 // Low-discrepancy sequence in [0, 1): successive samples fill the gaps left
 // by earlier ones.
 const halton = (i: number, base: number) => {
@@ -158,7 +59,7 @@ const SILVER: Finish = {
   height: 0.8,
 };
 
-function solarPanelMaps(anisotropy: number) {
+export function solarPanelMaps(anisotropy: number) {
   const layer = () => {
     const canvas = document.createElement("canvas");
     canvas.width = PANEL.w * PX_PER_MM;
@@ -492,20 +393,28 @@ function finishMaterial(m: THREE.MeshStandardMaterial) {
   }
 }
 
-export function mountSatellite(
-  canvas: HTMLCanvasElement,
-  chapters: HTMLElement[],
-  story: HTMLElement,
-  onProgress: (fraction: number) => void,
-  onReady: () => void,
-) {
-  const reducedMotion = window.matchMedia(
-    "(prefers-reduced-motion: reduce)",
-  ).matches;
-  const poses = chapters.map((el) => POSES[el.dataset.chapter!]);
+export interface RenderOptions {
+  // Frame size in pixels. The frame is centred on the focus point.
+  width: number;
+  height: number;
+  // Pixels per viewport height at fit = 1: the frame spans height / base
+  // viewport heights, so it can include what portrait screens or shifted
+  // layouts see beyond a landscape viewport.
+  base: number;
+}
 
-  const renderer = new THREE.WebGLRenderer({ canvas });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+export async function createRenderer(
+  canvas: HTMLCanvasElement,
+  { width, height, base }: RenderOptions,
+) {
+  const poses = POSE_LIST;
+
+  const renderer = new THREE.WebGLRenderer({
+    canvas,
+    preserveDrawingBuffer: true,
+  });
+  renderer.setPixelRatio(1);
+  renderer.setSize(width, height, false);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFShadowMap;
   // GTAO renders the scene a second time; without this the shadow map would
@@ -522,7 +431,7 @@ export function mountSatellite(
   // from the upper left, and casts the only shadows.
   const key = new THREE.DirectionalLight(0xffffff, 3.4);
   key.castShadow = true;
-  key.shadow.mapSize.set(2048, 2048);
+  key.shadow.mapSize.set(4096, 4096);
   key.shadow.bias = -0.0004;
   key.shadow.normalBias = 0.4;
   key.shadow.radius = 6;
@@ -534,25 +443,35 @@ export function mountSatellite(
   scene.add(rim);
   scene.add(new THREE.HemisphereLight(0xe8eeff, 0x1a1a1a, 0.5));
 
-  const camera = new THREE.PerspectiveCamera(28, 1, 5, 5000);
+  // The page's camera has a 28° vertical field of view across one viewport
+  // height; the frame spans height / base of those.
+  const camera = new THREE.PerspectiveCamera(
+    THREE.MathUtils.radToDeg(
+      2 * Math.atan((height / base) * Math.tan(THREE.MathUtils.degToRad(14))),
+    ),
+    width / height,
+    5,
+    5000,
+  );
 
-  // The composer draws one linear HDR sample of the scene with AO. Once the
-  // view stops moving, samples keep coming with the camera, key light and AO
-  // noise jittered, and are averaged into `accumulated`: this smooths edges
-  // and thin parts well beyond MSAA, turns the key light's single shadow into
-  // a soft area-light one, and dissolves AO noise. Tone mapping happens once,
-  // on the average.
+  // The composer draws one linear HDR sample of the scene with AO. Samples
+  // are taken with the camera, key light and AO noise jittered, and averaged
+  // into `accumulated`: this smooths edges and thin parts well beyond MSAA,
+  // turns the key light's single shadow into a soft area-light one, and
+  // dissolves AO noise. Tone mapping happens once, on the average.
   const composer = new EffectComposer(
     renderer,
-    new THREE.WebGLRenderTarget(1, 1, {
+    new THREE.WebGLRenderTarget(width, height, {
       type: THREE.HalfFloatType,
       samples: 4,
     }),
   );
   composer.renderToScreen = false;
+  composer.setPixelRatio(1);
+  composer.setSize(width, height);
   composer.addPass(new RenderPass(scene, camera));
   // Units are millimetres, so the AO radius is a few mm of contact shading.
-  const ao = new GTAOPass(scene, camera);
+  const ao = new GTAOPass(scene, camera, width, height);
   ao.updateGtaoMaterial({
     radius: 60,
     distanceExponent: 1,
@@ -562,10 +481,12 @@ export function mountSatellite(
   });
   composer.addPass(ao);
 
-  const accumulated = new THREE.WebGLRenderTarget(1, 1, {
-    type: THREE.HalfFloatType,
-    depthBuffer: false,
-  });
+  const target = () =>
+    new THREE.WebGLRenderTarget(width, height, {
+      type: THREE.HalfFloatType,
+      depthBuffer: false,
+    });
+  const accumulated = target();
   // Blends a sample in with weight w: a running average when w = 1 / n.
   const accumulateMaterial = new THREE.ShaderMaterial({
     uniforms: { tSample: { value: null }, weight: { value: 1 } },
@@ -646,10 +567,7 @@ export function mountSatellite(
     }
   };
   const renderAO = ao.render.bind(ao);
-  const withoutFaders = new THREE.WebGLRenderTarget(1, 1, {
-    type: THREE.HalfFloatType,
-    depthBuffer: false,
-  });
+  const withoutFaders = target();
   ao.render = (renderer, writeBuffer, ...rest) => {
     renderAO(renderer, writeBuffer, ...rest);
     const partial = faders.filter(
@@ -668,7 +586,6 @@ export function mountSatellite(
     renderer.autoClear = true;
   };
 
-  let dirty = true;
   const sat = new THREE.Group();
   sat.position.y = -150;
   scene.add(sat);
@@ -685,39 +602,32 @@ export function mountSatellite(
 
   const loader = new GLTFLoader();
   loader.setMeshoptDecoder(MeshoptDecoder);
-  loader.load(
-    "/models/pixelsat.glb",
-    (gltf) => {
-      const finished = new Set<THREE.Material>();
-      gltf.scene.traverse((o) => {
+  const gltf = await loader.loadAsync("/models/pixelsat.glb");
+  const finished = new Set<THREE.Material>();
+  gltf.scene.traverse((o) => {
+    if (!(o instanceof THREE.Mesh)) return;
+    for (const m of materialsOf(o)) {
+      if (finished.has(m)) continue;
+      finished.add(m);
+      finishMaterial(m as THREE.MeshStandardMaterial);
+    }
+  });
+  for (const child of [...gltf.scene.children]) {
+    child.traverse((o) => (o.castShadow = o.receiveShadow = true));
+    if (child.name === "frame") {
+      child.traverse((o) => {
         if (!(o instanceof THREE.Mesh)) return;
-        for (const m of materialsOf(o)) {
-          if (finished.has(m)) continue;
-          finished.add(m);
-          finishMaterial(m as THREE.MeshStandardMaterial);
-        }
+        makeFadeable(o);
+        frameMeshes.push(o);
       });
-      for (const child of [...gltf.scene.children]) {
-        child.traverse((o) => (o.castShadow = o.receiveShadow = true));
-        if (child.name === "frame") {
-          child.traverse((o) => {
-            if (!(o instanceof THREE.Mesh)) return;
-            makeFadeable(o);
-            frameMeshes.push(o);
-          });
-        } else {
-          nodes[child.name as Part] = child;
-          restBoxes[child.name as Part] = new THREE.Box3().setFromObject(child);
-          // Quantized meshes carry their offset in the node transform.
-          restY[child.name as Part] = child.position.y;
-        }
-        sat.add(child);
-      }
-      dirty = true;
-      onReady();
-    },
-    (event) => event.total && onProgress(event.loaded / event.total),
-  );
+    } else {
+      nodes[child.name as Part] = child;
+      restBoxes[child.name as Part] = new THREE.Box3().setFromObject(child);
+      // Quantized meshes carry their offset in the node transform.
+      restY[child.name as Part] = child.position.y;
+    }
+    sat.add(child);
+  }
 
   const centerOf = (focus: Pose["focus"], lift: Pose["lift"]) => {
     if (focus === "all" || !restBoxes[focus[0]])
@@ -733,40 +643,16 @@ export function mountSatellite(
     return box.getCenter(new THREE.Vector3());
   };
 
-  let width = 0;
-  let height = 0;
-  const resize = () => {
-    width = canvas.clientWidth;
-    height = canvas.clientHeight;
-    renderer.setSize(width, height, false);
-    composer.setPixelRatio(renderer.getPixelRatio());
-    composer.setSize(width, height);
-    const ratio = renderer.getPixelRatio();
-    accumulated.setSize(Math.floor(width * ratio), Math.floor(height * ratio));
-    withoutFaders.setSize(
-      Math.floor(width * ratio),
-      Math.floor(height * ratio),
-    );
-    camera.aspect = width / height;
-    camera.updateProjectionMatrix();
-    dirty = true;
-  };
-  new ResizeObserver(resize).observe(canvas);
-  resize();
-
   const focusA = new THREE.Vector3();
   const focusB = new THREE.Vector3();
   const offset = new THREE.Vector3();
   const lightDir = new THREE.Vector3();
   const disc = new THREE.Vector3();
-  let running = false;
 
-  // Draws sample k of the view at s (k = 0 is unjittered) and blends it into
-  // the running average with the given weight.
-  const frameAt = (s: number, time: number, k: number, weight: number) => {
-    const i = Math.min(poses.length - 2, Math.floor(s));
-    // Hold each pose for the first third of its segment, then move.
-    const t = smooth(clamp01((s - i - 0.3) / 0.7));
+  // Draws sample k of segment i at progress t (k = 0 is unjittered) and
+  // blends it into the running average with the given weight.
+  // Poses the scene and camera for sample k of segment i at progress t.
+  const place = (i: number, t: number, k: number) => {
     const a = poses[i];
     const b = poses[i + 1];
 
@@ -794,15 +680,10 @@ export function mountSatellite(
     focusB.copy(centerOf(b.focus, b.lift));
     const focus = focusA.lerp(focusB, t).add(sat.position);
 
-    // Portrait screens can't fit the model as wide, so back off.
-    const fit = Math.max(1, 1.25 / camera.aspect) ** 0.8;
-    const sway = reducedMotion
-      ? 0
-      : Math.sin(time / 2400) * 6 * (1 - t) * +(i === 0);
-    const az = THREE.MathUtils.degToRad(lerp(a.az, b.az, t) + sway);
+    const az = THREE.MathUtils.degToRad(lerp(a.az, b.az, t));
     scene.environmentRotation.y = az;
     const el = THREE.MathUtils.degToRad(lerp(a.el, b.el, t));
-    const dist = lerp(a.dist, b.dist, t) * fit;
+    const dist = lerp(a.dist, b.dist, t);
     offset.set(
       Math.cos(el) * Math.sin(az),
       Math.sin(el),
@@ -823,7 +704,8 @@ export function mountSatellite(
       .normalize();
     key.position.copy(focus).addScaledVector(lightDir, 800);
     key.target.position.copy(focus);
-    const extent = dist * 0.4;
+    // Cover the whole frame, not just one viewport's worth of it.
+    const extent = dist * 0.4 * Math.max(1, height / base);
     Object.assign(key.shadow.camera, {
       left: -extent,
       right: extent,
@@ -834,26 +716,16 @@ export function mountSatellite(
 
     camera.rotateZ(THREE.MathUtils.degToRad(lerp(a.roll, b.roll, t)));
 
-    // Shift the projection so the model sits beside (or below) the copy.
-    const wide = width >= 900;
-    const sideOf = (p: Pose) => +(p.side === true || (wide && !!p.side));
-    const side = lerp(sideOf(a), sideOf(b), t);
-    const shiftX = wide ? side * 0.22 : 0;
-    // The closing chapter is just two buttons, so the model can sit higher.
-    const drop = (p: Pose) => (p.side === false ? 0.1 : 0.25);
-    const shiftY = lerp(lerp(drop(a), drop(b), t), wide ? 0 : -0.2, side);
-    // Sub-pixel jitter, in CSS pixels like the rest of the view offset.
-    const pixel = 1 / renderer.getPixelRatio();
-    const jitterX = k ? (halton(k, 2) - 0.5) * pixel : 0;
-    const jitterY = k ? (halton(k, 3) - 0.5) * pixel : 0;
-    camera.setViewOffset(
-      width,
-      height,
-      -shiftX * width + jitterX,
-      -shiftY * height + jitterY,
-      width,
-      height,
-    );
+    // Sub-pixel jitter.
+    const jitterX = k ? halton(k, 2) - 0.5 : 0;
+    const jitterY = k ? halton(k, 3) - 0.5 : 0;
+    camera.setViewOffset(width, height, jitterX, jitterY, width, height);
+  };
+
+  // Draws sample k (k = 0 is unjittered) and blends it into the running
+  // average with the given weight.
+  const frameAt = (i: number, t: number, k: number, weight: number) => {
+    place(i, t, k);
 
     rollNoise(k);
     renderer.shadowMap.needsUpdate = true;
@@ -865,100 +737,49 @@ export function mountSatellite(
     renderer.setRenderTarget(accumulated);
     accumulate.render(renderer);
     renderer.autoClear = true;
-    output.render(renderer, null!, accumulated, 0, false);
   };
 
-  // Chapter k is fully shown at s = k. Its copy scrolls natively and only
-  // its opacity is set here, from the raw scroll position so it stays in
-  // step with the page.
-  const updateCopy = (s: number) => {
-    chapters.forEach((el, k) => {
-      const d = s - k;
-      const last = k === chapters.length - 1;
-      const opacity =
-        k === 0 && d < 0
-          ? 1
-          : last && d > 0
-            ? 1
-            : 1 - smooth(clamp01((Math.abs(d) - 0.08) / 0.3));
-      el.style.opacity = opacity.toFixed(3);
-    });
-  };
-
-  // Scroll offsets, from the top of the story, at which each chapter's top
-  // reaches the top of the viewport. Measured rather than derived from CSS so
-  // chapters that grow past a screen tall stay in step with their poses.
-  let tops: number[] = [];
-  const measure = () => {
-    const top = story.getBoundingClientRect().top;
-    tops = chapters.map((el) => el.getBoundingClientRect().top - top);
-  };
-  new ResizeObserver(measure).observe(story);
-  measure();
-
-  const target = () => {
-    const scrolled = -story.getBoundingClientRect().top;
-    const last = tops.length - 1;
-    for (let i = 0; i < last; i++) {
-      if (scrolled < tops[i + 1])
-        return i + Math.max(0, scrolled - tops[i]) / (tops[i + 1] - tops[i]);
+  // Corners of everything visible, projected to frame pixels, for measuring
+  // how far the view moves between two poses. Corners off the frame are NaN.
+  const corner = new THREE.Vector3();
+  const box = new THREE.Box3();
+  const project = (i: number, t: number) => {
+    place(i, t, 0);
+    sat.updateMatrixWorld(true);
+    camera.updateMatrixWorld();
+    const points: number[] = [];
+    const objects = [
+      ...Object.values(nodes),
+      ...panels.map((p) => p.mesh),
+      ...frameMeshes,
+    ];
+    for (const o of objects) {
+      const faded = o instanceof THREE.Mesh && materialsOf(o)[0].opacity < 0.05;
+      box.setFromObject(o);
+      for (let c = 0; c < 8; c++) {
+        corner
+          .set(
+            c & 1 ? box.max.x : box.min.x,
+            c & 2 ? box.max.y : box.min.y,
+            c & 4 ? box.max.z : box.min.z,
+          )
+          .project(camera);
+        const x = ((corner.x + 1) / 2) * width;
+        const y = ((1 - corner.y) / 2) * height;
+        const inside = !faded && x >= 0 && x <= width && y >= 0 && y <= height;
+        points.push(inside ? x : NaN, inside ? y : NaN);
+      }
     }
-    return Math.max(0, last);
+    return points;
   };
 
-  // Only draw when something changed (scroll is still easing, or the canvas
-  // or model changed), and then for SAMPLES frames more to refine the still
-  // view. The hero's slow sway moves the camera only a fraction of a pixel
-  // per frame, so it keeps a short moving average of the last few samples.
-  //
-  // While the view moves, each frame is a cheap preview without GTAO. Once it
-  // stops, full-quality samples are averaged on top of the last preview
-  // rather than replacing it, so AO and soft shadows fade in over a few
-  // frames instead of popping; the preview ends up weighted 1 / SAMPLES.
-  const SAMPLES = 32;
-  // Time constant of the camera's easing towards the scroll position, in ms.
-  // Short enough to track the natively scrolling copy; long enough to smooth
-  // out mouse-wheel steps.
-  const EASE = 50;
-  let s = target();
-  let copyAt = NaN;
-  let drawn = NaN;
-  let k = 0;
-  let last = NaN;
-  const tick = (time: number) => {
-    if (!running) return;
-    // Clamp the step so a frame after a stall (or a background tab) doesn't
-    // jump.
-    const dt = Math.min(100, time - last) || 16;
-    last = time;
-    const goal = target();
-    if (goal !== copyAt) updateCopy((copyAt = goal));
-    s =
-      reducedMotion || Math.abs(goal - s) < 1e-4
-        ? goal
-        : s + (goal - s) * (1 - Math.exp(-dt / EASE));
-    const moving = s !== drawn;
-    const swaying = !reducedMotion && s < 1;
-    if (moving || dirty) k = 0;
-    if (k < SAMPLES || swaying) {
-      ao.enabled = !moving;
-      const weight = Math.max(1 / (k + 1), swaying ? 0.2 : 0);
-      frameAt(s, time, k % SAMPLES, weight);
-      drawn = s;
-      dirty = false;
-      k++;
-    }
-    requestAnimationFrame(tick);
+  return {
+    // Renders segment i at progress t, averaging `samples` samples, onto the
+    // canvas.
+    render(i: number, t: number, samples: number) {
+      for (let k = 0; k < samples; k++) frameAt(i, t, k, 1 / (k + 1));
+      output.render(renderer, null!, accumulated, 0, false);
+    },
+    project,
   };
-
-  new IntersectionObserver(([entry]) => {
-    const wasRunning = running;
-    running = entry.isIntersecting;
-    if (running && !wasRunning) {
-      last = NaN;
-      requestAnimationFrame(tick);
-    }
-  }).observe(story);
-
-  updateCopy(s);
 }

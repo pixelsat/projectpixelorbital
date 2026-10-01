@@ -17,7 +17,8 @@ const posts = new Map(
 );
 const post = (slug: string) => ({ href: `/${slug}`, label: posts.get(slug) });
 
-// Each chapter's `id` picks its camera pose in src/scripts/satellite.ts.
+// Each chapter's `id` picks its pose in src/scripts/story.ts; after changing
+// poses or chapters, run `npm run render-frames`.
 const chapters = [
   {
     id: "open",
@@ -62,22 +63,11 @@ const stats = [
   <div class="sticky top-0 h-svh overflow-hidden">
     <canvas class="story-canvas absolute inset-0 size-full" data-story-canvas
     ></canvas>
-
-    <div
-      class="absolute bottom-10 left-1/2 z-10 h-0.5 w-32 -translate-x-1/2 overflow-hidden rounded-full bg-white/15 transition-opacity duration-700"
-      data-story-loading
-    >
-      <div
-        class="h-full w-0 bg-white/60 transition-[width] duration-300"
-        data-story-percent
-      >
-      </div>
-    </div>
   </div>
 
   {
     /* The copy scrolls natively over the sticky canvas. Each chapter's top
-      edge marks where its pose is fully shown (see src/scripts/satellite.ts). */
+      edge marks where its pose is fully shown (see src/scripts/story-player.ts). */
   }
   <div class="relative z-10 -mt-[100svh]">
     <div class="story-chapter" data-chapter="hero" id="top">
@@ -85,14 +75,14 @@ const stats = [
       <div class="story-center story-hero">
         <p class="story-eyebrow">PixelSat I</p>
         <h1 class="story-display">A CubeSat built by high schoolers</h1>
-        <p class="story-lede mx-auto max-w-[62ch] min-[900px]:mx-0">
+        <p class="story-lede mx-auto max-w-[62ch] wide:mx-0">
           Project Pixel Orbital is a fully student-led team at Stanford Online
           High School building PixelSat I, a 3U CubeSat targeting launch into
           sun-synchronous low Earth orbit in early 2027, from scratch, on an
           extremely limited budget.
         </p>
         <div
-          class="mt-6 flex items-center justify-center gap-3 min-[900px]:justify-start"
+          class="mt-6 flex items-center justify-center gap-3 wide:justify-start"
         >
           <OuterLink href={donate} button primary>
             Donate to PixelSat I
@@ -141,7 +131,7 @@ const stats = [
       ))
     }
 
-    <div class="story-chapter story-center" data-chapter="together">
+    <div class="story-chapter story-closing" data-chapter="together">
       <div class="flex flex-wrap justify-center gap-3">
         <OuterLink href={donate} button primary>
           Help fund the hardware
@@ -157,22 +147,14 @@ const stats = [
 </section>
 
 <script>
-  import { mountSatellite } from "../scripts/satellite.ts";
+  import manifest from "../data/story-frames.json";
+  import { mountStory } from "../scripts/story-player.ts";
 
   const story = document.querySelector<HTMLElement>("[data-story]")!;
   const canvas = story.querySelector<HTMLCanvasElement>("[data-story-canvas]")!;
-  const loading = story.querySelector<HTMLElement>("[data-story-loading]")!;
-  const percent = story.querySelector<HTMLElement>("[data-story-percent]")!;
   const chapters = [...story.querySelectorAll<HTMLElement>("[data-chapter]")];
 
-  mountSatellite(
-    canvas,
-    chapters,
-    story,
-    (fraction) => (percent.style.width = `${fraction * 100}%`),
-    () => {
-      loading.style.opacity = "0";
-      canvas.classList.add("is-ready");
-    },
+  mountStory(manifest, canvas, chapters, story, () =>
+    canvas.classList.add("is-ready"),
   );
 </script>

@@ -2,6 +2,8 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Landing from "../components/Landing.astro";
+import manifest from "../data/story-frames.json";
+import { SEQUENCE_MEDIA, frameUrl } from "../scripts/story.ts";
 
 const blogPosts = (await getCollection("blog"))
   .sort(
@@ -17,13 +19,18 @@ const blogPosts = (await getCollection("blog"))
 ---
 
 <BaseLayout>
-  {/* Start the model download alongside the JS bundle instead of after it. */}
-  <link
-    slot="head"
-    rel="preload"
-    href="/models/pixelsat.glb"
-    as="fetch"
-    crossorigin="anonymous"
-  />
+  {/* Fetch the hero frame for this screen alongside the JS bundle. */}
+  {
+    SEQUENCE_MEDIA.map(([sequence, media]) => (
+      <link
+        slot="head"
+        rel="preload"
+        as="image"
+        href={frameUrl(manifest, sequence, 0)}
+        media={media}
+        fetchpriority="high"
+      />
+    ))
+  }
   <Landing blogPosts={blogPosts} />
 </BaseLayout>

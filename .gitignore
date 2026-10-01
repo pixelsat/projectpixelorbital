@@ -6,3 +6,6 @@ dist/
 npm-debug.log*
 .DS_Store
 .idea/
+
+# Interrupted npm run render-frames output
+public/story.partial/

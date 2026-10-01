@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Screens that put the story's copy beside the model rather than above or
+   below it. Keep in step with WIDE_QUERY in src/scripts/story.ts. */
+@custom-variant wide (@media (min-width: 900px) and (min-aspect-ratio: 1/1));
+
 @theme {
   --font-sans: var(--font);
 
@@ -92,7 +96,7 @@
 }
 
 /* Scroll-driven satellite story. Chapters scroll natively over a sticky
-   canvas; src/scripts/satellite.ts poses the model and fades each chapter's
+   canvas; src/scripts/story-player.ts draws pre-rendered frames and fades each chapter's
    opacity from the scroll position. */
 .story-canvas {
   opacity: 0;
@@ -121,6 +125,15 @@
   text-align: center;
 }
 
+/* Buttons along the bottom, so they rise into view below the model rather
+   than scrolling up across it. */
+.story-closing {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 20px 10svh;
+}
+
 .story-side {
   display: flex;
   flex-direction: column;
@@ -128,11 +141,11 @@
 }
 
 .story-copy {
-  padding: 18svh 20px 7svh;
+  padding: 18svh max(20px, calc((100% - 640px) / 2)) 7svh;
   background: linear-gradient(transparent, rgb(0 0 0 / 85%) 30%);
 }
 
-@media (min-width: 900px) {
+@media (min-width: 900px) and (min-aspect-ratio: 1/1) {
   .story-side {
     width: min(440px, 38vw);
     margin-left: max(20px, calc((100vw - 1040px) / 2));
