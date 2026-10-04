@@ -170,10 +170,10 @@ const snapshot = [
         </div>
 
         <div
-          class="relative z-[2] mx-auto flex w-full max-w-[1040px] flex-1 flex-col justify-between gap-12 px-5 pt-26 pb-7 sm:pt-28 sm:pb-10"
+          class="relative z-2 mx-auto flex w-full max-w-260 flex-1 flex-col justify-between gap-12 px-5 pt-26 pb-7 sm:pt-28 sm:pb-10"
         >
           <div
-            class="hero-exit flex max-w-[700px] flex-col items-start gap-5"
+            class="hero-exit flex max-w-175 flex-col items-start gap-5"
             data-hero-text
           >
             <div class="hero-fade" style="--fade-delay: 80ms">
@@ -244,7 +244,7 @@ const snapshot = [
             data-hero-stats
           >
             <div
-              class="hero-fade grid max-w-[720px] grid-cols-3 gap-2 sm:gap-2.5"
+              class="hero-fade grid max-w-180 grid-cols-3 gap-2 sm:gap-2.5"
               style="--fade-delay: 380ms"
             >
               {
@@ -274,7 +274,7 @@ const snapshot = [
         </div>
 
         <div
-          class="hero-scroll-cue absolute bottom-5 left-1/2 z-[4] -translate-x-1/2"
+          class="hero-scroll-cue absolute bottom-5 left-1/2 z-4 -translate-x-1/2"
           aria-hidden="true"
           data-hero-cue
         >
@@ -295,7 +295,7 @@ const snapshot = [
         </div>
 
         <div
-          class="absolute inset-0 z-[5] bg-background opacity-0 pointer-events-none"
+          class="absolute inset-0 z-5 bg-background opacity-0 pointer-events-none"
           aria-hidden="true"
           data-hero-fade
         >
@@ -333,7 +333,7 @@ const snapshot = [
 
           {blogPosts[0] && (
             <CardLink
-              class="min-h-[150px]"
+              class="min-h-37.5"
               href={`/${blogPosts[0].slug}`}
               title={blogPosts[0].title}
               desc={
@@ -345,7 +345,7 @@ const snapshot = [
       )
     }
 
-    <section class="flex flex-col gap-[18px]" data-scroll-reveal>
+    <section class="flex flex-col gap-4.5" data-scroll-reveal>
       <div class="flex flex-col gap-2.5">
         <Text variant="title">In brief</Text>
       </div>
@@ -366,15 +366,15 @@ const snapshot = [
       </div>
     </section>
 
-    <section id="mission" class="flex flex-col gap-[18px]" data-scroll-reveal>
-      <div class="flex flex-col gap-[14px]">
+    <section id="mission" class="flex flex-col gap-4.5" data-scroll-reveal>
+      <div class="flex flex-col gap-3.5">
         <Text variant="title">Mission</Text>
       </div>
 
       <div class="grid gap-3 md:grid-cols-2">
         {
           mission.map((item) => (
-            <article class="rounded-[16px] bg-elevated-3 p-5">
+            <article class="rounded-2xl bg-elevated-3 p-5">
               <Text variant="heading">{item.title}</Text>
               <Text variant="subheading" tone="secondary" class="mt-2">
                 {item.body}
@@ -385,8 +385,8 @@ const snapshot = [
       </div>
     </section>
 
-    <section id="systems" class="flex flex-col gap-[18px]" data-scroll-reveal>
-      <div class="flex flex-col gap-[14px]">
+    <section id="systems" class="flex flex-col gap-4.5" data-scroll-reveal>
+      <div class="flex flex-col gap-3.5">
         <Text variant="title">Technical overview</Text>
       </div>
 
@@ -395,7 +395,7 @@ const snapshot = [
           systems.map((system) => (
             <a
               href={system.link}
-              class="group flex flex-col gap-2.5 rounded-[16px] bg-elevated-3 p-5 transition-colors hover:bg-elevated-5 focus-visible:outline-2 focus-visible:outline-primary"
+              class="group flex flex-col gap-2.5 rounded-2xl bg-elevated-3 p-5 transition-colors hover:bg-elevated-5 focus-visible:outline-2 focus-visible:outline-primary"
             >
               <Text
                 variant="heading"
@@ -427,7 +427,7 @@ const snapshot = [
       </div>
     </section>
 
-    <section id="team" class="flex flex-col gap-[18px]" data-scroll-reveal>
+    <section id="team" class="flex flex-col gap-4.5" data-scroll-reveal>
       <div class="flex items-end justify-between gap-5">
         <Text variant="title">Team</Text>
       </div>
@@ -435,7 +435,7 @@ const snapshot = [
       <div class="grid gap-x-6 gap-y-8 sm:grid-cols-2 md:grid-cols-3">
         {
           team.map((member) => (
-            <article class="flex flex-col gap-[14px]">
+            <article class="flex flex-col gap-3.5">
               {member.image ? (
                 <Picture
                   src={member.image}
@@ -443,12 +443,12 @@ const snapshot = [
                   widths={[320, 640]}
                   sizes="(min-width: 768px) 331px, (min-width: 640px) calc((100vw - 64px) / 2), calc(100vw - 40px)"
                   quality={85}
-                  class="aspect-square w-full rounded-[16px] bg-elevated-10 object-cover object-center"
+                  class="aspect-square w-full rounded-2xl bg-elevated-10 object-cover object-center"
                   alt={member.name}
                   loading="lazy"
                 />
               ) : (
-                <div class="grid aspect-square w-full place-items-center rounded-[16px] bg-elevated-5 text-[42px] font-medium text-primary">
+                <div class="grid aspect-square w-full place-items-center rounded-2xl bg-elevated-5 text-[42px] font-medium text-primary">
                   {member.initials}
                 </div>
               )}
@@ -465,7 +465,7 @@ const snapshot = [
     </section>
 
     <section
-      class="flex flex-col gap-[18px] rounded-[20px] bg-elevated-3 p-6 sm:p-8"
+      class="flex flex-col gap-4.5 rounded-[20px] bg-elevated-3 p-6 sm:p-8"
       data-scroll-reveal
     >
       <Text variant="title">Support us</Text>
