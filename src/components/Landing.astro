@@ -487,6 +487,48 @@ const snapshot = [
         </OuterLink>
       </div>
     </section>
+
+    <section
+      id="newsletter"
+      class="flex flex-col gap-4.5 rounded-[20px] bg-elevated-3 p-6 sm:p-8"
+      data-scroll-reveal
+    >
+      <Text variant="title">Subscribe</Text>
+      <Text variant="subheading" tone="secondary" class="max-w-[72ch]">
+        Get updates on PixelSat I's progress delivered to your inbox.
+      </Text>
+
+      <form
+        method="post"
+        action="https://lists.projectpixelorbital.com/subscription/form"
+        class="listmonk-form flex w-full max-w-120 flex-wrap items-center gap-3"
+      >
+        <input type="hidden" name="nonce" />
+        <input
+          type="hidden"
+          name="l"
+          value="b27e5fbb-cb92-4d7a-b4e6-4e84446fef8b"
+        />
+
+        <label for="newsletter-email" class="sr-only">E-mail</label>
+        <input
+          id="newsletter-email"
+          type="email"
+          name="email"
+          required
+          autocomplete="email"
+          placeholder="E-mail"
+          class="min-h-9.5 min-w-0 flex-1 basis-56 rounded-full bg-elevated-7 px-4 py-2.25 text-[16px] font-medium text-primary placeholder:text-primary/50 transition-colors duration-200 hover:bg-elevated-10 focus-visible:bg-elevated-10 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-primary"
+        />
+
+        <button
+          type="submit"
+          class="inline-flex min-h-9.5 w-fit cursor-pointer items-center gap-1.75 rounded-full bg-blue px-4 py-2.25 text-[16px] font-medium text-white transition-[background-color,transform,opacity] duration-200 will-change-transform hover:bg-blue-hover active:scale-[0.97] active:bg-blue-press focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-primary"
+        >
+          Subscribe
+        </button>
+      </form>
+    </section>
   </main>
 </div>
 
