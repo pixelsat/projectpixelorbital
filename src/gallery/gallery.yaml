@@ -1,0 +1,277 @@
+# Gallery entries. To add a photo:
+#   1. Drop the image file in this folder (src/gallery/).
+#   2. Add an entry below. Order here is the order shown on the page.
+#
+# - image: ./my-photo.jpg          # path relative to this file
+#   caption: What's in the photo.
+#   milestones: [Comms, Antenna]
+#   date: 2026-10-01               # optional
+
+- image: ./a-hand-welded-cell-with.jpg
+  caption: "An initial battery pack design."
+  milestones: [Power]
+  date: 2026-03-12
+  order: 4
+
+- image: ./mechanical-key-switches-newly-arrived.png
+  caption: "E22 400T30D transceivers, newly arrived."
+  milestones: [Comms]
+  date: 2026-05-06
+  order: 6
+
+- image: ./the-redesigned-3u-aluminum-frame.png
+  caption: "The redesigned 3U aluminum frame in CAD."
+  milestones: [Render, Structural]
+  date: 2026-05-30
+  order: 7
+
+- image: ./render-of-the-redesigned-machined.png
+  caption: "Render of the redesigned machined-aluminum frame."
+  milestones: [Render, Structural]
+  date: 2026-05-30
+  order: 8
+
+- image: ./cad-of-the-hand-wound.png
+  caption: "CAD of the magnetorquer bobbins."
+  milestones: [Render, ADCS]
+  date: 2026-06-01
+  order: 9
+
+- image: ./handwritten-notes-on-the-power.jpg
+  caption: "Notes on magnetorquer design."
+  milestones: [ADCS]
+  date: 2026-06-01
+  order: 10
+
+- image: ./the-team-at-a-pixelsat.jpg
+  caption: "The team at an event."
+  milestones: [Team, Outreach]
+  date: 2026-06-05
+  order: 12
+
+- image: ./debugging-the-transceiver-with-the.jpg
+  caption: "Initial transceiver bringup."
+  milestones: [Comms, Software]
+  date: 2026-06-17
+  order: 13
+
+- image: ./serial-output-verifying-a-transceiver.jpg
+  caption: "Initial transceiver bringup."
+  milestones: [Comms, Software]
+  date: 2026-06-17
+  order: 14
+
+- image: ./the-stm32-flight-computer-wired.png
+  caption: "The STM32 flight computer wired up to an arducam."
+  milestones: [Electrical, Camera]
+  date: 2026-06-21
+  order: 16
+
+- image: ./breadboard-wiring-during-avionics-testing.png
+  caption: "Breadboard wiring during camera testing."
+  milestones: [Electrical, Camera]
+  date: 2026-06-24
+  order: 17
+
+- image: ./the-flight-computer-breadboard-with.png
+  caption: "The flight-computer breadboard with its peripherals."
+  milestones: [Electrical, Software]
+  date: 2026-06-24
+  order: 18
+
+- image: ./flight-computer-electronics-under-test.png
+  caption: "Transceiver testing."
+  milestones: [Comms, Electrical]
+  date: 2026-06-24
+  order: 19
+
+- image: ./frame-parts-and-assemblies-laid.jpg
+  caption: "Initial 3d printed frame being assembled."
+  milestones: [Structural]
+  date: 2026-08-04
+  order: 21
+
+- image: ./assembling-the-magnetorquer-and-flight.jpg
+  caption: "Initial 3d printed frame being assembled."
+  milestones: [Structural]
+  date: 2026-08-04
+  order: 22
+
+- image: ./multi-layer-pcb-layout-for.png
+  caption: "MQTT pcb"
+  milestones: [Electrical, Power]
+  date: 2026-08-07
+  order: 23
+
+- image: ./the-power-distribution-board-layout.png
+  caption: "Figuring out mainboard"
+  milestones: [Electrical]
+  date: 2026-08-25
+  order: 24
+
+- image: ./early-pcb-layout-for-the.png
+  caption: "Figuring out mainboard"
+  milestones: [Electrical]
+  date: 2026-08-26
+  order: 25
+
+- image: ./the-mppt-power-board-layout.png
+  caption: "MQTT board"
+  milestones: [Electrical, Power]
+  date: 2026-08-26
+  order: 26
+
+- image: ./the-camera-board-layout-with.png
+  caption: "Power PCB"
+  milestones: [Electrical, Power]
+  date: 2026-08-26
+  order: 27
+
+- image: ./a-revised-main-board-layout.png
+  caption: "More MQTT"
+  milestones: [Electrical, Power]
+  date: 2026-08-26
+  order: 28
+
+- image: ./the-six-layer-main-board.png
+  caption: "Six-layer main-board redesign"
+  milestones: [Electrical]
+  date: 2026-08-26
+  order: 29
+
+- image: ./the-assembled-main-board-stack.png
+  caption: "Mainboard render"
+  milestones: [Render, Electrical]
+  date: 2026-08-26
+  order: 30
+
+- image: ./the-pi-coprocessor-brought-up.png
+  caption: "The Pi coprocessor with an orin."
+  milestones: [Electrical, Software]
+  date: 2026-09-03
+  order: 31
+
+- image: ./3d-printing-the-flatsat-frame.png
+  caption: "3D-printing the flatsat frame."
+  milestones: [Structural]
+  date: 2026-09-05
+  order: 32
+
+- image: ./project-pixel-orbital-mission-pins.jpg
+  caption: "outreach stuff"
+  milestones: [Outreach]
+  date: 2026-09-07
+  order: 33
+
+- image: ./the-ov2640-camera-module-with.jpg
+  caption: "The new Pi camera."
+  milestones: [Camera, Electrical]
+  date: 2026-09-07
+  order: 34
+
+- image: ./a-test-photo-from-the.png
+  caption: "A test photo from the onboard Pi camera."
+  milestones: [Camera]
+  date: 2026-09-08
+  order: 35
+
+- image: ./the-pi-and-flight-computer.png
+  caption: "The Pi and flight computer on a breadboard."
+  milestones: [Electrical, Software]
+  date: 2026-09-08
+  order: 36
+
+- image: ./cad-of-the-aluminum-frame.png
+  caption: "CAD of the aluminum frame."
+  milestones: [Render, Structural]
+  date: 2026-09-11
+  order: 37
+
+- image: ./cad-work-alongside-the-flight.png
+  caption: "Initial transceiver bringup."
+  milestones: [Comms, Software]
+  date: 2026-09-14
+  order: 38
+
+- image: ./the-stm32-nucleo-board-and.png
+  caption: "The STM32 Nucleo board and Pi coprocessor during development."
+  milestones: [Electrical, Software]
+  date: 2026-09-14
+  order: 39
+
+- image: ./an-outreach-poster-for-the.jpg
+  caption: "An outreach poster for the project."
+  milestones: [Outreach]
+  date: 2026-09-15
+  order: 40
+
+- image: ./decoding-the-433-mhz-lora.jpg
+  caption: "Decoding the 433 MHz LoRa link with an SDR and GNU Radio."
+  milestones: [Comms, Ground station]
+  date: 2026-09-17
+  order: 41
+
+- image: ./cad-of-the-magnetorquer-board.png
+  caption: "Render of the power board stack."
+  milestones: [Render, Power]
+  date: 2026-09-19
+  order: 42
+
+- image: ./testing-the-e22-lora-transceiver.jpg
+  caption: "More exploration of the UART E22."
+  milestones: [Comms]
+  date: 2026-09-20
+  order: 43
+
+- image: ./the-burn-wire-mechanism-for.png
+  caption: "Magnetorquers, ferrite core."
+  milestones: [ADCS]
+  date: 2026-09-23
+  order: 44
+
+- image: ./the-uhf-tape-measure-antenna.jpg
+  caption: "UHF tape measure antenna prototype"
+  milestones: [Antenna, Comms]
+  date: 2026-09-23
+  order: 45
+
+- image: ./antenna-deploy-slowmo.png
+  caption: "A still from a slow-motion clip of our antenna prototype deploying violently and uncontrollably."
+  milestones: [Antenna]
+  order: 45.5
+
+- image: ./the-burn-wire-release-on.jpg
+  caption: "UHF tape measure antenna prototype"
+  milestones: [Antenna]
+  date: 2026-09-23
+  order: 46
+
+- image: ./the-deployable-tape-measure-antenna.jpg
+  caption: "UHF tape measure antenna prototype."
+  milestones: [Antenna]
+  date: 2026-09-23
+  order: 47
+
+- image: ./cad-of-the-full-cubesat.png
+  caption: "More magnetorquer renders"
+  milestones: [Render, ADCS]
+  date: 2026-09-23
+  order: 48
+
+- image: ./render-of-the-cubesat-with.png
+  caption: "Render of the CubeSat with its internal stack."
+  milestones: [Render, Structural]
+  date: 2026-09-26
+  order: 49
+
+- image: ./ground-station-link-testing-with.png
+  caption: "Ground-station link testing."
+  milestones: [Ground station, Comms]
+  date: 2026-09-26
+  order: 50
+
+- image: ./x-ray-inspection-of-the.png
+  caption: "X-ray inspection of the mainboard."
+  milestones: [Electrical]
+  date: 2026-09-28
+  order: 51
