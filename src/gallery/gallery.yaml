@@ -104,7 +104,7 @@
   order: 22
 
 - image: ./multi-layer-pcb-layout-for.png
-  caption: "MQTT pcb"
+  caption: "MPPT PCB"
   milestones: [Electrical, Power]
   date: 2026-08-07
   order: 23
@@ -122,7 +122,7 @@
   order: 25
 
 - image: ./the-mppt-power-board-layout.png
-  caption: "MQTT board"
+  caption: "MPPT board"
   milestones: [Electrical, Power]
   date: 2026-08-26
   order: 26
@@ -134,7 +134,7 @@
   order: 27
 
 - image: ./a-revised-main-board-layout.png
-  caption: "More MQTT"
+  caption: "More MPPT"
   milestones: [Electrical, Power]
   date: 2026-08-26
   order: 28

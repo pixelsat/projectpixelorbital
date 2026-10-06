@@ -103,6 +103,7 @@ const pillClass =
           <section
             aria-label="Photos"
             class="columns-1 gap-1 sm:columns-2 md:columns-3"
+            data-gallery-grid
           >
             {items.map((item, i) => {
               const meta = [
@@ -198,6 +199,42 @@ const pillClass =
     "[data-gallery-filters] button",
   );
   const items = document.querySelectorAll<HTMLElement>("[data-gallery-item]");
+  const grid = document.querySelector<HTMLElement>("[data-gallery-grid]");
+  // Tailwind's sm and md breakpoints, matching the columns-* fallback.
+  const twoColumns = matchMedia("(min-width: 640px)");
+  const threeColumns = matchMedia("(min-width: 768px)");
+
+  // CSS columns fill top to bottom, one column at a time, so the order would
+  // read down the page. Instead put each visible photo in the column that is
+  // shortest so far, which keeps the order reading across rows while
+  // balancing the columns. Heights come from each image's width and height
+  // attributes, so this works before the images load.
+  function layout() {
+    if (!grid) return;
+    const count = threeColumns.matches ? 3 : twoColumns.matches ? 2 : 1;
+    const columns = Array.from({ length: count }, () => {
+      const column = document.createElement("div");
+      column.className = "flex min-w-0 flex-1 flex-col";
+      return column;
+    });
+    const heights = columns.map(() => 0);
+    items.forEach((item) => {
+      if (item.hidden) {
+        columns[0].append(item);
+        return;
+      }
+      const img = item.querySelector("img")!;
+      const shortest = heights.indexOf(Math.min(...heights));
+      columns[shortest].append(item);
+      heights[shortest] +=
+        Number(img.getAttribute("height")) / Number(img.getAttribute("width"));
+    });
+    grid.className = "flex items-start gap-1";
+    grid.replaceChildren(...columns);
+  }
+
+  twoColumns.addEventListener("change", layout);
+  threeColumns.addEventListener("change", layout);
 
   function applyFilter(slug: string) {
     if (slug && ![...filters].some((b) => b.dataset.milestone === slug)) {
@@ -214,6 +251,7 @@ const pillClass =
     if (slug) url.searchParams.set("milestone", slug);
     else url.searchParams.delete("milestone");
     history.replaceState(null, "", url);
+    layout();
   }
 
   filters.forEach((b) =>
@@ -230,11 +268,8 @@ const pillClass =
   const viewerCaption = viewer.querySelector<HTMLElement>(
     "[data-gallery-viewer-caption]",
   )!;
-  const openers = [
-    ...document.querySelectorAll<HTMLButtonElement>(
-      "[data-gallery-item] button",
-    ),
-  ];
+  // From items rather than the page, which layout() has reordered by column.
+  const openers = [...items].map((item) => item.querySelector("button")!);
   const viewerMeta = viewer.querySelector<HTMLElement>(
     "[data-gallery-viewer-meta]",
   )!;
