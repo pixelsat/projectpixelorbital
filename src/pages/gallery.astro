@@ -1,0 +1,285 @@
+---
+import { getCollection } from "astro:content";
+import { Picture, getImage } from "astro:assets";
+import SiteHeader from "../components/SiteHeader.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Text from "../components/Text.astro";
+import { formatDate } from "../scripts/date.ts";
+
+const slugify = (s: string) =>
+  s
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+
+const entries = (await getCollection("gallery")).sort(
+  (a, b) => (a.data.order ?? Infinity) - (b.data.order ?? Infinity),
+);
+
+const items = await Promise.all(
+  entries.map(async (entry) => {
+    const { image, caption, milestones, date } = entry.data;
+    const full = await getImage({
+      src: image,
+      width: Math.min(image.width, 2000),
+      format: "webp",
+      quality: 85,
+    });
+    return {
+      image,
+      caption,
+      date,
+      milestones,
+      slugs: milestones.map(slugify),
+      fullSrc: full.src,
+    };
+  }),
+);
+
+const milestones = [
+  ...new Map(
+    items.flatMap((item) => item.milestones.map((m) => [slugify(m), m])),
+  ),
+].map(([slug, name]) => ({
+  slug,
+  name,
+  count: items.filter((item) => item.slugs.includes(slug)).length,
+}));
+
+const pillClass =
+  "inline-flex min-h-[38px] items-center gap-2 rounded-full px-4 py-[9px] text-[16px] font-medium transition-[background-color,color,transform] duration-200 active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-primary bg-elevated-7 text-primary hover:bg-elevated-10 aria-pressed:bg-primary aria-pressed:text-background";
+---
+
+<BaseLayout title="Gallery | Project Pixel Orbital">
+  <div class="min-h-screen">
+    <SiteHeader />
+
+    <main
+      class="mx-auto flex w-[min(1040px,calc(100vw-40px))] flex-col gap-8 py-8 pb-[72px] max-md:pb-14"
+    >
+      <section class="flex flex-col gap-[14px]">
+        <Text variant="display">Gallery</Text>
+      </section>
+
+      {
+        milestones.length > 0 && (
+          <div
+            role="group"
+            aria-label="Filter by milestone"
+            class="flex flex-wrap gap-2"
+            data-gallery-filters
+          >
+            <button
+              type="button"
+              class={pillClass}
+              aria-pressed="true"
+              data-milestone=""
+            >
+              All
+              <span class="opacity-50">{items.length}</span>
+            </button>
+            {milestones.map((m) => (
+              <button
+                type="button"
+                class={pillClass}
+                aria-pressed="false"
+                data-milestone={m.slug}
+              >
+                {m.name}
+                <span class="opacity-50">{m.count}</span>
+              </button>
+            ))}
+          </div>
+        )
+      }
+
+      {
+        items.length === 0 ? (
+          <Text variant="body" tone="tertiary">
+            No photos yet.
+          </Text>
+        ) : (
+          <section
+            aria-label="Photos"
+            class="columns-1 gap-1 sm:columns-2 md:columns-3"
+          >
+            {items.map((item, i) => {
+              const meta = [
+                ...item.milestones,
+                item.date && formatDate(item.date),
+              ]
+                .filter(Boolean)
+                .join(" · ");
+              return (
+                <figure
+                  class="m-0 mb-1 break-inside-avoid"
+                  data-gallery-item
+                  data-milestones={item.slugs.join(" ")}
+                >
+                  <button
+                    type="button"
+                    class="group relative block w-full cursor-zoom-in overflow-hidden rounded-md bg-elevated-3 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                    aria-label={`View image: ${item.caption}`}
+                    data-full={item.fullSrc}
+                    data-caption={item.caption}
+                    data-meta={meta}
+                  >
+                    <Picture
+                      src={item.image}
+                      formats={["avif", "webp"]}
+                      widths={[400, 800]}
+                      sizes="(min-width: 768px) 344px, (min-width: 640px) calc((100vw - 44px) / 2), calc(100vw - 40px)"
+                      quality={80}
+                      alt={item.caption}
+                      loading={i < 6 ? "eager" : "lazy"}
+                      class="block h-auto w-full"
+                    />
+                    <span class="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col gap-0.5 bg-linear-to-t from-black/80 via-black/50 to-transparent px-4 pt-10 pb-3 text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
+                      <span class="text-[15px] leading-snug font-medium text-[#f3f3f3]">
+                        {item.caption}
+                      </span>
+                      {meta && (
+                        <span class="text-[13px] font-medium text-[#f3f3f3]/65">
+                          {meta}
+                        </span>
+                      )}
+                    </span>
+                  </button>
+                </figure>
+              );
+            })}
+          </section>
+        )
+      }
+    </main>
+  </div>
+
+  <dialog
+    class="m-auto max-h-none max-w-none bg-transparent p-0 text-primary backdrop:bg-black/85 backdrop:backdrop-blur-sm"
+    aria-label="Image viewer"
+    data-gallery-viewer
+  >
+    <div
+      class="flex h-svh w-screen flex-col items-center justify-center gap-4 p-5 sm:p-10"
+      data-gallery-viewer-backdrop
+    >
+      <img
+        alt=""
+        class="max-h-[calc(100svh-140px)] max-w-full rounded-2xl object-contain"
+        data-gallery-viewer-image
+      />
+      <div class="flex max-w-[70ch] flex-col gap-1 text-center">
+        <p
+          class="m-0 text-base font-medium text-tertiary"
+          data-gallery-viewer-caption
+        >
+        </p>
+        <p
+          class="m-0 text-sm font-medium text-tertiary opacity-60"
+          data-gallery-viewer-meta
+        >
+        </p>
+      </div>
+    </div>
+    <button
+      type="button"
+      aria-label="Close"
+      class="absolute top-4 right-4 grid size-[38px] place-items-center rounded-full bg-elevated-7 text-xl text-primary transition-colors hover:bg-elevated-10 focus-visible:outline-2 focus-visible:outline-primary"
+      data-gallery-viewer-close
+    >
+      &times;
+    </button>
+  </dialog>
+</BaseLayout>
+
+<script>
+  const filters = document.querySelectorAll<HTMLButtonElement>(
+    "[data-gallery-filters] button",
+  );
+  const items = document.querySelectorAll<HTMLElement>("[data-gallery-item]");
+
+  function applyFilter(slug: string) {
+    if (slug && ![...filters].some((b) => b.dataset.milestone === slug)) {
+      slug = "";
+    }
+    filters.forEach((b) =>
+      b.setAttribute("aria-pressed", String(b.dataset.milestone === slug)),
+    );
+    items.forEach((item) => {
+      const slugs = item.dataset.milestones?.split(" ") ?? [];
+      item.hidden = slug !== "" && !slugs.includes(slug);
+    });
+    const url = new URL(location.href);
+    if (slug) url.searchParams.set("milestone", slug);
+    else url.searchParams.delete("milestone");
+    history.replaceState(null, "", url);
+  }
+
+  filters.forEach((b) =>
+    b.addEventListener("click", () => applyFilter(b.dataset.milestone ?? "")),
+  );
+  applyFilter(new URLSearchParams(location.search).get("milestone") ?? "");
+
+  const viewer = document.querySelector<HTMLDialogElement>(
+    "[data-gallery-viewer]",
+  )!;
+  const viewerImage = viewer.querySelector<HTMLImageElement>(
+    "[data-gallery-viewer-image]",
+  )!;
+  const viewerCaption = viewer.querySelector<HTMLElement>(
+    "[data-gallery-viewer-caption]",
+  )!;
+  const openers = [
+    ...document.querySelectorAll<HTMLButtonElement>(
+      "[data-gallery-item] button",
+    ),
+  ];
+  const viewerMeta = viewer.querySelector<HTMLElement>(
+    "[data-gallery-viewer-meta]",
+  )!;
+  let current = -1;
+
+  function show(index: number) {
+    const opener = openers[index];
+    current = index;
+    viewerImage.src = opener.dataset.full ?? "";
+    viewerImage.alt = opener.dataset.caption ?? "";
+    viewerCaption.textContent = opener.dataset.caption ?? "";
+    viewerMeta.textContent = opener.dataset.meta ?? "";
+  }
+
+  function step(dir: number) {
+    const visible = openers.filter((o) => !o.closest("figure")!.hidden);
+    const pos = visible.indexOf(openers[current]);
+    if (visible.length < 2 || pos === -1) return;
+    const next = visible[(pos + dir + visible.length) % visible.length];
+    show(openers.indexOf(next));
+  }
+
+  openers.forEach((opener, i) =>
+    opener.addEventListener("click", () => {
+      show(i);
+      viewer.showModal();
+    }),
+  );
+
+  viewer.addEventListener("click", (e) => {
+    const target = e.target as HTMLElement;
+    if (
+      target.closest("[data-gallery-viewer-close]") ||
+      target.hasAttribute("data-gallery-viewer-backdrop")
+    ) {
+      viewer.close();
+    }
+  });
+
+  viewer.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight") step(1);
+    if (e.key === "ArrowLeft") step(-1);
+  });
+
+  viewer.addEventListener("close", () => {
+    openers[current]?.focus();
+  });
+</script>
