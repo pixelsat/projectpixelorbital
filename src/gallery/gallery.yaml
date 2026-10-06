@@ -61,12 +61,6 @@
   date: 2026-06-17
   order: 14
 
-- image: ./late-night-avionics-and-transceiver.jpg
-  caption: "Writing drivers IRL."
-  milestones: [Software, Team]
-  date: 2026-06-21
-  order: 15
-
 - image: ./the-stm32-flight-computer-wired.png
   caption: "The STM32 flight computer wired up to an arducam."
   milestones: [Electrical, Camera]
